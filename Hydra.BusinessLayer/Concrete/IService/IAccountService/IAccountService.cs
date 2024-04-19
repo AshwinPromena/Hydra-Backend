@@ -4,7 +4,7 @@ namespace Hydra.BusinessLayer.Repository.IService.IAccountService
 {
     public interface IAccountService
     {
-        Task<ApiResponse> Register(UserModel model);
+        Task<ApiResponse> Register(UserRegisterModel model);
 
         Task<ServiceResponse<LoginResponse>> Login(LoginModel model);
 

@@ -13,40 +13,38 @@ using System.Text;
 
 namespace Hydra.BusinessLayer.Repository.Service.AccountService
 {
-    public class AccountService(HydraContext context, IConfiguration configuration, IUnitOfWork unitOfWork) : IAccountService
+    public class AccountService(IUnitOfWork unitOfWork, IConfiguration configuration) : EncryptionService, IAccountService
     {
-        private readonly HydraContext _context = context;
-        private readonly IConfiguration _configuration = configuration;
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IConfiguration _configuration = configuration;
 
 
-        public async Task<ApiResponse> Register(UserModel model)
+        public async Task<ApiResponse> Register(UserRegisterModel model)
         {
-            var verifyUser = await _unitOfWork.UserRepository.FindByCondition(x => x.Email == model.Email)
-                                                .Include(x => x.Department)
-                                                .Include(x => x.AccessLevel)
-                                                .Include(x => x.UserRole)
-                                                .ThenInclude(x => x.Role).FirstOrDefaultAsync();
-            if (verifyUser == null)
-            {
-                return new(400, ResponseConstants.Exists);
-            }
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.Equals(model.UserName, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefaultAsync();
+            if (user != null)
+                return new(400, ResponseConstants.UserNameExists);
 
-            var user = new User
+            user = new User
             {
                 UserName = model.UserName,
                 Email = model.Email,
                 MobileNumber = model.MobileNumber,
+                Password = Encipher(model.Password),
+                IsActive = true,
+                IsApproved = false,
+                AccessId = model.AccessLevelId,
+                DepartmentId = model.DepartmentId,
+                CreatedDate = DateTime.UtcNow,
+                UpdatedDate = DateTime.UtcNow,
             };
             user.UserRole.Add(new()
             {
-                UserId = user.Id,
                 RoleId = (long)Roles.Staff,
             });
-            user.Password = model.Password;
 
-            _context.Add(user);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.UserRepository.Create(user);
+            await _unitOfWork.UserRepository.CommitChanges();
 
             return new(200, ResponseConstants.Success);
         }
@@ -54,35 +52,38 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ServiceResponse<LoginResponse>> Login(LoginModel model)
         {
-            var verifuUser = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName == model.UserName && x.IsActive == true)
-                                                .Include(x => x.UserRole).ThenInclude(x => x.Role).FirstOrDefaultAsync();
-            if (verifuUser == null)
-            {
-                return new(404, ResponseConstants.InvalidCredential);
-            }
-            if (model.Password == EncryptionService.Decipher(verifuUser.Password))
-            {
-                return new(404, ResponseConstants.InvalidCredential);
-            }
-            var accessToken = AccessToken(verifuUser, verifuUser?.UserRole?.FirstOrDefault()?.Role?.Name, verifuUser?.UserRole?.FirstOrDefault()?.RoleId);
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.Equals(model.UserName, StringComparison.CurrentCultureIgnoreCase) && x.IsActive && x.IsApproved)
+                                                       .Include(x => x.UserRole).ThenInclude(x => x.Role)
+                                                       .FirstOrDefaultAsync();
+            if (user == null)
+                return new(400, ResponseConstants.InvalidUserName);
+            
+            if (Encipher(model.Password) == user.Password)
+                return new(400, ResponseConstants.InvalidPassword);
 
             return new(200, ResponseConstants.Success, new LoginResponse
             {
-                AccessToken = accessToken,
+                AccessToken = AccessToken(user, user.UserRole.FirstOrDefault().Role.Name, user?.UserRole?.FirstOrDefault()?.RoleId),
             });
         }
 
 
         public async Task<ApiResponse> ResetPassword(PasswordResetModel model)
         {
-            var verifyUser = await _unitOfWork.UserRepository.FindByCondition(x => x.Email == model.Email).FirstOrDefaultAsync();
-            verifyUser.Password = EncryptionService.Encipher(model.NewPassword);
-            _context.Update(verifyUser);
-            await _context.SaveChangesAsync();
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.Equals(model.UserName, StringComparison.CurrentCultureIgnoreCase) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
+            if (user == null)
+                return new(400, ResponseConstants.InvalidUserName);
+
+            user.Password = Encipher(model.Password);
+
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.UserRepository.CommitChanges();
 
             return new(200, ResponseConstants.Password);
         }
 
+
+        #region Account Service Helpers
 
         protected string AccessToken(User appUser, string roles, long? roleId)
         {
@@ -96,14 +97,17 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                 {
                     new(ClaimTypes.Email, appUser.Email),
                     new(ClaimTypes.NameIdentifier, $"{appUser.Id}"),
+                    new("userName",appUser.UserName),
                     new("roles", roles),
                     new("roleId", roleId.ToString())
                 }),
-                Expires = DateTime.Now.AddYears(1),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        #endregion
     }
 }

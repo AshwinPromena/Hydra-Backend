@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hydra.Common.Models
 {
-    public class UserModel
+    public class UserRegisterModel
     {
         [JsonProperty("userName")]
         public string UserName { get; set; }
@@ -51,18 +51,13 @@ namespace Hydra.Common.Models
 
     public class PasswordResetModel
     {
-        [JsonProperty("email")]
-        [Required(ErrorMessage = "Email is required.")]
-        public string Email { get; set; }
+        [JsonProperty("userName")]
+        [Required(ErrorMessage = "UesrName is required.")]
+        public string UserName { get; set; }
 
-        [JsonProperty("newPassword")]
-        [Required(ErrorMessage = "New password is required.")]
+        [JsonProperty("password")]
+        [Required(ErrorMessage = "Password is required.")]
         [RegularExpression("^(?!\\s*$).+", ErrorMessage = "New password cannot be empty.")]
-        public string NewPassword { get; set; }
-
-        [JsonProperty("confirmPassword")]
-        [Required(ErrorMessage = "Confirm password is required.")]
-        [RegularExpression("^(?!\\s*$).+", ErrorMessage = "Confirm password cannot be empty.")]
-        public string ConfirmPassword { get; set; }
+        public string Password { get; set; }
     }
 }

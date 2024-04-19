@@ -9,7 +9,17 @@
         public const string NotExists = "User with these credentials does not exists";
         public const string NotFound = "No content";
         public const string BadRequest = "Bad request";
-        public const string Password = "Password has been changed Successfully";
+
+        #endregion
+
+        #region Account Services Responses
+
+        public const string UserNameExists = "UserName already exists";
+        public const string InvalidUserName = "Invalid username";
+        public const string InvalidPassword = "Invalid password";
+        public const string Password = "Password has been changed successfully";
+
+
         #endregion
 
         #region LearnerResponseContants
