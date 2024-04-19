@@ -17,7 +17,7 @@ namespace Hydra.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -31,9 +31,9 @@ namespace Hydra.Database.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("AccessLevelName")
+                    b.Property<string>("Name")
                         .HasColumnType("longtext")
-                        .HasColumnName("access_level_name");
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
@@ -391,9 +391,9 @@ namespace Hydra.Database.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("AccessId")
+                    b.Property<long>("AccessLevelId")
                         .HasColumnType("bigint")
-                        .HasColumnName("access_id");
+                        .HasColumnName("access_level_id");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)")
@@ -453,7 +453,7 @@ namespace Hydra.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccessId");
+                    b.HasIndex("AccessLevelId");
 
                     b.HasIndex("DepartmentId");
 
@@ -612,7 +612,7 @@ namespace Hydra.Database.Migrations
                 {
                     b.HasOne("Hydra.Database.Entities.AccessLevel", "AccessLevel")
                         .WithMany("User")
-                        .HasForeignKey("AccessId")
+                        .HasForeignKey("AccessLevelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

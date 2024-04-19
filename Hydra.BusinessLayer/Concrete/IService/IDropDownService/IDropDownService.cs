@@ -3,8 +3,8 @@ namespace Hydra.BusinessLayer.Repository.IService.IDropDownService
 {
     public interface IDropDownService
     {
-        Task<ServiceResponse<List<DepartmentModel>>> GetAllDepartment();
+        Task<PagedResponse<List<DepartmentModel>>> GetAllDepartment(PagedResponseInput model);
 
-        Task<ServiceResponse<List<AccessLevelModel>>> GetAllAccessLevel();
+        Task<PagedResponse<List<AccessLevelModel>>> GetAllAccessLevel(PagedResponseInput model);
     }
 }

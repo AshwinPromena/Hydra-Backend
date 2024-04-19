@@ -21,7 +21,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ApiResponse> Register(UserRegisterModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.Equals(model.UserName, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefaultAsync();
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower())).FirstOrDefaultAsync();
             if (user != null)
                 return new(400, ResponseConstants.UserNameExists);
 
@@ -33,7 +33,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                 Password = Encipher(model.Password),
                 IsActive = true,
                 IsApproved = false,
-                AccessId = model.AccessLevelId,
+                AccessLevelId = model.AccessLevelId,
                 DepartmentId = model.DepartmentId,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
@@ -52,13 +52,13 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ServiceResponse<LoginResponse>> Login(LoginModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.Equals(model.UserName, StringComparison.CurrentCultureIgnoreCase) && x.IsActive && x.IsApproved)
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved)
                                                        .Include(x => x.UserRole).ThenInclude(x => x.Role)
                                                        .FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
             
-            if (Encipher(model.Password) == user.Password)
+            if (Encipher(model.Password) != user.Password)
                 return new(400, ResponseConstants.InvalidPassword);
 
             return new(200, ResponseConstants.Success, new LoginResponse
@@ -70,7 +70,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ApiResponse> ResetPassword(PasswordResetModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.Equals(model.UserName, StringComparison.CurrentCultureIgnoreCase) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
 

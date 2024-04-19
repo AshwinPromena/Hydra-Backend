@@ -47,10 +47,10 @@ namespace Hydra.Database.Entities
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
 
-        [Column("access_id")]
-        public long AccessId { get; set; }
+        [Column("access_level_id")]
+        public long AccessLevelId { get; set; }
 
-        [ForeignKey("AccessId")]
+        [ForeignKey("AccessLevelId")]
         [InverseProperty("User")]
         public virtual AccessLevel AccessLevel { get; set; }
 

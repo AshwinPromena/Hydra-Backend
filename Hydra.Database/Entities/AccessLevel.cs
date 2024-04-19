@@ -15,8 +15,8 @@ namespace Hydra.Database.Entities
         [Column("id")]
         public long Id { get; set; }
 
-        [Column("access_level_name")]
-        public string AccessLevelName { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
 
         [InverseProperty("AccessLevel")]
