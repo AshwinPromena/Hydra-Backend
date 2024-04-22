@@ -54,6 +54,8 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
         {
             var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved)
                                                        .Include(x => x.UserRole).ThenInclude(x => x.Role)
+                                                       .Include(i => i.AccessLevel)
+                                                       .Include(i => i.Department)
                                                        .FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
@@ -63,7 +65,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
             return new(200, ResponseConstants.Success, new LoginResponse
             {
-                AccessToken = AccessToken(user, user.UserRole.FirstOrDefault().Role.Name, user?.UserRole?.FirstOrDefault()?.RoleId),
+                AccessToken = AccessToken(user),
             });
         }
 
@@ -85,7 +87,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         #region Account Service Helpers
 
-        protected string AccessToken(User appUser, string roles, long? roleId)
+        protected string AccessToken(User appUser)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JwtOptions:SecurityKey"));
@@ -98,8 +100,13 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                     new(ClaimTypes.Email, appUser.Email),
                     new(ClaimTypes.NameIdentifier, $"{appUser.Id}"),
                     new("userName",appUser.UserName),
-                    new("roles", roles),
-                    new("roleId", roleId.ToString())
+                    new("roles", $"{appUser.UserRole.FirstOrDefault().Role.Name}"),
+                    new("roleId", $"{appUser.UserRole.FirstOrDefault().RoleId}"),
+                    new("accessLevelId",$"{appUser.AccessLevelId}"),
+                    new("accessLevel", $"{appUser.AccessLevel.Name}"),
+                    new("departmentId", $"{appUser.DepartmentId}"),
+                    //new("department",$"{appUser.Department.Name}"),
+                    new("profilePicture",$"{appUser.ProfilePicture}")
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
