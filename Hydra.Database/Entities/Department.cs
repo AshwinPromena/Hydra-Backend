@@ -16,18 +16,18 @@ namespace Hydra.Database.Entities
         [Column("id")]
         public long Id { get; set; }
 
-        [Column("department_name")]
+        [Column("name")]
         [MaxLength(100)]
-        public string DepartmentName { get; set; }
+        public string Name { get; set; }
 
         [Column("created_date")]
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [Column("updated_date")]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
 
         [Column("is_active")]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         [InverseProperty("Department")]
         public virtual ICollection<User> User { get; set; }

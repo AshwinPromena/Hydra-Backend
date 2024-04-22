@@ -15,24 +15,18 @@ namespace Hydra.Database.Entities
         [Column("id")]
         public long Id { get; set; }
 
-        [Column("sequence_name")]
-        public string SequenceName { get; set; }
+        [Column("name")]
+        [MaxLength(100)]
+        public string Name { get; set; }
 
         [Column("created_date")]
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [Column("updated_date")]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
 
         [Column("is_active")]
-        public bool IsActive { get; set; }
-
-        [Column("user_id")]
-        public long UserId { get; set; }
-
-        [ForeignKey("UserId")]
-        [InverseProperty("BadgeSequence")]
-        public virtual User User { get; set; }
+        public bool IsActive { get; set; } = true;
 
         [InverseProperty("BadgeSequence")]
         public virtual ICollection<Badge> Badge { get; set; }

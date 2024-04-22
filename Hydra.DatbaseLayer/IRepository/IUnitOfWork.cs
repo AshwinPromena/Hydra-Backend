@@ -13,5 +13,7 @@
         ILearnerRepository LearnerRepository { get; }
 
         IAccessLevelRepository AccessLevelRepository { get; }
+
+        IBadgeSequenceRepository BadgeSequenceRepository { get; }
     }
 }

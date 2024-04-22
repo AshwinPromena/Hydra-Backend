@@ -16,16 +16,16 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
             var data = await _unitOfWork.DepartmentRepository
                                         .FindByCondition(x => x.IsActive)
                                         .Where(x => string.IsNullOrEmpty(model.SearchString) ||
-                                                   (x.DepartmentName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
+                                                   (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
                                         .GroupBy(x => 1)
                                         .Select(x => new PagedResponseOutput<List<DepartmentModel>>
                                         {
                                             TotalCount = x.Count(),
-                                            Data = x.OrderBy(x => x.DepartmentName)
+                                            Data = x.OrderBy(x => x.Name)
                                                     .Select(s => new DepartmentModel
                                                     {
                                                         DepartmentId = s.Id,
-                                                        DepartmentName = s.DepartmentName
+                                                        DepartmentName = s.Name
                                                     }).Skip(model.PageSize * (model.PageIndex - 1))
                                                       .Take(model.PageSize)
                                                       .ToList()
