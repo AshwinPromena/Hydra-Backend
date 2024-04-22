@@ -62,6 +62,12 @@ namespace Hydra.Common.Models
 
         [JsonProperty("totalRecords")]
         public long TotalRecords { get; set; }
+
+        [JsonProperty("statusCode")]
+        public long StatusCode { get; set; }
+
+        [JsonProperty("message")]
+        public string Message { get; set; }
     }
 
     public class PagedResponseOutput<T>

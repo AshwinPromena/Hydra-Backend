@@ -10,7 +10,6 @@ namespace Hydra.Database.Entities
         {
             UserRole = new HashSet<UserRole>();
             Badge = new HashSet<Badge>();
-            BadgeSequence = new HashSet<BadgeSequence>();
             BadgeMedia = new HashSet<BadgeMedia>();
             BadgeField = new HashSet<BadgeField>();
             LearnerBadge = new HashSet<LearnerBadge>();
@@ -81,9 +80,6 @@ namespace Hydra.Database.Entities
 
         [InverseProperty("User")]
         public virtual ICollection<Badge> Badge { get; set; }
-
-        [InverseProperty("User")]
-        public virtual ICollection<BadgeSequence> BadgeSequence { get; set; }
 
         [InverseProperty("User")]
         public virtual ICollection<BadgeMedia> BadgeMedia { get; set; }

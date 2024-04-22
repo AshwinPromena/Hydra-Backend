@@ -18,5 +18,7 @@ namespace Hydra.DatbaseLayer.Repository
         public IAccessLevelRepository AccessLevelRepository => new AccessLevelRepository(_context);
 
         public IDepartmentRepository DepartmentRepository => new DepartmentRepository(_context);
+
+        public IBadgeSequenceRepository BadgeSequenceRepository => new BadgeSequenceRepository(_context);
     }
 }

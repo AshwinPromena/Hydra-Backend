@@ -1,3 +1,5 @@
+using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
+using Hydra.BusinessLayer.Concrete.Service.BadgeService;
 using Hydra.BusinessLayer.Repository.IService.IAccountService;
 using Hydra.BusinessLayer.Repository.IService.IDropDownService;
 using Hydra.BusinessLayer.Repository.IService.ILearnerService;
@@ -97,6 +99,9 @@ builder.Services.AddScoped<IDropDownService, DropDownService>();
 builder.Services.AddScoped<IStorageservice, StorageService>();
 builder.Services.AddScoped<ILearnerManagmentService, LearnerManagmentService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDepartmentServices, DepartmentServices>();
+builder.Services.AddScoped<IBadgeSequenceService, BadgeSequenceService>();
+builder.Services.AddScoped<IBadgeSequenceService, BadgeSequenceService>();
 
 builder.Services.AddSwaggerGen();
 
