@@ -8,6 +8,10 @@ namespace Hydra.BusinessLayer.Repository.IService.IAccountService
 
         Task<ServiceResponse<LoginResponse>> Login(LoginModel model);
 
-        Task<ApiResponse> ResetPassword(PasswordResetModel model);
+        Task<ApiResponse> ForgotPassword(ForgotPasswordModel model);
+
+        Task<ApiResponse> ResetPassword(ResetPasswordModel model);
+
+        Task<ApiResponse> ReSendOtp(ForgotPasswordModel model);
     }
 }

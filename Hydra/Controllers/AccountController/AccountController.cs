@@ -1,5 +1,6 @@
 ﻿using Hydra.BusinessLayer.Repository.IService.IAccountService;
 using Hydra.BusinessLayer.Repository.IService.IDropDownService;
+using Hydra.Common.Globle;
 using Hydra.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,11 +31,29 @@ namespace Hydra.Controllers.AccountController
 
 
         [HttpPost("[action]")]
-        public async Task<ApiResponse> ResetPassword(PasswordResetModel model)
+        public async Task<ApiResponse> ForgotPassword(ForgotPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+            return await _accountService.ForgotPassword(model);
+        }
+
+
+        [HttpPost("[action]")]
+        public async Task<ApiResponse> ResetPassword(ResetPasswordModel model)
         {
             if (!ModelState.IsValid)
                 return new(400, ResponseConstants.BadRequest);
             return await _accountService.ResetPassword(model);
+        }
+
+
+        [HttpPost("[action]")]
+        public async Task<ApiResponse> ReSendOtp(ForgotPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+            return await _accountService.ReSendOtp(model);
         }
     }
 }

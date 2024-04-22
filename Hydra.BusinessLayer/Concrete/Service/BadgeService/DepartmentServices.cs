@@ -1,4 +1,5 @@
 ﻿using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
+using Hydra.Common.Globle;
 using Hydra.Common.Models;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;

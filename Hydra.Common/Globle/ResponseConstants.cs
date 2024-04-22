@@ -1,8 +1,9 @@
-﻿namespace Hydra.Common.Models
+﻿namespace Hydra.Common.Globle
 {
     public class ResponseConstants
-    { 
+    {
         #region common Responses
+
         public const string Success = "Success";
         public const string InvalidCredential = "Invalid credentials";
         public const string Exists = "User with these credentials exists";
@@ -18,6 +19,9 @@
         public const string InvalidUserName = "Invalid username";
         public const string InvalidPassword = "Invalid password";
         public const string Password = "Password has been changed successfully";
+        public const string PasswordResetOtpSent = "Password reset OTP sent to email";
+        public const string InvalidOtp = "Invalid OTP";
+        public const string OtpExpired = "OTP expired";
 
         #endregion
 
@@ -40,7 +44,6 @@
         public const string InvalidBadgeSequenceId = "Invalid badge sequence id.";
 
         #endregion
-
 
         #region LearnerResponseContants
         public const string LearnerExists = "Learners with credentials already exists";

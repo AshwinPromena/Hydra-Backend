@@ -28,7 +28,6 @@ namespace Hydra.Common.Models
         public string Password { get; set; }
     }
 
-
     public class LoginModel
     {
         [JsonProperty("userName")]
@@ -41,23 +40,28 @@ namespace Hydra.Common.Models
         public string Password { get; set; }
     }
 
-
     public class LoginResponse
     {
         [JsonProperty("accessToken")]
         public string AccessToken { get; set; }
     }
 
-
-    public class PasswordResetModel
+    public class ForgotPasswordModel
     {
         [JsonProperty("userName")]
         [Required(ErrorMessage = "UesrName is required.")]
         public string UserName { get; set; }
+    }
 
+    public class ResetPasswordModel : ForgotPasswordModel
+    {
         [JsonProperty("password")]
         [Required(ErrorMessage = "Password is required.")]
         [RegularExpression("^(?!\\s*$).+", ErrorMessage = "New password cannot be empty.")]
         public string Password { get; set; }
+
+        [JsonProperty("otp")]
+        [Required(ErrorMessage = "OTP is required.")]
+        public string Otp { get; set; }
     }
 }

@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Hydra.BusinessLayer\Hydra.BusinessLayer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Templates\PasswordResetOtp.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

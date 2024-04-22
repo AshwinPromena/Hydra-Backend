@@ -75,6 +75,13 @@ namespace Hydra.Database.Entities
         [Column("last_name")]
         public string LastName { get; set; }
 
+        [Column("password_reset_otp")]
+        public string PasswordResetOtp { get; set; }
+
+        [Column("otp_expiry_date")]
+
+        public DateTime? OtpExpiryDate { get; set; }
+
         [InverseProperty("User")]
         public virtual ICollection<UserRole> UserRole { get; set; }
 

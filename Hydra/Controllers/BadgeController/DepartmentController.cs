@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.EMMA;
 using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
 using Hydra.BusinessLayer.Concrete.Service.BadgeService;
+using Hydra.Common.Globle;
 using Hydra.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

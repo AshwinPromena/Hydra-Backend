@@ -2,6 +2,7 @@
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
+using Hydra.Common.Repository.IService;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +14,13 @@ using System.Text;
 
 namespace Hydra.BusinessLayer.Repository.Service.AccountService
 {
-    public class AccountService(IUnitOfWork unitOfWork, IConfiguration configuration) : EncryptionService, IAccountService
+    public class AccountService(IUnitOfWork unitOfWork, IConfiguration configuration, IEmailService emailService) : EncryptionService, IAccountService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
         private readonly IConfiguration _configuration = configuration;
 
+        private readonly IEmailService _emailService = emailService;
 
         public async Task<ApiResponse> Register(UserRegisterModel model)
         {
@@ -49,7 +52,6 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             return new(200, ResponseConstants.Success);
         }
 
-
         public async Task<ServiceResponse<LoginResponse>> Login(LoginModel model)
         {
             var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved)
@@ -69,12 +71,38 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             });
         }
 
-
-        public async Task<ApiResponse> ResetPassword(PasswordResetModel model)
+        public async Task<ApiResponse> ForgotPassword(ForgotPasswordModel model)
         {
             var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
+            try
+            {
+                user.PasswordResetOtp = await _emailService.SendPasswordResetOTP(user.Email, user.UserName);
+                user.OtpExpiryDate = DateTime.UtcNow.AddMinutes(10);
+
+                _unitOfWork.UserRepository.Update(user);
+                await _unitOfWork.UserRepository.CommitChanges();
+
+                return new(200, ResponseConstants.PasswordResetOtpSent);
+            }
+            catch(Exception ex)
+            {
+                return new(400, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse> ResetPassword(ResetPasswordModel model)
+        {
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
+            if (user == null)
+                return new(400, ResponseConstants.InvalidUserName);
+
+            if (user.PasswordResetOtp != model.Otp)
+                return new(400, ResponseConstants.InvalidOtp);
+
+            if (user.OtpExpiryDate <= DateTime.UtcNow)
+                return new(400, ResponseConstants.OtpExpired);
 
             user.Password = Encipher(model.Password);
 
@@ -82,6 +110,27 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             await _unitOfWork.UserRepository.CommitChanges();
 
             return new(200, ResponseConstants.Password);
+        }
+
+        public async Task<ApiResponse> ReSendOtp(ForgotPasswordModel model) 
+        {
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
+            if (user == null)
+                return new(400, ResponseConstants.InvalidUserName);
+            try
+            {
+                user.PasswordResetOtp = await _emailService.SendPasswordResetOTP(user.Email, user.UserName);
+                user.OtpExpiryDate = DateTime.UtcNow.AddMinutes(10);
+
+                _unitOfWork.UserRepository.Update(user);
+                await _unitOfWork.UserRepository.CommitChanges();
+
+                return new(200, ResponseConstants.PasswordResetOtpSent);
+            }
+            catch (Exception ex)
+            {
+                return new(400, ex.Message);
+            }
         }
 
 
@@ -105,7 +154,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                     new("accessLevelId",$"{appUser.AccessLevelId}"),
                     new("accessLevel", $"{appUser.AccessLevel.Name}"),
                     new("departmentId", $"{appUser.DepartmentId}"),
-                    //new("department",$"{appUser.Department.Name}"),
+                    new("department",$"{appUser.Department.Name}"),
                     new("profilePicture",$"{appUser.ProfilePicture}")
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),

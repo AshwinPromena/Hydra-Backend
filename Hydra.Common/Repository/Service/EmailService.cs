@@ -1,4 +1,5 @@
-﻿using Hydra.Common.Models;
+﻿using Hydra.Common.Globle;
+using Hydra.Common.Models;
 using Hydra.Common.Repository.IService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -14,13 +15,24 @@ namespace Hydra.Common.Repository.Service
         private readonly IHostEnvironment _environment = environment;
 
 
-        public async Task<string> PasswordResetTemplate(string email)
+        public async Task<string> SendPasswordResetOTP(string email, string userName)
         {
             string Otp = GenerateOtp(4);
-            string template = await ReadTemplate("PasswordResetOtp.html");
-            string content = template.Replace("{Otp}", Otp);
-            await SendMail(email, "OTP to Reset You Password", content);
+            string template = await ReadTemplate(TemplateConstatnt.PasswordResetOtpTemplate);
+            string content = template.Replace(ReplaceStringConstant.Otp, Otp).Replace(ReplaceStringConstant.UserName, userName);
+            await SendMail(email, TemplateSubjectConstant.PasswordResetOtpTemplateSubject, content);
             return Otp;
+        }
+
+        public async Task<string> ReadTemplate(string templateName)
+        {
+            var pathToFile = $"{_environment.ContentRootPath}{Path.DirectorySeparatorChar}Templates{Path.DirectorySeparatorChar}{templateName}";
+            string builder = "";
+            using (StreamReader reader = File.OpenText(pathToFile))
+            {
+                builder = await reader.ReadToEndAsync();
+            }
+            return builder;
         }
 
         public async Task<ApiResponse> SendMail(string email, string subject, string content, List<string> attachments = null)
@@ -58,19 +70,6 @@ namespace Hydra.Common.Repository.Service
                 return new(500, ex.Message);
             }
         }
-
-
-        public async Task<string> ReadTemplate(string templateName)
-        {
-            var pathToFile = $"{_environment.ContentRootPath}{Path.DirectorySeparatorChar}EmailTemplates{Path.DirectorySeparatorChar}{templateName}";
-            string builder = "";
-            using (StreamReader reader = File.OpenText(pathToFile))
-            {
-                builder = await reader.ReadToEndAsync();
-            }
-            return builder;
-        }
-
 
         public string GenerateOtp(int Length)
         {
