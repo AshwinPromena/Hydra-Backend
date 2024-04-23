@@ -11,7 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hydra.Common", "Hydra.Commo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hydra.BusinessLayer", "Hydra.BusinessLayer\Hydra.BusinessLayer.csproj", "{A5796CDB-84C7-435E-8C7D-E38516B7E2D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hydra.DatbaseLayer", "Hydra.DatbaseLayer\Hydra.DatbaseLayer.csproj", "{F3705CA1-3B12-494F-B1E8-CE3B457D1B29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hydra.DatbaseLayer", "Hydra.DatbaseLayer\Hydra.DatbaseLayer.csproj", "{F3705CA1-3B12-494F-B1E8-CE3B457D1B29}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9819DD46-9F1C-402D-8A34-C1D60405C1E4}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
