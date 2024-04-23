@@ -5,7 +5,14 @@ namespace Hydra.Common.Models
 {
     public class UserRegisterModel
     {
+        [JsonProperty("firstName")]
+        public string FirstName { get; set; } = string.Empty;
+
+        [JsonProperty("lastName")]
+        public string LastName { get; set; } = string.Empty;
+
         [JsonProperty("userName")]
+        [Required(ErrorMessage = "UserName is required.")]
         public string UserName { get; set; }
 
         [JsonProperty("email")]
@@ -17,9 +24,11 @@ namespace Hydra.Common.Models
         public string MobileNumber { get; set; }
 
         [JsonProperty("departmentId")]
+        [Required(ErrorMessage = "Department is required")]
         public long DepartmentId { get; set; }
 
         [JsonProperty("acccessLevelId")]
+        [Required(ErrorMessage = "Access level is required")]
         public long AccessLevelId { get; set; }
 
         [JsonProperty("password")]

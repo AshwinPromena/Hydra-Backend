@@ -31,6 +31,8 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             user = new User
             {
                 UserName = model.UserName,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
                 Email = model.Email,
                 MobileNumber = model.MobileNumber,
                 Password = Encipher(model.Password),
