@@ -7,10 +7,9 @@ namespace Hydra.Controllers.LearnerController
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LearnerManagmentController(ILearnerManagmentService learnerManagmentService, IStorageservice storageservice) : ControllerBase
+    public class LearnerManagmentController(ILearnerManagmentService learnerManagmentService) : ControllerBase
     {
         private readonly ILearnerManagmentService _learnerManagmentService = learnerManagmentService;
-        private readonly IStorageservice _storageservice = storageservice;
 
 
         //[HttpPost("[action]")]

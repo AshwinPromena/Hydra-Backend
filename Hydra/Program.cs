@@ -1,5 +1,7 @@
 using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
+using Hydra.BusinessLayer.Concrete.IService.IStaffService;
 using Hydra.BusinessLayer.Concrete.Service.BadgeService;
+using Hydra.BusinessLayer.Concrete.Service.StaffService;
 using Hydra.BusinessLayer.Repository.IService.IAccountService;
 using Hydra.BusinessLayer.Repository.IService.IDropDownService;
 using Hydra.BusinessLayer.Repository.IService.ILearnerService;
@@ -93,15 +95,16 @@ builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IDropDownService, DropDownService>();
-builder.Services.AddScoped<IStorageservice, StorageService>();
-builder.Services.AddScoped<ILearnerManagmentService, LearnerManagmentService>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IDepartmentServices, DepartmentServices>();
-builder.Services.AddScoped<IBadgeSequenceService, BadgeSequenceService>();
-builder.Services.AddScoped<IBadgeSequenceService, BadgeSequenceService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<IDropDownService, DropDownService>();
+builder.Services.AddTransient<IStorageService, StorageServices>();
+builder.Services.AddTransient<ILearnerManagmentService, LearnerManagmentService>();
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddTransient<IDepartmentServices, DepartmentServices>();
+builder.Services.AddTransient<IBadgeSequenceService, BadgeSequenceService>();
+builder.Services.AddTransient<IBadgeSequenceService, BadgeSequenceService>();
+builder.Services.AddTransient<IStaffService, StaffServices>();
 
 builder.Services.AddSwaggerGen();
 

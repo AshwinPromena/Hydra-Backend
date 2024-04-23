@@ -1,271 +1,136 @@
-﻿using DocumentFormat.OpenXml;
+﻿using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Hydra.Common.Globle;
+using Hydra.Common.Models;
 using Hydra.Common.Repository.IService;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Hydra.Common.Repository.Service
 {
-    public class StorageService(HydraContext context, IUnitOfWork unitOfWork) : IStorageservice
+    public class StorageServices(IConfiguration configuration) : FileExtentionService, IStorageService
     {
-        private readonly HydraContext _context = context;
-        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IConfiguration _configuration = configuration;
 
+        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.APSouth1;
 
-        //public async Task<ServiceResponse<List<string>>> UploadExcelFile(IFormFile file)
-        //{
-        //    List<string> existingLearners = new List<string>();
-        //    System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-        //    using (var memoryStream = new MemoryStream())
-        //    {
-        //        await file.CopyToAsync(memoryStream);
-        //        ExcelDataReader.IExcelDataReader reader;
-        //        reader = ExcelDataReader.ExcelReaderFactory.CreateReader(memoryStream);
+        private static int MAX_FILE_SIZE = 1024 * 1024 * 70; // 70 MB
 
-        //        var conf = new ExcelDataSetConfiguration
-        //        {
-        //            ConfigureDataTable = _ => new ExcelDataTableConfiguration
-        //            {
-        //                UseHeaderRow = true
-        //            }
-        //        };
-        //        var dataSet = reader.AsDataSet(conf);
-        //        var dataTable = dataSet.Tables[0];
-        //        var json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
-        //        List<LearnerBadge> learnerData = JsonConvert.DeserializeObject<List<LearnerBadge>>(json);
-        //        //foreach (var data in learnerData)
-        //        //{
-        //        //    var verifyLearner = await _context.Learner.Where(x => x.Email == data.Email).FirstOrDefaultAsync();
-        //        //    if (verifyLearner != null)
-        //        //    {
-        //        //        existingLearners.Add(data.Email);
-        //        //    }
-        //        //    await _context.Learner.AddAsync(data);
-        //        //    await _context.SaveChangesAsync();
-        //        //}
-        //        var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(l => learnerData.Select(s => s.Email).Contains(l.Email)).Select(s => s.Email).ToListAsync();
-        //        var newLearners = learnerData.Where(data => !verifyLearner.Contains(data.Email)).ToList();
-        //        await _context.Learner.AddRangeAsync(newLearners);
-        //        await _context.SaveChangesAsync();
+        private static string[] EXTENSION_LOWER_CASE = new string[] { "pdf", "jpg", "png", "jpeg", "gif", "mp4", "webp", "txt" };
 
-        //        existingLearners = verifyLearner;
-        //        if (existingLearners.Count > 0)
-        //        {
-        //            return new ServiceResponse<List<string>>
-        //            {
-        //                Data = existingLearners,
-        //                Message = ResponseConstants.LearnerExists,
-        //                StatusCode = 409,
-        //            };
-
-        //        }
-        //        else
-        //        {
-        //            return new(200, ResponseConstants.LearnersAdded);
-        //        }
-        //    }
-        //}
-
-
-        //public async Task<string> DownloadSampleExcelFile()
-        //{
-        //    var data = await _context.Learner.ToListAsync();
-
-        //    List<Dictionary<string, string>> convertedList = new List<Dictionary<string, string>>();
-
-        //    foreach (var order in data)
-        //    {
-        //        Dictionary<string, string> convertedDict = new Dictionary<string, string>();
-
-        //        var orderProperties = order.GetType().GetProperties();
-        //        foreach (var prop in orderProperties)
-        //        {
-        //            string key = prop.Name;
-        //            string value = prop.GetValue(order, null)?.ToString() ?? "";
-        //            convertedDict.Add(key, value);
-        //        }
-        //        convertedList.Add(convertedDict);
-        //    }
-        //    var excelString = string.Empty;
-
-        //    excelString = DownloadExcelFromJson(convertedList);
-
-        //    return excelString;
-        //}
-
-
-        public string DownloadExcelFromJson(List<Dictionary<string, string>> jsonData, string reportName = null, string reportDescription = null, string fromDate = null, string toDate = null)
+        private string GenerateS3Path(string path, string fileName)
         {
-            MemoryStream mem = new MemoryStream();
-
-            using (SpreadsheetDocument document = SpreadsheetDocument.Create(mem, SpreadsheetDocumentType.Workbook))
-            {
-                WorkbookPart workbookPart = document.AddWorkbookPart();
-                workbookPart.Workbook = new Workbook();
-
-                WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-                worksheetPart.Worksheet = new Worksheet(new SheetData());
-
-                Sheets sheets = document.WorkbookPart.Workbook.AppendChild(new Sheets());
-                Sheet sheet = new Sheet { Id = document.WorkbookPart.GetIdOfPart(worksheetPart), SheetId = 1, Name = "Sheet1" };
-                sheets.Append(sheet);
-                Worksheet_Style(document);
-
-                SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
-
-                int currentRowIndex = 1;
-
-                int lastHeaderColumnIndex = jsonData.FirstOrDefault().Keys.Count() - 1;
-
-                if (!string.IsNullOrEmpty(reportName))
-                {
-                    AppendToSheet(sheetData, reportName, currentRowIndex++, lastHeaderColumnIndex);
-                }
-
-                if (!string.IsNullOrEmpty(reportDescription))
-                {
-                    AppendToSheet(sheetData, reportDescription, currentRowIndex++, lastHeaderColumnIndex);
-                }
-
-                sheetData.AppendChild(new Row());
-                currentRowIndex++;
-
-                var headerRow = new Row();
-                foreach (var columnName in jsonData.FirstOrDefault().Keys)
-                {
-                    var cell = new Cell() { DataType = CellValues.String, CellValue = new CellValue(columnName) };
-                    cell.StyleIndex = 1;
-                    headerRow.AppendChild(cell);
-                }
-                sheetData.AppendChild(headerRow);
-                currentRowIndex++;
-
-
-                foreach (var row in jsonData)
-                {
-                    var dataRow = new Row();
-                    foreach (var column in row.Values)
-                    {
-                        var cell = new Cell() { DataType = CellValues.String, CellValue = new CellValue(column) };
-                        cell.StyleIndex = 2;
-                        dataRow.AppendChild(cell);
-                    }
-                    sheetData.AppendChild(dataRow);
-                    currentRowIndex++;
-                }
-
-
-                string printedDateTime = $"PrintedDate - {DateTime.Now.ToString("dd/MM/yyyy hh:mm tt")} - ";
-                var footerRow = new Row();
-                for (var i = 1; i < jsonData.FirstOrDefault().Keys.Count(); i++)
-                {
-                    footerRow.AppendChild(new Cell() { DataType = CellValues.String, CellValue = new CellValue(string.Empty) });
-                }
-                var dateTimeCell = new Cell() { DataType = CellValues.String, CellValue = new CellValue(printedDateTime) };
-                dateTimeCell.StyleIndex = 1;
-                footerRow.AppendChild(dateTimeCell);
-                sheetData.AppendChild(footerRow);
-
-                worksheetPart.Worksheet.Save();
-                workbookPart.Workbook.Save();
-            }
-
-            byte[] byteArray = mem.ToArray();
-            string temp_inBase64 = Convert.ToBase64String(byteArray);
-            return temp_inBase64;
+            var key = $"{path}/{Guid.NewGuid()}{Path.GetExtension(fileName).ToLower()}";
+            return key;
         }
 
-
-        private void AppendToSheet(SheetData sheetData, string value, int rowIndex, int mergeCount)
+        private bool ValidateFilesSize(IFormFile file)
         {
-            var titleRow = new Row();
-            var titleCell = new Cell() { DataType = CellValues.String, CellValue = new CellValue(value) };
-
-            string mergeReference = $"A{rowIndex}:{GetCellRef(mergeCount)}{rowIndex}";
-
-            MergeCells mergeCells = sheetData.Descendants<MergeCells>().FirstOrDefault();
-            if (mergeCells == null)
-            {
-                mergeCells = new MergeCells();
-                sheetData.InsertAfter(mergeCells, sheetData.Descendants<SheetFormatProperties>().FirstOrDefault());
-            }
-
-            mergeCells.AppendChild(new MergeCell() { Reference = new StringValue(mergeReference) });
-            titleCell.StyleIndex = 3;
-            titleRow.AppendChild(titleCell);
-            sheetData.AppendChild(titleRow);
+            return file == null ? false : file.Length > MAX_FILE_SIZE ? false : true;
         }
 
-
-        private string GetCellRef(int count)
+        private bool IsExtensionsAvailable(string extension)
         {
-            if (count < 1)
-            {
-                throw new ArgumentOutOfRangeException("count", "Count must be positive and non-zero.");
-            }
-
-            string cellRef = string.Empty;
-            while (count > 0)
-            {
-                count--; // Decrementing count to make it 0-based
-                cellRef = (char)('A' + (count % 26)) + cellRef;
-                count /= 26;
-            }
-            return cellRef;
+            return EXTENSION_LOWER_CASE.Contains(extension) ? false : true;
         }
 
-
-        private static WorkbookStylesPart Worksheet_Style(SpreadsheetDocument document)
+        public async Task<ServiceResponse<string>> UploadFile(string path, IFormFile file)
         {
-            WorkbookStylesPart create_style = document.WorkbookPart.AddNewPart<WorkbookStylesPart>();
-            Fonts fonts = new Fonts(
-            new Font(),
-            new Font(new Bold()),
-            new Font()
-            );
+            try
+            {
+                using IAmazonS3 client = new AmazonS3Client(_configuration.GetConnectionString("AccessKey"), _configuration.GetConnectionString("SecretKey"), bucketRegion);
+                if (file == null)
+                    return new ServiceResponse<string>(StatusCodes.Status400BadRequest,"File was null", null);
 
-            Fills fills = new Fills(new Fill());
-            Borders borders = new Borders(
-                new Border(),
-                new Border()
+                if (ValidateFilesSize(file) == false)
+                    return new ServiceResponse<string>(StatusCodes.Status413RequestEntityTooLarge, "Entity Too Large", null);
+
+                if (IsExtensionsAvailable(file.FileName.Split(".")[1]))
+                    return new ServiceResponse<string>(StatusCodes.Status406NotAcceptable, "Not Acceptable", null);
+
+                var filetransferutility = new TransferUtility(client);
+                var filePath = GenerateS3Path(path, file.FileName);
+                using (var fileStream = file.OpenReadStream())
                 {
-                    LeftBorder = new LeftBorder()
-                    {
-                        Style = BorderStyleValues.Thin,
-                        Color = new Color() { Indexed = (UInt32Value)64U },
-
-                    },
-                    RightBorder = new RightBorder()
-                    {
-                        Style = BorderStyleValues.Thin,
-                        Color = new Color() { Indexed = (UInt32Value)64U },
-
-                    },
-                    BottomBorder = new BottomBorder()
-                    {
-                        Style = BorderStyleValues.Thin,
-                        Color = new Color() { Indexed = (UInt32Value)64U },
-
-                    },
-                    TopBorder = new TopBorder()
-                    {
-                        Style = BorderStyleValues.Thin,
-                        Color = new Color() { Indexed = (UInt32Value)64U },
-
-                    }
+                    await filetransferutility.UploadAsync(fileStream, _configuration.GetConnectionString("BucketName"), filePath);
+                }
+                await client.PutACLAsync(new PutACLRequest
+                {
+                    BucketName = _configuration.GetConnectionString("BucketName"),
+                    CannedACL = S3CannedACL.PublicReadWrite,
+                    Key = filePath
                 });
+                return new ServiceResponse<string>(StatusCodes.Status200OK, "", $"{_configuration.GetConnectionString("AWSBasePath")}{filePath}");
 
-            CellFormats cellFormats = new CellFormats(
-                new CellFormat(),
-                new CellFormat { FontId = 1, FillId = 0, BorderId = 1, Alignment = new Alignment { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center } },
-                new CellFormat { FontId = 2, FillId = 0, BorderId = 1, Alignment = new Alignment { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center } },
-                new CellFormat { FontId = 1, FillId = 0, BorderId = 0, Alignment = new Alignment { Horizontal = HorizontalAlignmentValues.Center, Vertical = VerticalAlignmentValues.Center } }
-            );
-            create_style.Stylesheet = new Stylesheet(fonts, fills, borders, cellFormats);
-            create_style.Stylesheet.Save();
+            }
+            catch (AmazonS3Exception e)
+            {
+                return new ServiceResponse<string>(StatusCodes.Status500InternalServerError, e.Message, null);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResponse<string>(StatusCodes.Status500InternalServerError, e.Message, null);
+            }
+        }
 
-            return create_style;
+        public async Task<ServiceResponse<string>> UploadFile(string path, string file)
+        {
+            try
+            {
+                byte[] inBytes = Convert.FromBase64String(file);
+                var stream = new MemoryStream(inBytes);
+                Random random = new Random();
+                var fileName = random.Next(100000, 199999).ToString();
+
+                using IAmazonS3 client = new AmazonS3Client(_configuration.GetConnectionString("AccessKey"), _configuration.GetConnectionString("SecretKey"), bucketRegion);
+                var filetransferutility = new TransferUtility(client);
+                var extension = GetExtension(file[..5]);
+                var filePath = GenerateS3Path(path, $"{fileName}{extension}");
+                await filetransferutility.UploadAsync(stream, _configuration.GetConnectionString("BucketName"), filePath);
+                await client.PutACLAsync(new PutACLRequest
+                {
+                    BucketName = _configuration.GetConnectionString("BucketName"),
+                    CannedACL = S3CannedACL.PublicRead,
+                    Key = filePath
+                });
+                return new ServiceResponse<string>(StatusCodes.Status200OK, "", $"{_configuration.GetConnectionString("AWSBasePath")}{filePath}");
+            }
+            catch (AmazonS3Exception e)
+            {
+                return new ServiceResponse<string>(StatusCodes.Status500InternalServerError, e.Message, null);
+            }
+            catch (Exception e)
+            {
+                return new ServiceResponse<string>(StatusCodes.Status500InternalServerError, e.Message, null);
+            }
+        }
+
+        public async Task<ApiResponse> DeleteFile(string path)
+        {
+            if (path is null)
+                return new ApiResponse(400,"Path cannot be null");
+            using IAmazonS3 client = new AmazonS3Client(_configuration.GetConnectionString("AccessKey"), _configuration.GetConnectionString("SecretKey"), bucketRegion);
+            DeleteObjectRequest request = new()
+            {
+                BucketName = _configuration.GetConnectionString("BucketName"),
+                Key = path
+            };
+            try
+            {
+                var abc = await client.DeleteObjectAsync(request);
+            }
+            catch (AmazonS3Exception ex)
+            {
+
+            }
+            return new ApiResponse(200, "Successfully Removed");
         }
     }
 }

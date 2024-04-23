@@ -13,6 +13,12 @@
 
         #endregion
 
+        #region Document Responses
+
+        public const string Mediapath = "hydra/media";
+
+        #endregion
+
         #region Account Service Responses
 
         public const string UserNameExists = "UserName already exists";
@@ -44,6 +50,16 @@
         public const string InvalidBadgeSequenceId = "Invalid badge sequence id.";
 
         #endregion
+
+        #region Staff Service Responses
+
+        public const string StaffAdded = "Staff member added successfully.";
+        public const string StaffUpdated = "Staff member updated successfully.";
+        public const string StaffDeleted = "Staff member removed successfully.";
+        public const string InvalidUserId = "Invalid user id";
+
+        #endregion
+
 
         #region LearnerResponseContants
         public const string LearnerExists = "Learners with credentials already exists";
