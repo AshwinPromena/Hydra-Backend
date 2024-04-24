@@ -105,6 +105,7 @@ builder.Services.AddTransient<IDepartmentServices, DepartmentServices>();
 builder.Services.AddTransient<IBadgeSequenceService, BadgeSequenceService>();
 builder.Services.AddTransient<IBadgeSequenceService, BadgeSequenceService>();
 builder.Services.AddTransient<IStaffService, StaffServices>();
+builder.Services.AddTransient<IBadgeService, BadgeService>();
 
 builder.Services.AddSwaggerGen();
 

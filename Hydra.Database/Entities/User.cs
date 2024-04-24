@@ -9,12 +9,9 @@ namespace Hydra.Database.Entities
         public User()
         {
             UserRole = new HashSet<UserRole>();
-            Badge = new HashSet<Badge>();
-            BadgeMedia = new HashSet<BadgeMedia>();
-            BadgeField = new HashSet<BadgeField>();
             LearnerBadge = new HashSet<LearnerBadge>();
             LearnerBadgeIssuedBy = new HashSet<LearnerBadge>();
-            BadgeApproval = new HashSet<BadgeApproval>();
+            Badge = new HashSet<Badge>();
         }
 
         [Key]
@@ -36,12 +33,6 @@ namespace Hydra.Database.Entities
         [Column("mobile_number")]
         [MaxLength(10)]
         public string MobileNumber { get; set; }
-
-        [Column("created_date")]
-        public DateTime CreatedDate { get; set; }
-
-        [Column("updated_date")]
-        public DateTime UpdatedDate { get; set; }
 
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
@@ -79,20 +70,16 @@ namespace Hydra.Database.Entities
         public string PasswordResetOtp { get; set; }
 
         [Column("otp_expiry_date")]
-
         public DateTime? OtpExpiryDate { get; set; }
+
+        [Column("created_date")]
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        [Column("updated_date")]
+        public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
 
         [InverseProperty("User")]
         public virtual ICollection<UserRole> UserRole { get; set; }
-
-        [InverseProperty("User")]
-        public virtual ICollection<Badge> Badge { get; set; }
-
-        [InverseProperty("User")]
-        public virtual ICollection<BadgeMedia> BadgeMedia { get; set; }
-
-        [InverseProperty("User")]
-        public virtual ICollection<BadgeField> BadgeField { get; set; }
 
         [InverseProperty("User")]
         public virtual ICollection<LearnerBadge> LearnerBadge { get; set; }
@@ -100,7 +87,7 @@ namespace Hydra.Database.Entities
         [InverseProperty("IssuedUser")]
         public virtual ICollection<LearnerBadge> LearnerBadgeIssuedBy { get; set; }
 
-        [InverseProperty("User")]
-        public virtual ICollection<BadgeApproval> BadgeApproval { get; set; }
+        [InverseProperty("ApprovalUser")]
+        public virtual ICollection<Badge> Badge { get; set; }
     }
 }

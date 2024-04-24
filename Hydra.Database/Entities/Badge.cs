@@ -8,18 +8,16 @@ namespace Hydra.Database.Entities
     {
         public Badge()
         {
-            BadgeMedia = new HashSet<BadgeMedia>();
             BadgeField = new HashSet<BadgeField>();
             LearnerBadge = new HashSet<LearnerBadge>();
-            BadgeApproval = new HashSet<BadgeApproval>();
         }
 
         [Key]
         [Column("id")]
         public long Id { get; set; }
 
-        [Column("badge_name")]
-        public string BadgeName { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
         [Column("department_id")]
         public long DepartmentId { get; set; }
@@ -34,39 +32,45 @@ namespace Hydra.Database.Entities
         [Column("expiration_date")]
         public DateTime ExpirationDate { get; set; }
 
-        [Column("badge_description")]
-        public string BadgeDescription { get; set; }
+        [Column("description")]
+        public string Description { get; set; }
 
-        [Column("sequence_id")]
-        public long SequenceId { get; set; }
+        [Column("badge_sequence_id")]
+        public long? BadgeSequenceId { get; set; }
 
-        [ForeignKey("SequenceId")]
+        [ForeignKey("BadgeSequenceId")]
         [InverseProperty("Badge")]
         public virtual BadgeSequence BadgeSequence { get; set; }
 
+        [Column("image")]
+        public string Image { get; set; }
+
+        [Column("approvalUserId")]
+        public long? ApprovalUserId { get; set; }
+
+        [ForeignKey("ApprovalUserId")]
+        [InverseProperty("Badge")]
+        public virtual User ApprovalUser { get; set; }
+
         [Column("requires_approval")]
-        public bool RequiresApproval { get; set; }
+        public bool RequiresApproval { get; set; } = false;
 
         [Column("is_approved")]
-        public bool IsApproved { get; set; }
+        public bool IsApproved { get; set; } = true;
 
-        [Column("user_id")]
-        public long UserId { get; set; }
+        [Column("is_active")]
+        public bool IsActive { get; set; } = true;
 
-        [ForeignKey("UserId")]
-        [InverseProperty("Badge")]
-        public virtual User User { get; set; }
+        [Column("created_date")]
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        [InverseProperty("Badge")]
-        public virtual ICollection<BadgeMedia> BadgeMedia { get; set; }
+        [Column("updated_date")]
+        public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
 
         [InverseProperty("Badge")]
         public virtual ICollection<BadgeField> BadgeField { get; set; }
 
         [InverseProperty("Badge")]
         public virtual ICollection<LearnerBadge> LearnerBadge { get; set; }
-
-        [InverseProperty("Badge")]
-        public virtual ICollection<BadgeApproval> BadgeApproval { get; set; }
     }
 }

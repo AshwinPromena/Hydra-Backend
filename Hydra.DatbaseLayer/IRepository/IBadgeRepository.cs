@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hydra.DatbaseLayer.IRepository
 {
-    public interface IBadgeSequenceRepository : ICommonRepository<BadgeSequence> 
+    public interface IBadgeRepository : ICommonRepository<Badge>
     {
-        Task DeleteBadgeFields(long badgeId);
     }
 }

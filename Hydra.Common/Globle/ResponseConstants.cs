@@ -60,6 +60,16 @@
 
         #endregion
 
+        #region Badge Service Responses 
+
+        public const string BadgeExists = "Badge already exists.";
+        public const string ApprovedBadgeAdded = "Badge added successfully.";
+        public const string RequiresApprovalBadgeAdded = "";
+        public const string BadgeUpdated = "Badge updated successfully.";
+        public const string BadgeDeleted = "Badge removed successfully.";
+        public const string InvalidBadgeId = "Invalid badge id";
+
+        #endregion
 
         #region LearnerResponseContants
         public const string LearnerExists = "Learners with credentials already exists";

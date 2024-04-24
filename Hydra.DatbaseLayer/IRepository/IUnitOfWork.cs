@@ -15,5 +15,7 @@
         IAccessLevelRepository AccessLevelRepository { get; }
 
         IBadgeSequenceRepository BadgeSequenceRepository { get; }
+
+        IBadgeRepository BadgeRepository { get; }
     }
 }

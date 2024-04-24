@@ -17,23 +17,16 @@ namespace Hydra.Database.Entities
         [InverseProperty("BadgeField")]
         public virtual Badge Badge { get; set; }
 
-        [Column("field_content")]
-        public string FieldContent { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
+
+        [Column("content")]
+        public string Content { get; set; }
 
         [Column("type")]
         public int Type { get; set; }
 
         [Column("type_name")]
         public string TypeName { get; set; }
-
-        [Column("field_name")]
-        public string FieldName { get; set; }
-
-        [Column("user_id")]
-        public long UserId { get; set; }
-
-        [ForeignKey("UserId")]
-        [InverseProperty("BadgeField")]
-        public virtual User User { get; set; }
     }
 }
