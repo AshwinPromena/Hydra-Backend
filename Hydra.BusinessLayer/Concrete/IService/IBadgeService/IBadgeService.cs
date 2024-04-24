@@ -18,5 +18,7 @@ namespace Hydra.BusinessLayer.Concrete.IService.IBadgeService
         Task<ServiceResponse<GetBadgeModel>> GetBadgeById(long badgeId);
 
         Task<PagedResponse<List<GetBadgeModel>>> GetAllBadges(PagedResponseInput model);
+
+        Task<ApiResponse> AssignBadges(AssignBadgeModel model);
     }
 }

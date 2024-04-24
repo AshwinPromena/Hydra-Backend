@@ -156,7 +156,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                     new("accessLevelId",$"{appUser.AccessLevelId}"),
                     new("accessLevel", $"{appUser.AccessLevel.Name}"),
                     new("departmentId", $"{appUser.DepartmentId}"),
-                    new("department",$"{appUser.Department.Name}"),
+                    new("department",$"{appUser.Department?.Name}"),
                     new("profilePicture",$"{appUser.ProfilePicture}")
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),

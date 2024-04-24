@@ -63,8 +63,8 @@
         #region Badge Service Responses 
 
         public const string BadgeExists = "Badge already exists.";
-        public const string ApprovedBadgeAdded = "Badge added successfully.";
-        public const string RequiresApprovalBadgeAdded = "";
+        public const string ApprovedBadgeAdded = "{BadgeName} badge is now live and ready to issue. Issue this badge to learner now.";
+        public const string RequiresApprovalBadgeAdded = "{BadgeName} badge will be live once other admin approve it.";
         public const string BadgeUpdated = "Badge updated successfully.";
         public const string BadgeDeleted = "Badge removed successfully.";
         public const string InvalidBadgeId = "Invalid badge id";

@@ -40,7 +40,7 @@ namespace Hydra.Common.Models
         public string LastName { get; set; }
 
         [JsonProperty("profilePicture")]
-        public IFormFile ProfilePicture { get; set; }
+        public string ProfilePicture { get; set; }
     }
 
     public class UpdateStaffModel : AddStaffModel
@@ -74,8 +74,5 @@ namespace Hydra.Common.Models
 
         [JsonProperty("departmentName")]
         public string DepartmentName { get; set; }
-
-        [JsonProperty("profilePicture")]
-        public new string ProfilePicture { get; set; }
     }
 }

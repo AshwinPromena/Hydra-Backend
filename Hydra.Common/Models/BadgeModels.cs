@@ -42,8 +42,6 @@ namespace Hydra.Common.Models
 
         [JsonProperty("competencies")]
         public List<BadgeFieldModel> Competencies { get; set; }
-
-
     }
 
     public class BadgeFieldModel
@@ -83,6 +81,45 @@ namespace Hydra.Common.Models
 
         [JsonProperty("isApproved")]
         public bool IsApproved { get; set; }
+
+        [JsonProperty("createdDate")]
+        public DateTime CreatedDate { get; set; }
+
+        [JsonProperty("updatedDate")]
+        public DateTime UpdatedDate { get; set; }
+    }
+
+    public class AssignBadgeModel
+    {
+        [JsonProperty("userIds")]
+        public List<long> UserIds { get; set; }
+
+        [JsonProperty("badges")]
+        public List<long> BadgeIds { get; set;}
+    }
+
+    public class BadgeSequenceOutputModel
+    {
+        [JsonProperty("sequenceId")]
+        public long SequenceId { get; set; }
+
+        [JsonProperty("sequenceName")]
+        public string SequenceName { get; set; }
+
+        [JsonProperty("createdDate")]
+        public DateTime CreatedDate { get; set; }
+
+        [JsonProperty("updatedDate")]
+        public DateTime UpdatedDate { get; set; }
+    }
+
+    public class DepartmentOutputModel
+    {
+        [JsonProperty("departmentId")]
+        public long DepartmentId { get; set; }
+
+        [JsonProperty("departmentName")]
+        public string DepartmentName { get; set; }
 
         [JsonProperty("createdDate")]
         public DateTime CreatedDate { get; set; }

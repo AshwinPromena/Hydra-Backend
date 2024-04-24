@@ -37,8 +37,9 @@ namespace Hydra.Database.Entities
         {
             modelBuilder.Entity<Role>().HasData(
             new Role { Id = 1, Name = "Admin" },
-            new Role { Id = 2, Name = "Learner" },
-            new Role { Id = 3, Name = "Staff" });
+            new Role { Id = 2, Name = "UniversityAdmin" },
+            new Role { Id = 3, Name = "Staff" },
+            new Role { Id = 4, Name = "Learner" });
         }
 
         public static void SeedUserRoleMasterData(ModelBuilder modelBuilder)

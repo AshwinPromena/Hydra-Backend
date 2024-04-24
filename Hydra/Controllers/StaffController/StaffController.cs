@@ -16,7 +16,7 @@ namespace Hydra.Controllers.StaffController
         private readonly IStaffService _staffService = staffService;
 
         [HttpPost("[action]")]
-        public async Task<ApiResponse> AddStaff([FromForm]AddStaffModel model)
+        public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
             if (!ModelState.IsValid)
                 return new (400, ResponseConstants.BadRequest);
@@ -25,7 +25,7 @@ namespace Hydra.Controllers.StaffController
         }
 
         [HttpPost("[action]")]
-        public async Task<ApiResponse> UpdateStaff([FromForm]UpdateStaffModel model)
+        public async Task<ApiResponse> UpdateStaff(UpdateStaffModel model)
         {
             if (!ModelState.IsValid)
                 return new (400, ResponseConstants.BadRequest);
@@ -64,18 +64,7 @@ namespace Hydra.Controllers.StaffController
         public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(PagedResponseInput model, bool isArchived)
         {
             if (!ModelState.IsValid)
-                return new PagedResponse<List<GetStaffModel>>()
-                {
-                    Data = [],
-                    PageIndex = model.PageIndex,
-                    PageSize = model.PageSize,
-                    SearchString = model.SearchString,
-                    TotalRecords = 0,
-                    HasNextPage = false,
-                    HasPreviousPage = false,
-                    StatusCode = 400,
-                    Message = ResponseConstants.BadRequest
-                };
+                return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
 
             return await _staffService.GetAllStaff(model, isArchived);
         }

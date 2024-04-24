@@ -127,20 +127,4 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             };
         }
     }
-
-    public class BadgeSequenceOutputModel
-    {
-        [JsonProperty("sequenceId")]
-        public long SequenceId { get; set; }
-
-        [JsonProperty("sequenceName")]
-        public string SequenceName { get; set; }
-
-        [JsonProperty("createdDate")]
-        public DateTime CreatedDate { get; set; }
-
-        [JsonProperty("updatedDate")]
-        public DateTime UpdatedDate { get; set; }
-    }
-
 }

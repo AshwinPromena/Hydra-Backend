@@ -126,19 +126,4 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             };
         }
     }
-
-    public class DepartmentOutputModel
-    {
-        [JsonProperty("departmentId")]
-        public long DepartmentId { get; set; }
-
-        [JsonProperty("departmentName")]
-        public string DepartmentName { get; set; }
-
-        [JsonProperty("createdDate")]
-        public DateTime CreatedDate { get; set; }
-
-        [JsonProperty("updatedDate")]
-        public DateTime UpdatedDate { get; set; }
-    }
 }

@@ -2,11 +2,6 @@
 
 namespace Hydra.Common.Models
 {
-    public class LearnerModel
-    {
-
-    }
-
     public class AddLearnerModel
     {
         [JsonProperty("firstName")]

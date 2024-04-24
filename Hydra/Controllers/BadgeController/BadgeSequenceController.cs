@@ -55,18 +55,7 @@ namespace Hydra.Controllers.BadgeController
         public async Task<PagedResponse<List<BadgeSequenceOutputModel>>> GetAllBadgeSequences(PagedResponseInput model)
         {
             if (!ModelState.IsValid)
-                return new PagedResponse<List<BadgeSequenceOutputModel>>()
-                {
-                    Data = [],
-                    PageIndex = model.PageIndex,
-                    PageSize = model.PageSize,
-                    SearchString = model.SearchString,
-                    TotalRecords = 0,
-                    HasNextPage = false,
-                    HasPreviousPage = false,
-                    StatusCode = 400,
-                    Message = ResponseConstants.BadRequest
-                };
+                return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
 
             return await _badgeSequenceService.GetAllBadgeSequences(model);
         }

@@ -47,7 +47,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 RoleId = (long)Roles.Staff,
             });
 
-            if (model.ProfilePicture != null)
+            if (!string.IsNullOrEmpty(model.ProfilePicture))
                 user.ProfilePicture = _storageService.UploadFile(ResponseConstants.Mediapath, model.ProfilePicture).Result.Data;
             
             await _unitOfWork.UserRepository.Create(user);
@@ -75,9 +75,9 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             user.DepartmentId = model.DepartmentId;
             user.UpdatedDate = DateTime.UtcNow;
 
-            if (model.ProfilePicture != null)
+            if (!string.IsNullOrEmpty(model.ProfilePicture))
             {
-                if (user.ProfilePicture != null)
+                if (!string.IsNullOrEmpty(user.ProfilePicture))
                     await _storageService.DeleteFile(user.ProfilePicture);
                 user.ProfilePicture = _storageService.UploadFile(ResponseConstants.Mediapath, model.ProfilePicture).Result.Data;
             }

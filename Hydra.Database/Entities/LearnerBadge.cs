@@ -25,10 +25,10 @@ namespace Hydra.Database.Entities
         public virtual Badge Badge { get; set; }
 
         [Column("created_date")]
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [Column("updated_date")]
-        public DateTime UpdatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
 
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
@@ -41,6 +41,6 @@ namespace Hydra.Database.Entities
         public virtual User IssuedUser { get; set; }
 
         [Column("is_revoked")]
-        public bool IsRevoked { get; set; }
+        public bool IsRevoked { get; set; } = false;
     }
 }

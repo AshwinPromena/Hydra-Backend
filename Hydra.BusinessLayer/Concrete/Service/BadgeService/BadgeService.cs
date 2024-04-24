@@ -3,6 +3,7 @@ using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
 using Hydra.Common.Repository.IService;
+using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,11 +14,13 @@ using System.Threading.Tasks;
 
 namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
 {
-    public class BadgeService(IUnitOfWork unitOfWork, IStorageService storageService) : IBadgeService
+    public class BadgeService(IUnitOfWork unitOfWork, IStorageService storageService, ICurrentUserService currentUserService) : IBadgeService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         private readonly IStorageService _storageService = storageService;
+
+        private readonly ICurrentUserService _currentUserService = currentUserService;
 
         public async Task<ApiResponse> AddBadge(AddBadgeModel model)
         {
@@ -55,15 +58,15 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 TypeName = FieldType.Competencies.ToString()
             }));
 
-            if (model.BadgeImage != null)
+            if (!string.IsNullOrEmpty(model.BadgeImage))
                 badge.Image = _storageService.UploadFile(ResponseConstants.Mediapath, model.BadgeImage).Result.Data;
 
             await _unitOfWork.BadgeRepository.Create(badge);
             await _unitOfWork.BadgeRepository.CommitChanges();
 
             return new(200, model.IsRequiresApproval 
-                           ? ResponseConstants.RequiresApprovalBadgeAdded 
-                           : ResponseConstants.ApprovedBadgeAdded);
+                           ? ResponseConstants.RequiresApprovalBadgeAdded.Replace("{BadgeName}",badge.Name)
+                           : ResponseConstants.ApprovedBadgeAdded.Replace("{BadgeName}", badge.Name));
         }
 
         public async Task<ApiResponse> UpdateBadge(UpdateBadgeModel model)
@@ -104,7 +107,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 TypeName = FieldType.Competencies.ToString()
             }));
 
-            if (model.BadgeImage != null)
+            if (!string.IsNullOrEmpty(model.BadgeImage))
             {
                 if (!string.IsNullOrEmpty(badge.Image))
                     await _storageService.DeleteFile(badge.Image);
@@ -164,7 +167,10 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                                                                FieldName = a.Name,
                                                                                                FieldContent = a.Content
                                                                                            }).ToList(),
-                                                             //ApprovalUser = b.ApprovalUser.FirstName + " " + b.ApprovalUser.LastName,
+                                                             ApprovalUser = b.ApprovalUserId == null ? null :
+                                                                            ((string.IsNullOrEmpty(b.ApprovalUser.FirstName) ? "" : b.ApprovalUser.FirstName) +
+                                                                            (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
+                                                                            (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName)),
                                                              CreatedDate = b.CreatedDate,
                                                              UpdatedDate = b.UpdatedDate
                                                          }).FirstOrDefaultAsync();
@@ -188,7 +194,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                         .Select(x => new PagedResponseOutput<List<GetBadgeModel>>
                                         {
                                             TotalCount = x.Count(),
-                                            Data = x.OrderBy(x => x.UpdatedDate)
+                                            Data = x.OrderByDescending(x => x.UpdatedDate)
                                                     .Select(b => new GetBadgeModel
                                                     {
                                                         BadgeId = b.Id,
@@ -202,9 +208,13 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                         ExpirationDate = b.ExpirationDate,
                                                         IsApproved = b.IsApproved,
                                                         ApprovalUserId = b.ApprovalUserId,
-                                                        //ApprovalUser = b.ApprovalUser.FirstName + " " + b.ApprovalUser.LastName,
+                                                        IsRequiresApproval = b.RequiresApproval,
                                                         CreatedDate = b.CreatedDate,
-                                                        UpdatedDate = b.UpdatedDate
+                                                        UpdatedDate = b.UpdatedDate,
+                                                        ApprovalUser = b.ApprovalUserId == null ? null :
+                                                                      ((string.IsNullOrEmpty(b.ApprovalUser.FirstName) ? "" : b.ApprovalUser.FirstName) +
+                                                                      (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
+                                                                      (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName))
                                                     }).Skip(model.PageSize * (model.PageIndex - 1))
                                                       .Take(model.PageSize)
                                                       .ToList()
@@ -222,6 +232,37 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 Message = ResponseConstants.Success,
                 StatusCode = 200
             };
+        }
+
+        public async Task<ApiResponse> AssignBadges(AssignBadgeModel model)
+        {
+            var currentUserId = _currentUserService.UserId;
+            var dateTime = DateTime.UtcNow;
+            var learnerBadges = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => model.UserIds.Contains(x.UserId) && x.IsActive).ToListAsync();
+            foreach (var userId in model.UserIds)
+            {
+                foreach (var badgeId in model.BadgeIds)
+                {
+                    if (!learnerBadges.Any(x => x.UserId == userId && x.BadgeId == badgeId))
+                    {
+                        learnerBadges.Add(new LearnerBadge
+                        {
+                            UserId = userId,
+                            BadgeId = badgeId,
+                            CreatedDate = dateTime,
+                            UpdatedDate = dateTime,
+                            IsActive = true,
+                            IsRevoked = false,
+                            IssuedBy = currentUserId
+                        });
+                    }
+                }
+            }
+
+            _unitOfWork.LearnerBadgeRepository.UpdateRange(learnerBadges);
+            await _unitOfWork.LearnerBadgeRepository.CommitChanges();
+
+            return new(200, ResponseConstants.Success);
         }
     }
 }
