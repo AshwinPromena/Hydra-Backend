@@ -17,5 +17,9 @@
         IBadgeSequenceRepository BadgeSequenceRepository { get; }
 
         IBadgeRepository BadgeRepository { get; }
+
+        IBadgeFieldRepository BadgeFieldRepository { get; }
+
+        ILearnerBadgeRepository LearnerBadgeRepository { get; }
     }
 }

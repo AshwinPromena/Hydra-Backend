@@ -23,5 +23,10 @@ namespace Hydra.Database.Entities
         public virtual DbSet<BadgeSequence> BadgeSequence { get; set; }
 
         public virtual DbSet<University> University { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.SeedData();
+        }
     }
 }

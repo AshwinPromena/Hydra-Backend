@@ -25,11 +25,11 @@ namespace Hydra.Common.Models
 
         [JsonProperty("departmentId")]
         [Required(ErrorMessage = "Department is required.")]
-        public long DepartmentId { get; set; }
+        public long? DepartmentId { get; set; }
 
         [JsonProperty("acccessLevelId")]
         [Required(ErrorMessage = "Access level is required.")]
-        public long AccessLevelId { get; set; }
+        public long? AccessLevelId { get; set; }
 
         [JsonProperty("firstName")]
         [Required(ErrorMessage = "FirstName is required.")]

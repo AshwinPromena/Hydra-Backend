@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Hydra.Database.Migrations
 {
     /// <inheritdoc />
@@ -31,12 +33,30 @@ namespace Hydra.Database.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "badge_sequence",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    is_active = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_badge_sequence", x => x.id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "department",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    department_name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
+                    name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     updated_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -99,19 +119,22 @@ namespace Hydra.Database.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     mobile_number = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     is_active = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    access_level_id = table.Column<long>(type: "bigint", nullable: false),
+                    access_level_id = table.Column<long>(type: "bigint", nullable: true),
                     is_approved = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    department_id = table.Column<long>(type: "bigint", nullable: false),
+                    department_id = table.Column<long>(type: "bigint", nullable: true),
                     profile_picture = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     is_archived = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     first_name = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     last_name = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    password_reset_otp = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    otp_expiry_date = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -120,39 +143,57 @@ namespace Hydra.Database.Migrations
                         name: "FK_user_access_level_access_level_id",
                         column: x => x.access_level_id,
                         principalTable: "access_level",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_user_department_department_id",
                         column: x => x.department_id,
                         principalTable: "department",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "badge_sequence",
+                name: "badge",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    sequence_name = table.Column<string>(type: "longtext", nullable: true)
+                    name = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    department_id = table.Column<long>(type: "bigint", nullable: false),
+                    issue_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    expiration_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    badge_sequence_id = table.Column<long>(type: "bigint", nullable: true),
+                    image = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    approvalUserId = table.Column<long>(type: "bigint", nullable: true),
+                    requires_approval = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    is_approved = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     is_active = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    user_id = table.Column<long>(type: "bigint", nullable: false)
+                    created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_badge_sequence", x => x.id);
+                    table.PrimaryKey("PK_badge", x => x.id);
                     table.ForeignKey(
-                        name: "FK_badge_sequence_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "user",
+                        name: "FK_badge_badge_sequence_badge_sequence_id",
+                        column: x => x.badge_sequence_id,
+                        principalTable: "badge_sequence",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_badge_department_department_id",
+                        column: x => x.department_id,
+                        principalTable: "department",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_badge_user_approvalUserId",
+                        column: x => x.approvalUserId,
+                        principalTable: "user",
+                        principalColumn: "id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -184,92 +225,19 @@ namespace Hydra.Database.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "badge",
-                columns: table => new
-                {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    badge_name = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    department_id = table.Column<long>(type: "bigint", nullable: false),
-                    issue_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    expiration_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    badge_description = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    sequence_id = table.Column<long>(type: "bigint", nullable: false),
-                    requires_approval = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    is_approved = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    user_id = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_badge", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_badge_badge_sequence_sequence_id",
-                        column: x => x.sequence_id,
-                        principalTable: "badge_sequence",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_badge_department_department_id",
-                        column: x => x.department_id,
-                        principalTable: "department",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_badge_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "user",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "badge_approval",
-                columns: table => new
-                {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    badge_id = table.Column<long>(type: "bigint", nullable: false),
-                    user_id = table.Column<long>(type: "bigint", nullable: false),
-                    created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    is_approved = table.Column<bool>(type: "tinyint(1)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_badge_approval", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_badge_approval_badge_badge_id",
-                        column: x => x.badge_id,
-                        principalTable: "badge",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_badge_approval_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "user",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "badge_field",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     badge_id = table.Column<long>(type: "bigint", nullable: false),
-                    field_content = table.Column<string>(type: "longtext", nullable: true)
+                    name = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    content = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     type = table.Column<int>(type: "int", nullable: false),
                     type_name = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    field_name = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    user_id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -278,42 +246,6 @@ namespace Hydra.Database.Migrations
                         name: "FK_badge_field_badge_badge_id",
                         column: x => x.badge_id,
                         principalTable: "badge",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_badge_field_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "user",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "badge_media",
-                columns: table => new
-                {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    badge_id = table.Column<long>(type: "bigint", nullable: false),
-                    badge_image_url = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    is_active = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    user_id = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_badge_media", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_badge_media_badge_badge_id",
-                        column: x => x.badge_id,
-                        principalTable: "badge",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_badge_media_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "user",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -357,55 +289,55 @@ namespace Hydra.Database.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.InsertData(
+                table: "access_level",
+                columns: new[] { "id", "name" },
+                values: new object[,]
+                {
+                    { 1L, "View only" },
+                    { 2L, "View and edit" },
+                    { 3L, "View, edit and delete" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "role",
+                columns: new[] { "id", "name" },
+                values: new object[,]
+                {
+                    { 1L, "Admin" },
+                    { 2L, "Learner" },
+                    { 3L, "Staff" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "user",
+                columns: new[] { "id", "access_level_id", "created_date", "department_id", "email", "first_name", "is_active", "is_approved", "is_archived", "last_name", "mobile_number", "otp_expiry_date", "password", "password_reset_otp", "profile_picture", "updated_date", "user_name" },
+                values: new object[] { 1L, 3L, new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "hydra@yopmail.com", "Admin", true, true, false, "", null, null, "", null, null, new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin" });
+
+            migrationBuilder.InsertData(
+                table: "user_role",
+                columns: new[] { "id", "role_id", "user_id" },
+                values: new object[] { 1L, 1L, 1L });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_badge_approvalUserId",
+                table: "badge",
+                column: "approvalUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_badge_badge_sequence_id",
+                table: "badge",
+                column: "badge_sequence_id");
+
             migrationBuilder.CreateIndex(
                 name: "IX_badge_department_id",
                 table: "badge",
                 column: "department_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_badge_sequence_id",
-                table: "badge",
-                column: "sequence_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_badge_user_id",
-                table: "badge",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_badge_approval_badge_id",
-                table: "badge_approval",
-                column: "badge_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_badge_approval_user_id",
-                table: "badge_approval",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_badge_field_badge_id",
                 table: "badge_field",
                 column: "badge_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_badge_field_user_id",
-                table: "badge_field",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_badge_media_badge_id",
-                table: "badge_media",
-                column: "badge_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_badge_media_user_id",
-                table: "badge_media",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_badge_sequence_user_id",
-                table: "badge_sequence",
-                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_learner_badge_badge_id",
@@ -447,13 +379,7 @@ namespace Hydra.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "badge_approval");
-
-            migrationBuilder.DropTable(
                 name: "badge_field");
-
-            migrationBuilder.DropTable(
-                name: "badge_media");
 
             migrationBuilder.DropTable(
                 name: "learner_badge");

@@ -9,36 +9,45 @@ namespace Hydra.DatbaseLayer.Repository
     {
         private readonly HydraContext _context = context;
 
-
         public virtual async Task Create(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
         }
 
-
-        public virtual void Delete(T entity)
+        public virtual async Task CreateRange(IEnumerable<T> entity)
         {
-            _context.Set<T>().Remove(entity);
+            await _context.AddRangeAsync(entity);
         }
-
-
-        public virtual IQueryable<T> FindAll()
-        {
-            return _context.Set<T>().AsNoTracking();
-        }
-
-
-        public virtual IQueryable<T> FindByCondition(Expression<Func<T, bool>> condition)
-        {
-            return _context.Set<T>().Where(condition).AsNoTracking();
-        }
-
 
         public virtual void Update(T entity)
         {
             _context.Set<T>().Update(entity);
         }
 
+        public virtual void UpdateRange(IEnumerable<T> entity)
+        {
+            _context.UpdateRange(entity);
+        }
+
+        public virtual void Delete(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+        }
+
+        public virtual void DeleteRange(IEnumerable<T> entity)
+        {
+            _context.RemoveRange(entity);
+        }
+
+        public virtual IQueryable<T> FindAll()
+        {
+            return _context.Set<T>().AsNoTracking();
+        }
+
+        public virtual IQueryable<T> FindByCondition(Expression<Func<T, bool>> condition)
+        {
+            return _context.Set<T>().Where(condition).AsNoTracking();
+        }
 
         public async Task CommitChanges()
         {

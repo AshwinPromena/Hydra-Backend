@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hydra.Database.Migrations
 {
     [DbContext(typeof(HydraContext))]
-    [Migration("20240420095557_updatedDepartmentTable")]
-    partial class updatedDepartmentTable
+    [Migration("20240424054432_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,6 +41,23 @@ namespace Hydra.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("access_level");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Name = "View only"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Name = "View and edit"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Name = "View, edit and delete"
+                        });
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.Badge", b =>
@@ -52,21 +69,37 @@ namespace Hydra.Database.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("BadgeDescription")
-                        .HasColumnType("longtext")
-                        .HasColumnName("badge_description");
+                    b.Property<long?>("ApprovalUserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("approvalUserId");
 
-                    b.Property<string>("BadgeName")
-                        .HasColumnType("longtext")
-                        .HasColumnName("badge_name");
+                    b.Property<long?>("BadgeSequenceId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("badge_sequence_id");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_date");
 
                     b.Property<long>("DepartmentId")
                         .HasColumnType("bigint")
                         .HasColumnName("department_id");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext")
+                        .HasColumnName("description");
+
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("expiration_date");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("longtext")
+                        .HasColumnName("image");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
 
                     b.Property<bool>("IsApproved")
                         .HasColumnType("tinyint(1)")
@@ -76,65 +109,27 @@ namespace Hydra.Database.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("issue_date");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext")
+                        .HasColumnName("name");
+
                     b.Property<bool>("RequiresApproval")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("requires_approval");
-
-                    b.Property<long>("SequenceId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("sequence_id");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("SequenceId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("badge");
-                });
-
-            modelBuilder.Entity("Hydra.Database.Entities.BadgeApproval", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("BadgeId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("badge_id");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_date");
-
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_approved");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("updated_date");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("user_id");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("BadgeId");
+                    b.HasIndex("ApprovalUserId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("BadgeSequenceId");
 
-                    b.ToTable("badge_approval");
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("badge");
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.BadgeField", b =>
@@ -150,13 +145,13 @@ namespace Hydra.Database.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("badge_id");
 
-                    b.Property<string>("FieldContent")
+                    b.Property<string>("Content")
                         .HasColumnType("longtext")
-                        .HasColumnName("field_content");
+                        .HasColumnName("content");
 
-                    b.Property<string>("FieldName")
+                    b.Property<string>("Name")
                         .HasColumnType("longtext")
-                        .HasColumnName("field_name");
+                        .HasColumnName("name");
 
                     b.Property<int>("Type")
                         .HasColumnType("int")
@@ -166,51 +161,11 @@ namespace Hydra.Database.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("type_name");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("user_id");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BadgeId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("badge_field");
-                });
-
-            modelBuilder.Entity("Hydra.Database.Entities.BadgeMedia", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("BadgeId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("badge_id");
-
-                    b.Property<string>("BadgeImageUrl")
-                        .HasColumnType("longtext")
-                        .HasColumnName("badge_image_url");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_active");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BadgeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("badge_media");
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.BadgeSequence", b =>
@@ -340,6 +295,23 @@ namespace Hydra.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("role");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Name = "Learner"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Name = "Staff"
+                        });
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.University", b =>
@@ -389,7 +361,7 @@ namespace Hydra.Database.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("AccessLevelId")
+                    b.Property<long?>("AccessLevelId")
                         .HasColumnType("bigint")
                         .HasColumnName("access_level_id");
 
@@ -397,7 +369,7 @@ namespace Hydra.Database.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("created_date");
 
-                    b.Property<long>("DepartmentId")
+                    b.Property<long?>("DepartmentId")
                         .HasColumnType("bigint")
                         .HasColumnName("department_id");
 
@@ -431,10 +403,18 @@ namespace Hydra.Database.Migrations
                         .HasColumnType("varchar(10)")
                         .HasColumnName("mobile_number");
 
+                    b.Property<DateTime?>("OtpExpiryDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("otp_expiry_date");
+
                     b.Property<string>("Password")
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)")
                         .HasColumnName("password");
+
+                    b.Property<string>("PasswordResetOtp")
+                        .HasColumnType("longtext")
+                        .HasColumnName("password_reset_otp");
 
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("longtext")
@@ -456,6 +436,23 @@ namespace Hydra.Database.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("user");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AccessLevelId = 3L,
+                            CreatedDate = new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "hydra@yopmail.com",
+                            FirstName = "Admin",
+                            IsActive = true,
+                            IsApproved = true,
+                            IsArchived = false,
+                            LastName = "",
+                            Password = "",
+                            UpdatedDate = new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserName = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.UserRole", b =>
@@ -482,52 +479,37 @@ namespace Hydra.Database.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("user_role");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            RoleId = 1L,
+                            UserId = 1L
+                        });
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.Badge", b =>
                 {
+                    b.HasOne("Hydra.Database.Entities.User", "ApprovalUser")
+                        .WithMany("Badge")
+                        .HasForeignKey("ApprovalUserId");
+
+                    b.HasOne("Hydra.Database.Entities.BadgeSequence", "BadgeSequence")
+                        .WithMany("Badge")
+                        .HasForeignKey("BadgeSequenceId");
+
                     b.HasOne("Hydra.Database.Entities.Department", "Department")
                         .WithMany("Badge")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Hydra.Database.Entities.BadgeSequence", "BadgeSequence")
-                        .WithMany("Badge")
-                        .HasForeignKey("SequenceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Hydra.Database.Entities.User", "User")
-                        .WithMany("Badge")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("ApprovalUser");
 
                     b.Navigation("BadgeSequence");
 
                     b.Navigation("Department");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Hydra.Database.Entities.BadgeApproval", b =>
-                {
-                    b.HasOne("Hydra.Database.Entities.Badge", "Badge")
-                        .WithMany("BadgeApproval")
-                        .HasForeignKey("BadgeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Hydra.Database.Entities.User", "User")
-                        .WithMany("BadgeApproval")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Badge");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.BadgeField", b =>
@@ -538,34 +520,7 @@ namespace Hydra.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Hydra.Database.Entities.User", "User")
-                        .WithMany("BadgeField")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Badge");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Hydra.Database.Entities.BadgeMedia", b =>
-                {
-                    b.HasOne("Hydra.Database.Entities.Badge", "Badge")
-                        .WithMany("BadgeMedia")
-                        .HasForeignKey("BadgeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Hydra.Database.Entities.User", "User")
-                        .WithMany("BadgeMedia")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Badge");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.LearnerBadge", b =>
@@ -599,15 +554,11 @@ namespace Hydra.Database.Migrations
                 {
                     b.HasOne("Hydra.Database.Entities.AccessLevel", "AccessLevel")
                         .WithMany("User")
-                        .HasForeignKey("AccessLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AccessLevelId");
 
                     b.HasOne("Hydra.Database.Entities.Department", "Department")
                         .WithMany("User")
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DepartmentId");
 
                     b.Navigation("AccessLevel");
 
@@ -640,11 +591,7 @@ namespace Hydra.Database.Migrations
 
             modelBuilder.Entity("Hydra.Database.Entities.Badge", b =>
                 {
-                    b.Navigation("BadgeApproval");
-
                     b.Navigation("BadgeField");
-
-                    b.Navigation("BadgeMedia");
 
                     b.Navigation("LearnerBadge");
                 });
@@ -669,12 +616,6 @@ namespace Hydra.Database.Migrations
             modelBuilder.Entity("Hydra.Database.Entities.User", b =>
                 {
                     b.Navigation("Badge");
-
-                    b.Navigation("BadgeApproval");
-
-                    b.Navigation("BadgeField");
-
-                    b.Navigation("BadgeMedia");
 
                     b.Navigation("LearnerBadge");
 

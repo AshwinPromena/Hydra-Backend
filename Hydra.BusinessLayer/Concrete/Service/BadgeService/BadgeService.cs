@@ -87,7 +87,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             badge.ApprovalUserId = model.ApprovalUserId;
             badge.UpdatedDate = DateTime.UtcNow;
 
-            await _unitOfWork.BadgeSequenceRepository.DeleteBadgeFields(model.BadgeId);
+            var badgeFieldsList = await _unitOfWork.BadgeFieldRepository.FindByCondition(x => x.BadgeId == model.BadgeId).ToListAsync();
+            _unitOfWork.BadgeFieldRepository.DeleteRange(badgeFieldsList);
             model.LearningOutcomes.ForEach(x => badge.BadgeField.Add(new()
             {
                 Name = x.FieldName,

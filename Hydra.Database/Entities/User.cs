@@ -38,7 +38,7 @@ namespace Hydra.Database.Entities
         public bool IsActive { get; set; } = true;
 
         [Column("access_level_id")]
-        public long AccessLevelId { get; set; }
+        public long? AccessLevelId { get; set; }
 
         [ForeignKey("AccessLevelId")]
         [InverseProperty("User")]
@@ -48,7 +48,7 @@ namespace Hydra.Database.Entities
         public bool IsApproved { get; set; }
 
         [Column("department_id")]
-        public long DepartmentId { get; set; }
+        public long? DepartmentId { get; set; }
 
         [ForeignKey("DepartmentId")]
         [InverseProperty("User")]
