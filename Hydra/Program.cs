@@ -88,7 +88,9 @@ builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
         "http://localhost:4200",
         "https://localhost:4200",
         "https://localhost:3000",
-        "http://localhost:3000")
+        "http://localhost:3000",
+        "https://localhost:3001",
+        "http://localhost:3001")
         .SetIsOriginAllowedToAllowWildcardSubdomains()
         .AllowCredentials();
 }));
