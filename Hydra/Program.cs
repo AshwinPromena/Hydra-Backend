@@ -90,7 +90,9 @@ builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
         "https://localhost:3000",
         "http://localhost:3000",
         "https://localhost:3001",
-        "http://localhost:3001")
+        "http://localhost:3001",
+        "https://hydra-react.vercel.app",
+        "http://hydra-react.vercel.app")
         .SetIsOriginAllowedToAllowWildcardSubdomains()
         .AllowCredentials();
 }));
