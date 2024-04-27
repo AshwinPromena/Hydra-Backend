@@ -28,6 +28,8 @@
         public const string PasswordResetOtpSent = "Password reset OTP sent to email";
         public const string InvalidOtp = "Invalid OTP";
         public const string OtpExpired = "OTP expired";
+        public const string AccountInactive = "Account is disabled, Please contact admin";
+        public const string NotApproved = "Account still not approved";
 
         #endregion
 

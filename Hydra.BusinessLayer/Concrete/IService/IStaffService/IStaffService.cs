@@ -20,5 +20,7 @@ namespace Hydra.BusinessLayer.Concrete.IService.IStaffService
         Task<ServiceResponse<GetStaffModel>> GetStaffById(long userId);
 
         Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(PagedResponseInput model, bool IsArchived = false);
+
+        Task<ApiResponse> ApproveStaffUser(long staffUserId);
     }
 }

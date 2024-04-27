@@ -56,14 +56,18 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ServiceResponse<LoginResponse>> Login(LoginModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved)
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()))
                                                        .Include(x => x.UserRole).ThenInclude(x => x.Role)
                                                        .Include(i => i.AccessLevel)
                                                        .Include(i => i.Department)
                                                        .FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
-            
+            if (!user.IsActive)
+                return new(400, ResponseConstants.AccountInactive);
+            if (!user.IsApproved)
+                return new(400, ResponseConstants.NotApproved);
+
             if (Encipher(model.Password) != user.Password)
                 return new(400, ResponseConstants.InvalidPassword);
 
