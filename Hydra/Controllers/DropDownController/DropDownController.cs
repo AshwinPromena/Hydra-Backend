@@ -2,7 +2,6 @@
 using Hydra.Common.Globle;
 using Hydra.Common.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hydra.Controllers.DropDownController
@@ -31,7 +30,7 @@ namespace Hydra.Controllers.DropDownController
             return await _dropDownService.GetAllAccessLevel(model);
         }
 
-        [HttpPost("[action]"),Authorize]
+        [HttpPost("[action]"), Authorize]
         public async Task<PagedResponse<List<UserDropDownModel>>> GetAllApprovalUsers(PagedResponseInput model)
         {
             if (!ModelState.IsValid)
@@ -49,7 +48,7 @@ namespace Hydra.Controllers.DropDownController
             return await _dropDownService.GetLearnersForBadgeAssign(model, badgeId);
         }
 
-        [HttpPost("[action]"),Authorize]
+        [HttpPost("[action]"), Authorize]
         public async Task<PagedResponse<List<BadgeDropDownModel>>> GetBadgesToAssignLearner(PagedResponseInput model, long? userId = null)
         {
             if (!ModelState.IsValid)

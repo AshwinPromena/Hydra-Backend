@@ -1,6 +1,7 @@
 ﻿using Hydra.BusinessLayer.Repository.IService.ILearnerService;
+using Hydra.Common.Globle;
 using Hydra.Common.Models;
-using Hydra.Common.Repository.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hydra.Controllers.LearnerController
@@ -12,29 +13,43 @@ namespace Hydra.Controllers.LearnerController
         private readonly ILearnerManagmentService _learnerManagmentService = learnerManagmentService;
 
 
-        //[HttpPost("[action]")]
-        //public async Task<ApiResponse> UploadLearners(IFormFile formFile)
-        //{
-        //    if (formFile == null)
-        //    {
-        //        return new(400, ResponseConstants.BadRequest);
-        //    }
+        [HttpGet("[action]")]
+        public async Task<ServiceResponse<LearnerDashBoardModel>> LearnerDashBoard()
+        {
+            return await _learnerManagmentService.LearnerDashBoard();
+        }
 
-        //    return await _storageservice.UploadExcelFile(formFile); 
-        //}
+        [HttpGet("[action]")]
+        public async Task<string> DownloadSampleExcelFile()
+        {
+            return await _learnerManagmentService.DownloadSampleExcelFile();
+        }
 
-
-        //[HttpGet("[action]")]
-        //public async Task<string> DownloadExcel()
-        //{
-        //    return await _storageservice.DownloadSampleExcelFile();
-        //}
-
+        [HttpPost("[action]")]
+        public async Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLearner(IFormFile file)
+        {
+            if (file == null)
+                return new(400, ResponseConstants.BadRequest);
+            return await _learnerManagmentService.BatchUploadLeraner(file);
+        }
 
         [HttpPost("[action]")]
         public async Task<ApiResponse> AddLearner(AddLearnerModel model)
         {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+
             return await _learnerManagmentService.AddLearner(model);
+        }
+
+
+        [HttpPost("[action]"), Authorize(Roles = "Staff")]
+        public async Task<ApiResponse> AssignBadgeToLearners(AssignBadgeModel model)
+        {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+
+            return await _learnerManagmentService.AssignBadgeToLearners(model);
         }
     }
 }

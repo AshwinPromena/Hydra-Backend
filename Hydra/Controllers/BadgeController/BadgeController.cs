@@ -1,5 +1,4 @@
 ﻿using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
-using Hydra.BusinessLayer.Concrete.Service.BadgeService;
 using Hydra.Common.Globle;
 using Hydra.Common.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -59,7 +58,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.GetAllBadges(model);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"),Authorize(Roles = "Staff")]
         public async Task<ApiResponse> AssignBadges(AssignBadgeModel model)
         {
             if (!ModelState.IsValid)
