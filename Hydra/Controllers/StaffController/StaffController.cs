@@ -1,9 +1,7 @@
 ﻿using Hydra.BusinessLayer.Concrete.IService.IStaffService;
-using Hydra.BusinessLayer.Concrete.Service.StaffService;
 using Hydra.Common.Globle;
 using Hydra.Common.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hydra.Controllers.StaffController
@@ -19,7 +17,7 @@ namespace Hydra.Controllers.StaffController
         public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
             if (!ModelState.IsValid)
-                return new (400, ResponseConstants.BadRequest);
+                return new(400, ResponseConstants.BadRequest);
 
             return await _staffService.AddStaff(model);
         }
@@ -28,7 +26,7 @@ namespace Hydra.Controllers.StaffController
         public async Task<ApiResponse> UpdateStaff(UpdateStaffModel model)
         {
             if (!ModelState.IsValid)
-                return new (400, ResponseConstants.BadRequest);
+                return new(400, ResponseConstants.BadRequest);
 
             return await _staffService.UpdateStaff(model);
         }
@@ -37,7 +35,7 @@ namespace Hydra.Controllers.StaffController
         public async Task<ApiResponse> DeleteStaff(DeleteStaffModel model)
         {
             if (!ModelState.IsValid)
-                return new (400, ResponseConstants.BadRequest);
+                return new(400, ResponseConstants.BadRequest);
 
             return await _staffService.DeleteStaff(model);
         }

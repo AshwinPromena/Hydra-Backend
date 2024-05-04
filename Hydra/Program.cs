@@ -111,6 +111,7 @@ builder.Services.AddTransient<IBadgeSequenceService, BadgeSequenceService>();
 builder.Services.AddTransient<IStaffService, StaffServices>();
 builder.Services.AddTransient<IBadgeService, BadgeService>();
 builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
+builder.Services.AddTransient<IReportService, ReportService>();
 
 builder.Services.AddSwaggerGen();
 

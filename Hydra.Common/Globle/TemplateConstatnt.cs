@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Presentation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,5 +21,6 @@ namespace Hydra.Common.Globle
     {
         public const string UserName = "{UserName}";
         public const string Otp = "{OTP}";
+        public const string Link = "{Link}";
     }
 }

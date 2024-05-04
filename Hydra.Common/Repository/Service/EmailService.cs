@@ -17,9 +17,13 @@ namespace Hydra.Common.Repository.Service
 
         public async Task<string> SendPasswordResetOTP(string email, string userName)
         {
+            Guid guid = Guid.NewGuid(); 
+            string link = $"https://hydra-react.vercel.app/reset-password?guid={guid}";
             string Otp = GenerateOtp(4);
             string template = await ReadTemplate(TemplateConstatnt.PasswordResetOtpTemplate);
-            string content = template.Replace(ReplaceStringConstant.Otp, Otp).Replace(ReplaceStringConstant.UserName, userName);
+            string content = template.Replace(ReplaceStringConstant.Otp, Otp)
+                                     .Replace(ReplaceStringConstant.UserName, userName)
+                                     .Replace(ReplaceStringConstant.Link,link);
             await SendMail(email, TemplateSubjectConstant.PasswordResetOtpTemplateSubject, content);
             return Otp;
         }

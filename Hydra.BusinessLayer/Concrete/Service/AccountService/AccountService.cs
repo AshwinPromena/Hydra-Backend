@@ -37,7 +37,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                 MobileNumber = model.MobileNumber,
                 Password = Encipher(model.Password),
                 IsActive = true,
-                IsApproved = false,
+                IsApproved = true,
                 AccessLevelId = model.AccessLevelId,
                 DepartmentId = model.DepartmentId,
                 CreatedDate = DateTime.UtcNow,
