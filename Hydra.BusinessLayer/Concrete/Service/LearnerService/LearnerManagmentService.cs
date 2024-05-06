@@ -29,7 +29,6 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             return new(200, ResponseConstants.Success, new LearnerDashBoardModel
             {
                 LearnerInTotal = learnerCount.Count,
-                LearnerWithBadge = _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.UserId ==  && x.IsActive).Count(),
             });
         }
 

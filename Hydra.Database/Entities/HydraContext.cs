@@ -24,6 +24,8 @@ namespace Hydra.Database.Entities
 
         public virtual DbSet<University> University { get; set; }
 
+        public virtual DbSet<Verification> Verification {  get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.SeedData();

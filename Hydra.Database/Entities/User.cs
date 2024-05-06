@@ -12,6 +12,7 @@ namespace Hydra.Database.Entities
             LearnerBadge = new HashSet<LearnerBadge>();
             LearnerBadgeIssuedBy = new HashSet<LearnerBadge>();
             Badge = new HashSet<Badge>();
+            Verification = new HashSet<Verification>(); 
         }
 
         [Key]
@@ -66,12 +67,6 @@ namespace Hydra.Database.Entities
         [Column("last_name")]
         public string LastName { get; set; }
 
-        [Column("password_reset_otp")]
-        public string PasswordResetOtp { get; set; }
-
-        [Column("otp_expiry_date")]
-        public DateTime? OtpExpiryDate { get; set; }
-
         [Column("created_date")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
@@ -89,5 +84,8 @@ namespace Hydra.Database.Entities
 
         [InverseProperty("ApprovalUser")]
         public virtual ICollection<Badge> Badge { get; set; }
+
+        [InverseProperty("User")]
+        public virtual ICollection<Verification> Verification { get; set; }
     }
 }

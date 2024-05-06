@@ -37,6 +37,11 @@ namespace Hydra.Controllers.AccountController
             return await _accountService.ForgotPassword(model);
         }
 
+        [HttpPost("[action]")]
+        public async Task<ServiceResponse<string>> ValidateResetUrl(long userId, string token)
+        {
+            return await _accountService.ValidateResetUrl(userId, token);
+        }
 
         [HttpPost("[action]")]
         public async Task<ApiResponse> ResetPassword(ResetPasswordModel model)

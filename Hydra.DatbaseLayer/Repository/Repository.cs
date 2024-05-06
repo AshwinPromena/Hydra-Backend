@@ -28,4 +28,6 @@ namespace Hydra.DatbaseLayer.Repository
     public class UserRepository(HydraContext context) : CommonRepository<User>(context), IUserRepository { }
 
     public class UserRoleRepository(HydraContext context) : CommonRepository<UserRole>(context), IUserRoleRepository { }
+
+    public class VerificationRepository(HydraContext context) : CommonRepository<Verification>(context) , IVerificationRepository { }
 }

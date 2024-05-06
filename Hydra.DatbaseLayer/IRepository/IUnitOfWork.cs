@@ -21,5 +21,7 @@
         IBadgeFieldRepository BadgeFieldRepository { get; }
 
         ILearnerBadgeRepository LearnerBadgeRepository { get; }
+
+        IVerificationRepository VerificationRepository { get; }
     }
 }
