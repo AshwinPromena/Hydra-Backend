@@ -10,6 +10,8 @@ namespace Hydra.BusinessLayer.Repository.IService.IAccountService
 
         Task<ApiResponse> ForgotPassword(ForgotPasswordModel model);
 
+        Task<ServiceResponse<string>> ValidateResetUrl(long userId, string token);
+
         Task<ApiResponse> ResetPassword(ResetPasswordModel model);
 
         Task<ApiResponse> ReSendOtp(ForgotPasswordModel model);

@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\PasswordResetLink.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\PasswordResetOtp.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

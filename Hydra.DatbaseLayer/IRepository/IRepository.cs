@@ -26,4 +26,6 @@ namespace Hydra.DatbaseLayer.IRepository
     public interface IUserRepository : ICommonRepository<User> { }
 
     public interface IUserRoleRepository : ICommonRepository<UserRole> { }
+
+    public interface IVerificationRepository : ICommonRepository<Verification> { }
 }

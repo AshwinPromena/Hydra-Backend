@@ -145,6 +145,18 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             return new ServiceResponse<GetStaffModel>(200, ResponseConstants.Success, staff);
         }
 
+
+        public async Task<ApiResponse> ApproveStaffUser(long staffUserId)
+        {
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == staffUserId).FirstOrDefaultAsync();
+            if (user is null)
+                return new(400, ResponseConstants.InvalidUserId);
+            user.IsApproved = true;
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.UserRepository.CommitChanges();
+            return new(200, ResponseConstants.Success);
+        }
+
         public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(PagedResponseInput model, bool IsArchived = false)
         {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);

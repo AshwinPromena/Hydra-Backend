@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hydra.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class Intial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -130,9 +130,6 @@ namespace Hydra.Database.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     last_name = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    password_reset_otp = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    otp_expiry_date = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     updated_date = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
@@ -225,6 +222,37 @@ namespace Hydra.Database.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "verification",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    user_id = table.Column<long>(type: "bigint", nullable: false),
+                    user_guid = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    otp = table.Column<string>(type: "varchar(6)", maxLength: 6, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    otp_expiry_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    is_active = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    password_reset_token = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    password_reser_token_expiry_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    is_token_active = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    created_date = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_verification", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_verification_user_user_id",
+                        column: x => x.user_id,
+                        principalTable: "user",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "badge_field",
                 columns: table => new
                 {
@@ -305,14 +333,15 @@ namespace Hydra.Database.Migrations
                 values: new object[,]
                 {
                     { 1L, "Admin" },
-                    { 2L, "Learner" },
-                    { 3L, "Staff" }
+                    { 2L, "UniversityAdmin" },
+                    { 3L, "Staff" },
+                    { 4L, "Learner" }
                 });
 
             migrationBuilder.InsertData(
                 table: "user",
-                columns: new[] { "id", "access_level_id", "created_date", "department_id", "email", "first_name", "is_active", "is_approved", "is_archived", "last_name", "mobile_number", "otp_expiry_date", "password", "password_reset_otp", "profile_picture", "updated_date", "user_name" },
-                values: new object[] { 1L, 3L, new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "hydra@yopmail.com", "Admin", true, true, false, "", null, null, "", null, null, new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin" });
+                columns: new[] { "id", "access_level_id", "created_date", "department_id", "email", "first_name", "is_active", "is_approved", "is_archived", "last_name", "mobile_number", "password", "profile_picture", "updated_date", "user_name" },
+                values: new object[] { 1L, 3L, new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), null, "hydra@yopmail.com", "Admin", true, true, false, "", null, "3AhCUZedQxVLajDQSZhRirNTvEyK/luGud/X7oAXJX0=", null, new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified), "Admin" });
 
             migrationBuilder.InsertData(
                 table: "user_role",
@@ -373,6 +402,11 @@ namespace Hydra.Database.Migrations
                 name: "IX_user_role_user_id",
                 table: "user_role",
                 column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_verification_user_id",
+                table: "verification",
+                column: "user_id");
         }
 
         /// <inheritdoc />
@@ -389,6 +423,9 @@ namespace Hydra.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "user_role");
+
+            migrationBuilder.DropTable(
+                name: "verification");
 
             migrationBuilder.DropTable(
                 name: "badge");

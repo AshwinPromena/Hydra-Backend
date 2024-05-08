@@ -67,15 +67,18 @@ namespace Hydra.Common.Models
         public string UserName { get; set; }
     }
 
-    public class ResetPasswordModel : ForgotPasswordModel
+    public class ResetPasswordModel
     {
-        [JsonProperty("password")]
-        [Required(ErrorMessage = "Password is required.")]
-        [RegularExpression("^(?!\\s*$).+", ErrorMessage = "New password cannot be empty.")]
-        public string Password { get; set; }
+        [JsonProperty("Token")]
+        public string Token { get; set; }
 
         [JsonProperty("otp")]
         [Required(ErrorMessage = "OTP is required.")]
         public string Otp { get; set; }
+
+        [JsonProperty("password")]
+        [Required(ErrorMessage = "Password is required.")]
+        [RegularExpression("^(?!\\s*$).+", ErrorMessage = "New password cannot be empty.")]
+        public string Password { get; set; }
     }
 }

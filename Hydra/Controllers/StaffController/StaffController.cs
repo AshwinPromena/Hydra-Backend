@@ -67,5 +67,12 @@ namespace Hydra.Controllers.StaffController
             return await _staffService.GetAllStaff(model, isArchived);
         }
 
+
+        [HttpGet("[action]")]
+        public async Task<ApiResponse> ApproveStaffUser(long staffUserId)
+        {
+            return await _staffService.ApproveStaffUser(staffUserId);
+        }
+
     }
 }

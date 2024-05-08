@@ -14,16 +14,22 @@ namespace Hydra.Common.Repository.Service
         private readonly IConfiguration _configuration = configuration;
         private readonly IHostEnvironment _environment = environment;
 
+        public async Task<ApiResponse> SendPasswordResetLink(string email, long userId, string userName, string token)
+        {
+            string Link = $"https://hydra-react.vercel.app/reset-password?userId={userId}&token={token}";
+            string template = await ReadTemplate(TemplateConstatnt.PasswordResetLink);
+            string content = template.Replace(ReplaceStringConstant.Link, Link)
+                                     .Replace(ReplaceStringConstant.UserName, userName);
+            await SendMail(email, TemplateSubjectConstant.PasswordResetLink, content);
+            return new(200, ResponseConstants.Success);
+        }
 
         public async Task<string> SendPasswordResetOTP(string email, string userName)
         {
-            Guid guid = Guid.NewGuid(); 
-            string link = $"https://hydra-react.vercel.app/reset-password?guid={guid}";
             string Otp = GenerateOtp(4);
             string template = await ReadTemplate(TemplateConstatnt.PasswordResetOtpTemplate);
             string content = template.Replace(ReplaceStringConstant.Otp, Otp)
-                                     .Replace(ReplaceStringConstant.UserName, userName)
-                                     .Replace(ReplaceStringConstant.Link,link);
+                                     .Replace(ReplaceStringConstant.UserName, userName);
             await SendMail(email, TemplateSubjectConstant.PasswordResetOtpTemplateSubject, content);
             return Otp;
         }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hydra.Database.Migrations
 {
     [DbContext(typeof(HydraContext))]
-    [Migration("20240424054432_initial")]
-    partial class initial
+    [Migration("20240506045059_Intial")]
+    partial class Intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -305,12 +305,17 @@ namespace Hydra.Database.Migrations
                         new
                         {
                             Id = 2L,
-                            Name = "Learner"
+                            Name = "UniversityAdmin"
                         },
                         new
                         {
                             Id = 3L,
                             Name = "Staff"
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Name = "Learner"
                         });
                 });
 
@@ -403,18 +408,10 @@ namespace Hydra.Database.Migrations
                         .HasColumnType("varchar(10)")
                         .HasColumnName("mobile_number");
 
-                    b.Property<DateTime?>("OtpExpiryDate")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("otp_expiry_date");
-
                     b.Property<string>("Password")
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)")
                         .HasColumnName("password");
-
-                    b.Property<string>("PasswordResetOtp")
-                        .HasColumnType("longtext")
-                        .HasColumnName("password_reset_otp");
 
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("longtext")
@@ -449,7 +446,7 @@ namespace Hydra.Database.Migrations
                             IsApproved = true,
                             IsArchived = false,
                             LastName = "",
-                            Password = "",
+                            Password = "3AhCUZedQxVLajDQSZhRirNTvEyK/luGud/X7oAXJX0=",
                             UpdatedDate = new DateTime(2024, 4, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserName = "Admin"
                         });
@@ -487,6 +484,59 @@ namespace Hydra.Database.Migrations
                             RoleId = 1L,
                             UserId = 1L
                         });
+                });
+
+            modelBuilder.Entity("Hydra.Database.Entities.Verification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_date");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsTokenActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("is_token_active");
+
+                    b.Property<string>("OTP")
+                        .HasMaxLength(6)
+                        .HasColumnType("varchar(6)")
+                        .HasColumnName("otp");
+
+                    b.Property<DateTime>("OtpExpiryDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("otp_expiry_date");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("longtext")
+                        .HasColumnName("password_reset_token");
+
+                    b.Property<DateTime>("PasswordResetTokenExpiryDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("password_reser_token_expiry_date");
+
+                    b.Property<string>("UserGuid")
+                        .HasColumnType("longtext")
+                        .HasColumnName("user_guid");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("verification");
                 });
 
             modelBuilder.Entity("Hydra.Database.Entities.Badge", b =>
@@ -584,6 +634,17 @@ namespace Hydra.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Hydra.Database.Entities.Verification", b =>
+                {
+                    b.HasOne("Hydra.Database.Entities.User", "User")
+                        .WithMany("Verification")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Hydra.Database.Entities.AccessLevel", b =>
                 {
                     b.Navigation("User");
@@ -622,6 +683,8 @@ namespace Hydra.Database.Migrations
                     b.Navigation("LearnerBadgeIssuedBy");
 
                     b.Navigation("UserRole");
+
+                    b.Navigation("Verification");
                 });
 #pragma warning restore 612, 618
         }

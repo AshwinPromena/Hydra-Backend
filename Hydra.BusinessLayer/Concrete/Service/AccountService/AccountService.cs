@@ -1,4 +1,5 @@
-﻿using Hydra.BusinessLayer.Repository.IService.IAccountService;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Hydra.BusinessLayer.Repository.IService.IAccountService;
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
@@ -8,8 +9,10 @@ using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Hydra.BusinessLayer.Repository.Service.AccountService
@@ -56,14 +59,18 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ServiceResponse<LoginResponse>> Login(LoginModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved)
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()))
                                                        .Include(x => x.UserRole).ThenInclude(x => x.Role)
                                                        .Include(i => i.AccessLevel)
                                                        .Include(i => i.Department)
                                                        .FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
-            
+            if (!user.IsActive)
+                return new(400, ResponseConstants.AccountInactive);
+            if (!user.IsApproved)
+                return new(400, ResponseConstants.NotApproved);
+
             if (Encipher(model.Password) != user.Password)
                 return new(400, ResponseConstants.InvalidPassword);
 
@@ -75,35 +82,74 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ApiResponse> ForgotPassword(ForgotPasswordModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
+            var Token = GenerateRefereshToken();
+            var user = await _unitOfWork.UserRepository
+                                        .FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) &&
+                                       x.IsActive && x.IsApproved)
+                                        .Include(x => x.Verification)
+                                        .FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
             try
             {
-                user.PasswordResetOtp = await _emailService.SendPasswordResetOTP(user.Email, user.UserName);
-                user.OtpExpiryDate = DateTime.UtcNow.AddMinutes(10);
-
+                var userVerification = user.Verification.FirstOrDefault() == null ? new() : user.Verification.FirstOrDefault();
+                userVerification.UserId = user.Id;
+                userVerification.PasswordResetToken = Token;
+                userVerification.IsTokenActive = true;
+                userVerification.PasswordResetTokenExpiryDate = DateTime.UtcNow.AddMinutes(10);
+                userVerification.CreatedDate = DateTime.UtcNow;
+                await _emailService.SendPasswordResetLink(user.Email, user.Id, user.UserName, Token);
                 _unitOfWork.UserRepository.Update(user);
+                _unitOfWork.VerificationRepository.Update(userVerification);
                 await _unitOfWork.UserRepository.CommitChanges();
 
                 return new(200, ResponseConstants.PasswordResetOtpSent);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new(400, ex.Message);
             }
         }
 
+        public async Task<ServiceResponse<string>> ValidateResetUrl(long userId, string token)
+        {
+            var user = await _unitOfWork.UserRepository
+                                               .FindByCondition(x => x.Id == userId &&
+                                               x.Verification.FirstOrDefault().PasswordResetToken == token)
+                                               .Include(i => i.Verification)
+                                               .FirstOrDefaultAsync();
+
+            if (user == null)
+                return new(400, ResponseConstants.InvalidToken);
+
+            if (user.Verification.FirstOrDefault().PasswordResetTokenExpiryDate <= DateTime.UtcNow)
+                return new(400, ResponseConstants.TokenExpired);
+
+            var Otp = await _emailService.SendPasswordResetOTP(user.Email, user.UserName);
+            var userVerification = user.Verification.FirstOrDefault() == null ? new() : user.Verification.FirstOrDefault();
+            userVerification.OTP = Otp;
+            userVerification.OtpExpiryDate = DateTime.UtcNow.AddMinutes(10);
+            _unitOfWork.VerificationRepository.Update(userVerification);
+            await _unitOfWork.VerificationRepository.CommitChanges();
+
+            return new(200, ResponseConstants.Success, userVerification.PasswordResetToken);
+        }
+
         public async Task<ApiResponse> ResetPassword(ResetPasswordModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
-            if (user == null)
-                return new(400, ResponseConstants.InvalidUserName);
+            var user = await _unitOfWork.UserRepository
+                                        .FindByCondition(x => x.Verification.FirstOrDefault().UserId == x.Id &&
+                                       x.Verification.FirstOrDefault().PasswordResetToken == model.Token)
+                                        .Include(i => i.Verification)
+                                        .FirstOrDefaultAsync();
 
-            if (user.PasswordResetOtp != model.Otp)
+            if (user == null)
+                return new(400, ResponseConstants.InvalidToken);
+
+            if (user.Verification.FirstOrDefault().OTP != model.Otp)
                 return new(400, ResponseConstants.InvalidOtp);
 
-            if (user.OtpExpiryDate <= DateTime.UtcNow)
+            if (user.Verification.FirstOrDefault().OtpExpiryDate <= DateTime.UtcNow)
                 return new(400, ResponseConstants.OtpExpired);
 
             user.Password = Encipher(model.Password);
@@ -114,15 +160,23 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             return new(200, ResponseConstants.Password);
         }
 
-        public async Task<ApiResponse> ReSendOtp(ForgotPasswordModel model) 
+        public async Task<ApiResponse> ReSendOtp(ForgotPasswordModel model)
         {
+            var Token = Guid.NewGuid().ToString();
             var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
             try
             {
-                user.PasswordResetOtp = await _emailService.SendPasswordResetOTP(user.Email, user.UserName);
-                user.OtpExpiryDate = DateTime.UtcNow.AddMinutes(10);
+                user.Verification.Add(new()
+                {
+                    UserId = user.Id,
+                    OTP = await _emailService.SendPasswordResetOTP(user.Email, user.UserName),
+                    OtpExpiryDate = DateTime.UtcNow.AddMinutes(10),
+                    PasswordResetToken = Token,
+                    IsTokenActive = true,
+                    CreatedDate = DateTime.UtcNow,
+                });
 
                 _unitOfWork.UserRepository.Update(user);
                 await _unitOfWork.UserRepository.CommitChanges();
@@ -166,6 +220,15 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             return tokenHandler.WriteToken(token);
         }
 
+        private string GenerateRefereshToken()
+        {
+#pragma warning disable SYSLIB0023 
+            using var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+#pragma warning restore SYSLIB0023 
+            var randomBytes = new byte[64];
+            rngCryptoServiceProvider.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
         #endregion
     }
 }
