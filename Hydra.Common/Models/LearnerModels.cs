@@ -46,4 +46,17 @@ namespace Hydra.Common.Models
         [JsonProperty("learnerWithoutBadge")]
         public int LearnerWithoutBadge { get; set; }
     }
+
+    public class GetLearnerModel
+    {
+        [JsonProperty("userId")]
+        public long UserId { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("email")]
+        public string Email { get; set; }
+
+    }
 }

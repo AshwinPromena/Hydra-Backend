@@ -25,12 +25,13 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             var learnerCount = await _unitOfWork.UserRepository
                                                 .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner)
                                                 .ToListAsync();
-
             return new(200, ResponseConstants.Success, new LearnerDashBoardModel
             {
                 LearnerInTotal = learnerCount.Count,
-                LearnerWithBadge = _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.UserId ==  && x.IsActive).Count(),
+                LearnerWithBadge = _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive).Count(),
+                LearnerWithoutBadge = _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive == false).Count(),
             });
+
         }
 
         public async Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLeraner(IFormFile file)
@@ -137,5 +138,46 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
         {
             return await _badgeService.AssignBadges(model);
         }
+
+        public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(PagedResponseInput model)
+        {
+            model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
+
+            var data = await _unitOfWork.UserRepository
+                                        .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner)
+                                        .Where(x => string.IsNullOrEmpty(model.SearchString) ||
+                                                    (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                    (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
+                                        .GroupBy(x => 1)
+                                        .Select(x => new PagedResponseOutput<List<GetLearnerModel>>
+                                        {
+                                            TotalCount = x.Count(),
+                                            Data = x.OrderByDescending(x => x.CreatedDate)
+                                                    .Select(s => new GetLearnerModel
+                                                    {
+                                                        UserId = x.FirstOrDefault().Id,
+                                                        Name = x.FirstOrDefault().FirstName + x.FirstOrDefault().LastName,
+                                                        Email = s.Email
+                                                    })
+                                                    .Skip(model.PageSize * (model.PageIndex - 1))
+                                                    .Take(model.PageSize)
+                                                    .ToList()
+
+                                        }).FirstOrDefaultAsync();
+
+            return new PagedResponse<List<GetLearnerModel>>
+            {
+                Data = data?.Data ?? [],
+                HasNextPage = data?.TotalCount > (model.PageSize * model.PageIndex),
+                HasPreviousPage = model.PageIndex > 1,
+                TotalRecords = data == null ? 0 : data.TotalCount,
+                SearchString = model.SearchString,
+                PageSize = model.PageSize,
+                PageIndex = model.PageIndex,
+                Message = ResponseConstants.Success,
+                StatusCode = 200
+            };
+        }
+
     }
 }
