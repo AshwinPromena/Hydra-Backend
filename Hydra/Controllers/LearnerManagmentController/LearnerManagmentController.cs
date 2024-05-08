@@ -51,5 +51,12 @@ namespace Hydra.Controllers.LearnerController
 
             return await _learnerManagmentService.AssignBadgeToLearners(model);
         }
+
+
+        [HttpPost("[action]")]
+        public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(PagedResponseInput model)
+        {
+             return await _learnerManagmentService.GetAllLearners(model);
+        }
     }
 }

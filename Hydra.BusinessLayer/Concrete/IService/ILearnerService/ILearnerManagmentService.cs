@@ -14,6 +14,6 @@ namespace Hydra.BusinessLayer.Repository.IService.ILearnerService
 
         Task<ApiResponse> AssignBadgeToLearners(AssignBadgeModel model);
 
-        //Task<ServiceResponse<List<LearnerBadge>>> GetAllLearner();
+        Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(PagedResponseInput model);
     }
 }
