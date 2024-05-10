@@ -16,7 +16,7 @@ namespace Hydra.Common.Repository.Service
 
         public async Task<ApiResponse> SendPasswordResetLink(string email, long userId, string userName, string token)
         {
-            string Link = $"https://hydra-react.vercel.app/reset-password?userId={userId}&token={token}";
+            string Link = $"https://hydra-react.vercel.app/otpverification?userId={userId}&token={token}";
             string template = await ReadTemplate(TemplateConstatnt.PasswordResetLink);
             string content = template.Replace(ReplaceStringConstant.Link, Link)
                                      .Replace(ReplaceStringConstant.UserName, userName);

@@ -23,5 +23,7 @@
         ILearnerBadgeRepository LearnerBadgeRepository { get; }
 
         IVerificationRepository VerificationRepository { get; }
+
+        IPasswordResetTokenRepository PasswordResetTokenRepository { get; }
     }
 }

@@ -26,17 +26,5 @@ namespace Hydra.Database.Entities
 
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
-
-        [Column("password_reset_token")]
-        public string PasswordResetToken {  get; set; }
-
-        [Column("password_reser_token_expiry_date")]
-        public DateTime PasswordResetTokenExpiryDate { get; set; }
-
-        [Column("is_token_active")]
-        public bool IsTokenActive { get; set; }
-
-        [Column("created_date")]
-        public DateTime CreatedDate { get; set; }
     }
 }

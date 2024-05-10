@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Office2013.Drawing.Chart;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Hydra.BusinessLayer.Repository.IService.IAccountService;
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
@@ -9,7 +10,6 @@ using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -87,20 +87,22 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                                         .FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) &&
                                        x.IsActive && x.IsApproved)
                                         .Include(x => x.Verification)
+                                        .Include(x => x.PasswordResetToken)
                                         .FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
             try
             {
-                var userVerification = user.Verification.FirstOrDefault() == null ? new() : user.Verification.FirstOrDefault();
-                userVerification.UserId = user.Id;
-                userVerification.PasswordResetToken = Token;
-                userVerification.IsTokenActive = true;
-                userVerification.PasswordResetTokenExpiryDate = DateTime.UtcNow.AddMinutes(10);
-                userVerification.CreatedDate = DateTime.UtcNow;
+                var token = new PasswordResetToken
+                {
+                    UserId = user.Id,
+                    ResetToken = Token,
+                    IsTokenActive = true,
+                    TokenExpiryDate = DateTime.UtcNow.AddMinutes(10),
+                    CreatedDate = DateTime.UtcNow,
+                };
                 await _emailService.SendPasswordResetLink(user.Email, user.Id, user.UserName, Token);
-                _unitOfWork.UserRepository.Update(user);
-                _unitOfWork.VerificationRepository.Update(userVerification);
+                await _unitOfWork.PasswordResetTokenRepository.Create(token);
                 await _unitOfWork.UserRepository.CommitChanges();
 
                 return new(200, ResponseConstants.PasswordResetOtpSent);
@@ -111,82 +113,91 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             }
         }
 
-        public async Task<ServiceResponse<string>> ValidateResetUrl(long userId, string token)
+        public async Task<ServiceResponse<string>> ValidateResetUrl(string token)
         {
-            var user = await _unitOfWork.UserRepository
-                                               .FindByCondition(x => x.Id == userId &&
-                                               x.Verification.FirstOrDefault().PasswordResetToken == token)
-                                               .Include(i => i.Verification)
+            var user = await _unitOfWork.PasswordResetTokenRepository
+                                               .FindByCondition(x =>
+                                               x.ResetToken == token &&
+                                              x.IsTokenActive == true && x.User.Id == x.UserId)
+                                               .Include(i => i.User)
                                                .FirstOrDefaultAsync();
 
             if (user == null)
                 return new(400, ResponseConstants.InvalidToken);
 
-            if (user.Verification.FirstOrDefault().PasswordResetTokenExpiryDate <= DateTime.UtcNow)
+            if (user.TokenExpiryDate <= DateTime.UtcNow)
                 return new(400, ResponseConstants.TokenExpired);
 
-            var Otp = await _emailService.SendPasswordResetOTP(user.Email, user.UserName);
-            var userVerification = user.Verification.FirstOrDefault() == null ? new() : user.Verification.FirstOrDefault();
-            userVerification.OTP = Otp;
-            userVerification.OtpExpiryDate = DateTime.UtcNow.AddMinutes(10);
-            _unitOfWork.VerificationRepository.Update(userVerification);
+            var Otp = await _emailService.SendPasswordResetOTP(user.User.Email, user.User.UserName);
+
+            var verification = new Verification
+            {
+                OTP = Otp,
+                OtpExpiryDate = DateTime.UtcNow.AddMinutes(10),
+                UserId = user.User.Id,
+                IsActive = true,
+            };
+
+            user.IsTokenActive = false;
+            var userToken = user.IsTokenActive == false ? GenerateRefereshToken() : user.ResetToken;
+            user.IsTokenActive = true;
+            user.TokenExpiryDate = DateTime.UtcNow.AddMinutes(10);
+            user.UserId = user.User.Id;
+            await _unitOfWork.VerificationRepository.Create(verification);
+            _unitOfWork.PasswordResetTokenRepository.Update(user);
             await _unitOfWork.VerificationRepository.CommitChanges();
 
-            return new(200, ResponseConstants.Success, userVerification.PasswordResetToken);
+
+            return new(200, ResponseConstants.Success, user.ResetToken);
         }
 
-        public async Task<ApiResponse> ResetPassword(ResetPasswordModel model)
+        public async Task<ServiceResponse<string>> ValidateOtp(ValidateOtpModel model)
         {
-            var user = await _unitOfWork.UserRepository
-                                        .FindByCondition(x => x.Verification.FirstOrDefault().UserId == x.Id &&
-                                       x.Verification.FirstOrDefault().PasswordResetToken == model.Token)
-                                        .Include(i => i.Verification)
+            var token = GenerateRefereshToken();
+            var user = await _unitOfWork.PasswordResetTokenRepository
+                                        .FindByCondition(x => x.ResetToken == model.Token &&
+                                       x.IsTokenActive)
+                                        .Include(i => i.User)
+                                        .ThenInclude(ti => ti.Verification)
                                         .FirstOrDefaultAsync();
 
             if (user == null)
                 return new(400, ResponseConstants.InvalidToken);
 
-            if (user.Verification.FirstOrDefault().OTP != model.Otp)
+            if (user.User.Verification.FirstOrDefault().OTP != model.Otp && user.User.Verification.FirstOrDefault().IsActive == true)
                 return new(400, ResponseConstants.InvalidOtp);
 
-            if (user.Verification.FirstOrDefault().OtpExpiryDate <= DateTime.UtcNow)
+            if (user.User.Verification.FirstOrDefault().OtpExpiryDate <= DateTime.UtcNow && user.User.Verification.FirstOrDefault().IsActive == true)
                 return new(400, ResponseConstants.OtpExpired);
 
-            user.Password = Encipher(model.Password);
+            user.User.Verification.FirstOrDefault().IsActive = false;
 
-            _unitOfWork.UserRepository.Update(user);
+            user.ResetToken = token;
+            user.IsTokenActive = true;
+            _unitOfWork.PasswordResetTokenRepository.Update(user);
+            await _unitOfWork.UserRepository.CommitChanges();
+
+            return new(200, ResponseConstants.Success, token);
+        }
+
+        public async Task<ApiResponse> ResetPassword(ResetPasswordModel model)
+        {
+            var user = await _unitOfWork.PasswordResetTokenRepository
+                                        .FindByCondition(x => x.ResetToken == model.Token &&
+                                       x.UserId == x.User.Id &&
+                                       x.IsTokenActive)
+                                        .Include(i => i.User)
+                                        .FirstOrDefaultAsync();
+            if (user == null)
+                return new(400, ResponseConstants.InvalidToken);
+
+            var newPassword = Encipher(model.Password);
+            user.User.Password = newPassword;
+
+            _unitOfWork.UserRepository.Update(user.User);
             await _unitOfWork.UserRepository.CommitChanges();
 
             return new(200, ResponseConstants.Password);
-        }
-
-        public async Task<ApiResponse> ReSendOtp(ForgotPasswordModel model)
-        {
-            var Token = Guid.NewGuid().ToString();
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.IsApproved).FirstOrDefaultAsync();
-            if (user == null)
-                return new(400, ResponseConstants.InvalidUserName);
-            try
-            {
-                user.Verification.Add(new()
-                {
-                    UserId = user.Id,
-                    OTP = await _emailService.SendPasswordResetOTP(user.Email, user.UserName),
-                    OtpExpiryDate = DateTime.UtcNow.AddMinutes(10),
-                    PasswordResetToken = Token,
-                    IsTokenActive = true,
-                    CreatedDate = DateTime.UtcNow,
-                });
-
-                _unitOfWork.UserRepository.Update(user);
-                await _unitOfWork.UserRepository.CommitChanges();
-
-                return new(200, ResponseConstants.PasswordResetOtpSent);
-            }
-            catch (Exception ex)
-            {
-                return new(400, ex.Message);
-            }
         }
 
 

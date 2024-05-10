@@ -36,9 +36,18 @@ namespace Hydra.Controllers.AccountController
         }
 
         [HttpPost("[action]")]
-        public async Task<ServiceResponse<string>> ValidateResetUrl(long userId, string token)
+        public async Task<ServiceResponse<string>> ValidateResetUrl(string token)
         {
-            return await _accountService.ValidateResetUrl(userId, token);
+            return await _accountService.ValidateResetUrl(token);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ServiceResponse<string>> ValidateOtp(ValidateOtpModel model)
+        {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+
+            return await _accountService.ValidateOtp(model);
         }
 
         [HttpPost("[action]")]
@@ -49,12 +58,12 @@ namespace Hydra.Controllers.AccountController
             return await _accountService.ResetPassword(model);
         }
 
-        [HttpPost("[action]")]
-        public async Task<ApiResponse> ReSendOtp(ForgotPasswordModel model)
-        {
-            if (!ModelState.IsValid)
-                return new(400, ResponseConstants.BadRequest);
-            return await _accountService.ReSendOtp(model);
-        }
+        //[HttpPost("[action]")]
+        //public async Task<ApiResponse> ReSendOtp(ForgotPasswordModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return new(400, ResponseConstants.BadRequest);
+        //    return await _accountService.ReSendOtp(model);
+        //}
     }
 }

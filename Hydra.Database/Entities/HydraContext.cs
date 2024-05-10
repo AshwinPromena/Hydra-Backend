@@ -26,6 +26,8 @@ namespace Hydra.Database.Entities
 
         public virtual DbSet<Verification> Verification {  get; set; }
 
+        public virtual DbSet<PasswordResetToken> PasswordResetToken { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.SeedData();

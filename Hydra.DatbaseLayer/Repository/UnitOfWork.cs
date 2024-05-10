@@ -28,5 +28,7 @@ namespace Hydra.DatbaseLayer.Repository
         public ILearnerBadgeRepository LearnerBadgeRepository => new LearnerBadgeRepository(_context);
 
         public IVerificationRepository VerificationRepository => new VerificationRepository(_context);
+
+        public IPasswordResetTokenRepository PasswordResetTokenRepository => new PasswordResetTokenRepository(_context);
     }
 }

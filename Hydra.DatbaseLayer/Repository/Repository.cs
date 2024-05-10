@@ -30,4 +30,6 @@ namespace Hydra.DatbaseLayer.Repository
     public class UserRoleRepository(HydraContext context) : CommonRepository<UserRole>(context), IUserRoleRepository { }
 
     public class VerificationRepository(HydraContext context) : CommonRepository<Verification>(context) , IVerificationRepository { }
+
+    public class PasswordResetTokenRepository(HydraContext context) : CommonRepository<PasswordResetToken>(context), IPasswordResetTokenRepository { }
 }

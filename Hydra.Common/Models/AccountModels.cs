@@ -69,16 +69,21 @@ namespace Hydra.Common.Models
 
     public class ResetPasswordModel
     {
-        [JsonProperty("Token")]
+        [JsonProperty("token")]
         public string Token { get; set; }
-
-        [JsonProperty("otp")]
-        [Required(ErrorMessage = "OTP is required.")]
-        public string Otp { get; set; }
 
         [JsonProperty("password")]
         [Required(ErrorMessage = "Password is required.")]
         [RegularExpression("^(?!\\s*$).+", ErrorMessage = "New password cannot be empty.")]
         public string Password { get; set; }
+    }
+
+    public class ValidateOtpModel
+    {
+        [JsonProperty("token")]
+        public string Token { get; set; }
+
+        [JsonProperty("otp")]
+        public string Otp { get; set; }
     }
 }
