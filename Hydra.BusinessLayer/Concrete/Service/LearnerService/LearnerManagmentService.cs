@@ -90,6 +90,9 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Email = model.Email,
+                Email2 = model.Email2,
+                Email3 = model.Email3,
+                MobileNumber = model.MobileNumber
             };
             learner.UserRole.Add(new()
             {
@@ -110,6 +113,9 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                     FirstName = "Mary",
                     LastName = "Johnson",
                     Email = "maryjohnson@yopmail.com",
+                    Email2 = "johson@yopmail.com",
+                    Email3 = "mary@yopmail.com",
+                    MobileNumber ="(555) 123-4567",
                 }
             };
             List<Dictionary<string, string>> convertedList = new List<Dictionary<string, string>>();
@@ -148,9 +154,9 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             learnersQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
                             learnersQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                      (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : learnersQuery;
-            learnersQuery = model.Type == 0 ?
+            learnersQuery = model.Type == (int)GetLearnerType.All ?
                             learnersQuery :
-                            (model.Type == 1 ?
+                            (model.Type == (int)GetLearnerType.Assigned ?
                                 learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() > 0) :
                                 learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() == 0));
             learnersQuery = model.FromDate != null ? learnersQuery.Where(x => x.CreatedDate.Date >= model.FromDate.Value.Date) : learnersQuery;
@@ -170,6 +176,12 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                         {
                                                             BadgeId = s.Id,
                                                             BadgeName = s.Badge.Name,
+                                                            DepartmentId = s.Badge.DepartmentId,
+                                                            DepartmentName = s.Badge.Department.Name,
+                                                            IssuedDate = s.Badge.IssueDate,
+                                                            ExpirationDate = s.Badge.ExpirationDate,
+                                                            SequenceId = s.Badge.BadgeSequenceId,
+                                                            SequenceName = s.Badge.BadgeSequence.Name,
                                                         }).ToList(),
                                                         ProfilePicture = s.ProfilePicture
                                                     })
@@ -193,11 +205,11 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             };
         }
 
-        public async Task<ServiceResponse<GetLearnerModel>> GetLearnerById(long userId)
+        public async Task<ServiceResponse<GetLearnerByIdModel>> GetLearnerById(long userId)
         {
             return new(200, ResponseConstants.Success, await _unitOfWork.UserRepository
                                                                         .FindByCondition(x => x.Id == userId && x.IsActive)
-                                                                        .Select(s => new GetLearnerModel
+                                                                        .Select(s => new GetLearnerByIdModel
                                                                         {
                                                                             UserId = s.Id,
                                                                             Name = s.FirstName + s.LastName,
@@ -206,7 +218,14 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                             {
                                                                                 BadgeId = s.BadgeId,
                                                                                 BadgeName = s.Badge.Name,
-                                                                            }).ToList()
+                                                                                DepartmentId = s.Badge.DepartmentId,
+                                                                                DepartmentName = s.Badge.Department.Name,
+                                                                                IssuedDate = s.Badge.IssueDate,
+                                                                                ExpirationDate = s.Badge.ExpirationDate,
+                                                                                SequenceId = s.Badge.BadgeSequenceId,
+                                                                                SequenceName = s.Badge.BadgeSequence.Name,
+                                                                            }).ToList(),
+                                                                            ProfilePicture = s.ProfilePicture,
                                                                         }).FirstOrDefaultAsync());
         }
 

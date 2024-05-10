@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hydra.Common.Models
 {
@@ -11,13 +12,25 @@ namespace Hydra.Common.Models
     public class AddLearnerModel
     {
         [JsonProperty("firstName")]
+        [Required(ErrorMessage = "This field is required")]
         public string FirstName { get; set; }
 
         [JsonProperty("lastName")]
+        [Required(ErrorMessage = "This field is required")]
         public string LastName { get; set; }
 
         [JsonProperty("email")]
+        [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; }
+
+        [JsonProperty("email2")]
+        public string? Email2 { get; set; }
+
+        [JsonProperty("email3")]
+        public string? Email3 { get; set; }
+
+        [JsonProperty("mobileNumber")]
+        public string? MobileNumber { get; set; }
     }
 
     public class ExistingLearnerModel
@@ -78,6 +91,34 @@ namespace Hydra.Common.Models
         public string ProfilePicture { get; set; }
     }
 
+    public class GetLearnerByIdModel
+    {
+        [JsonProperty("userId")]
+        public long UserId { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("email")]
+        public string Email { get; set; }
+
+        [JsonProperty("learnerBadgeModel")]
+        public List<LearnerBadgeModel> LearnerBadgeModel { get; set; }
+
+        [JsonProperty("profilePicture")]
+        public string ProfilePicture { get; set; }
+
+        [JsonProperty("active")]
+        public int Active {  get; set; }
+
+        [JsonProperty("expiring")]
+        public int Expiring { get; set; }
+
+        [JsonProperty("expired")]
+        public int Expired { get; set; }
+    }
+
+
     public class LearnerBadgeModel
     {
         [JsonProperty("badgeId")]
@@ -85,6 +126,24 @@ namespace Hydra.Common.Models
 
         [JsonProperty("badgeName")]
         public string BadgeName { get; set; }
+
+        [JsonProperty("departmentId")]
+        public long DepartmentId { get; set; }
+
+        [JsonProperty("departmentName")]
+        public string DepartmentName { get; set; }
+        [JsonProperty("issuedDate")]
+        public DateTime IssuedDate { get; set; }
+
+        [JsonProperty("expirationDate")]
+        public DateTime ExpirationDate { get; set; }
+
+        [JsonProperty("sequenceId")]
+        public long? SequenceId { get; set; }
+
+        [JsonProperty("sequenceName")]
+        public string SequenceName { get; set; }
+
     }
 
     public class RevokeBadgeModel

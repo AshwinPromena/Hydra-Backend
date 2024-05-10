@@ -28,6 +28,14 @@ namespace Hydra.Database.Entities
         [MaxLength(50)]
         public string Email { get; set; }
 
+        [Column("email_2")]
+        [MaxLength(50)]
+        public string Email2 { get; set; }
+
+        [Column("email_3")]
+        [MaxLength(50)]
+        public string Email3 { get; set; }
+
         [Column("password")]
         [MaxLength(50)]
         public string Password { get; set; }

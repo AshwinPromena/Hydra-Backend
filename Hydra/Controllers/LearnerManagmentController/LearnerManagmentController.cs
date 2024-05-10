@@ -52,21 +52,15 @@ namespace Hydra.Controllers.LearnerController
         }
 
         [HttpPost("[action]")]
-        public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(PagedResponseInput model)
+        public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model)
         {
             return await _learnerManagmentService.GetAllLearners(model);
         }
 
         [HttpGet("[action]")]
-        public async Task<ServiceResponse<GetLearnerModel>> GetLearnerById(long userId)
+        public async Task<ServiceResponse<GetLearnerByIdModel>> GetLearnerById(long userId)
         {
             return await _learnerManagmentService.GetLearnerById(userId);
-        }
-
-        [HttpPost("[action]")]
-        public async Task<PagedResponse<List<GetLearnerModel>>> GetRecentlyAddedLearner(DateTime fromDate, DateTime toDate, PagedResponseInput model)
-        {
-            return await _learnerManagmentService.GetRecentlyAddedLearner(fromDate, toDate, model);
         }
 
         [HttpPost("[action]")]
