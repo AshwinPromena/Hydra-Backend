@@ -42,7 +42,6 @@ namespace Hydra.Controllers.LearnerController
             return await _learnerManagmentService.AddLearner(model);
         }
 
-
         [HttpPost("[action]"), Authorize(Roles = "Staff")]
         public async Task<ApiResponse> AssignBadgeToLearners(AssignBadgeModel model)
         {
@@ -52,11 +51,40 @@ namespace Hydra.Controllers.LearnerController
             return await _learnerManagmentService.AssignBadgeToLearners(model);
         }
 
-
         [HttpPost("[action]")]
         public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(PagedResponseInput model)
         {
-             return await _learnerManagmentService.GetAllLearners(model);
+            return await _learnerManagmentService.GetAllLearners(model);
+        }
+
+        [HttpGet("[action]")]
+        public async Task<ServiceResponse<GetLearnerModel>> GetLearnerById(long userId)
+        {
+            return await _learnerManagmentService.GetLearnerById(userId);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<PagedResponse<List<GetLearnerModel>>> GetRecentlyAddedLearner(DateTime fromDate, DateTime toDate, PagedResponseInput model)
+        {
+            return await _learnerManagmentService.GetRecentlyAddedLearner(fromDate, toDate, model);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model)
+        {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+
+            return await  _learnerManagmentService.RevokeBadgeFromLearner(model);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ApiResponse> RemoveLearners(RemoveLearnerModel model)
+        {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+
+            return await _learnerManagmentService.RemoveLearners(model);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                                                     {
                                                         DepartmentId = s.Id,
                                                         DepartmentName = s.Name
-                                                    }).Skip(model.PageSize * (model.PageIndex - 1))
+                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
                                                       .Take(model.PageSize)
                                                       .ToList()
                                         }).FirstOrDefaultAsync();
@@ -62,7 +62,7 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                                                     {
                                                         AccessLevelId = s.Id,
                                                         AccessLevelName = s.Name
-                                                    }).Skip(model.PageSize * (model.PageIndex - 1))
+                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
                                                       .Take(model.PageSize)
                                                       .ToList()
                                         }).FirstOrDefaultAsync();
@@ -96,7 +96,7 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                                                     {
                                                         UserId = s.Id,
                                                         UserName = (string.IsNullOrEmpty(s.FirstName) ? null : s.FirstName) + (!string.IsNullOrEmpty(s.FirstName) && !string.IsNullOrEmpty(s.LastName) ? " " : null) + (string.IsNullOrEmpty(s.LastName) ? null : s.LastName)
-                                                    }).Skip(model.PageSize * (model.PageIndex - 1))
+                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
                                                       .Take(model.PageSize)
                                                       .ToList()
                                         }).FirstOrDefaultAsync();
@@ -138,7 +138,7 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                                                     {
                                                         UserId = s.Id,
                                                         UserName = (string.IsNullOrEmpty(s.FirstName) ? null : s.FirstName) + (!string.IsNullOrEmpty(s.FirstName) && !string.IsNullOrEmpty(s.LastName) ? " " : null) + (string.IsNullOrEmpty(s.LastName) ? null : s.LastName)
-                                                    }).Skip(model.PageSize * (model.PageIndex - 1))
+                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
                                                       .Take(model.PageSize)
                                                       .ToList()
                                         }).FirstOrDefaultAsync();
@@ -179,7 +179,7 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                                                     {
                                                         BadgeId = s.Id,
                                                         BadgeName = s.Name
-                                                    }).Skip(model.PageSize * (model.PageIndex - 1))
+                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
                                                       .Take(model.PageSize)
                                                       .ToList()
                                         }).FirstOrDefaultAsync();

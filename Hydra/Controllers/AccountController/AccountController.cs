@@ -19,7 +19,6 @@ namespace Hydra.Controllers.AccountController
             return await _accountService.Register(model);
         }
 
-
         [HttpPost("[action]")]
         public async Task<ServiceResponse<LoginResponse>> Login(LoginModel model)
         {
@@ -27,7 +26,6 @@ namespace Hydra.Controllers.AccountController
                 return new(400, ResponseConstants.BadRequest);
             return await _accountService.Login(model);
         }
-
 
         [HttpPost("[action]")]
         public async Task<ApiResponse> ForgotPassword(ForgotPasswordModel model)
@@ -50,7 +48,6 @@ namespace Hydra.Controllers.AccountController
                 return new(400, ResponseConstants.BadRequest);
             return await _accountService.ResetPassword(model);
         }
-
 
         [HttpPost("[action]")]
         public async Task<ApiResponse> ReSendOtp(ForgotPasswordModel model)

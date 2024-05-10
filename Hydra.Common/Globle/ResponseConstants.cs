@@ -80,6 +80,8 @@
         public const string LearnersExists = "Learners with these credentials already exists";
         public const string LearnerAdded = "Learner has been created";
         public const string LearnersAdded = "{count} Learners added successfully";
+        public const string BadgeRevoked = "Badges has been revoked from selected learners";
+        public const string LearnersRemoved = "Selected learners has been removed successfully";
         #endregion
     }
 }

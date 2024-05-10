@@ -8,12 +8,11 @@ namespace Hydra.Controllers.BadgeController
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class BadgeSequenceController(IBadgeSequenceService badgeSequenceService) : ControllerBase
     {
         private readonly IBadgeSequenceService _badgeSequenceService = badgeSequenceService;
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ApiResponse> AddBadgeSequence(string sequenceName)
         {
             if (!ModelState.IsValid)
@@ -22,7 +21,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeSequenceService.AddBadgeSequence(sequenceName);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ApiResponse> UpdateBadgeSequence(int sequenceId, string sequenceName)
         {
             if (!ModelState.IsValid)
@@ -31,7 +30,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeSequenceService.UpdateBadgeSequence(sequenceId, sequenceName);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ApiResponse> DeleteBadgeSequence(int sequenceId)
         {
             if (!ModelState.IsValid)
@@ -40,7 +39,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeSequenceService.DeleteBadgeSequence(sequenceId);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ServiceResponse<BadgeSequenceOutputModel>> GetBadgeSequenceById(int sequenceId)
         {
             if (!ModelState.IsValid)
@@ -49,7 +48,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeSequenceService.GetBadgeSequenceById(sequenceId);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<PagedResponse<List<BadgeSequenceOutputModel>>> GetAllBadgeSequences(PagedResponseInput model)
         {
             if (!ModelState.IsValid)
