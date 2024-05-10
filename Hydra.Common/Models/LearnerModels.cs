@@ -45,6 +45,19 @@ namespace Hydra.Common.Models
 
         [JsonProperty("learnerWithoutBadge")]
         public int LearnerWithoutBadge { get; set; }
+
+        [JsonProperty("addedTodayCount")]
+        public int AddedTodayCount { get; set; }
+    }
+
+
+    public class GetAllLearnerInputModel : PagedResponseInput
+    {
+        public DateTime? FromDate { get; set; }
+
+        public DateTime? ToDate { get; set; }
+
+        public int Type { get; set; }
     }
 
     public class GetLearnerModel
@@ -60,6 +73,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("learnerBadgeModel")]
         public List<LearnerBadgeModel> LearnerBadgeModel { get; set; }
+
+        [JsonProperty("profilePicture")]
+        public string ProfilePicture { get; set; }
     }
 
     public class LearnerBadgeModel

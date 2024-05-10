@@ -12,7 +12,7 @@ namespace Hydra.Database.Entities
             LearnerBadge = new HashSet<LearnerBadge>();
             LearnerBadgeIssuedBy = new HashSet<LearnerBadge>();
             Badge = new HashSet<Badge>();
-            Verification = new HashSet<Verification>(); 
+            Verification = new HashSet<Verification>();
             PasswordResetToken = new HashSet<PasswordResetToken>();
         }
 

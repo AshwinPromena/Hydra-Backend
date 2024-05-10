@@ -2,7 +2,6 @@
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
-using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
 

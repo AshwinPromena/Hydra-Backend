@@ -19,7 +19,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
 
         public async Task<ApiResponse> AddBadge(AddBadgeModel model)
         {
-            var badge = await _unitOfWork.BadgeRepository.FindByCondition(x => x.Name.ToLower().Replace(" ", string.Empty) == model.BadgeName.ToLower().Replace(" ",string.Empty) && x.IsActive).FirstOrDefaultAsync();
+            var badge = await _unitOfWork.BadgeRepository.FindByCondition(x => x.Name.ToLower().Replace(" ", string.Empty) == model.BadgeName.ToLower().Replace(" ", string.Empty) && x.IsActive).FirstOrDefaultAsync();
             if (badge != null)
                 return new(400, ResponseConstants.BadgeExists);
 
@@ -42,7 +42,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             {
                 Name = x.FieldName,
                 Content = x.FieldContent,
-                Type = (int) FieldType.LearningOutcomes,
+                Type = (int)FieldType.LearningOutcomes,
                 TypeName = FieldType.LearningOutcomes.ToString()
             }));
             model.Competencies.ForEach(x => badge.BadgeField.Add(new()
@@ -59,8 +59,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             await _unitOfWork.BadgeRepository.Create(badge);
             await _unitOfWork.BadgeRepository.CommitChanges();
 
-            return new(200, model.IsRequiresApproval 
-                           ? ResponseConstants.RequiresApprovalBadgeAdded.Replace("{BadgeName}",badge.Name)
+            return new(200, model.IsRequiresApproval
+                           ? ResponseConstants.RequiresApprovalBadgeAdded.Replace("{BadgeName}", badge.Name)
                            : ResponseConstants.ApprovedBadgeAdded.Replace("{BadgeName}", badge.Name));
         }
 
@@ -151,7 +151,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                              IsSequence = b.BadgeSequenceId != null,
                                                              ApprovalUserId = b.ApprovalUserId,
                                                              LearningOutcomes = b.BadgeField.Where(x => x.Type == (long)FieldType.LearningOutcomes)
-                                                                                           .Select(a => new BadgeFieldModel() 
+                                                                                           .Select(a => new BadgeFieldModel()
                                                                                            {
                                                                                                FieldName = a.Name,
                                                                                                FieldContent = a.Content

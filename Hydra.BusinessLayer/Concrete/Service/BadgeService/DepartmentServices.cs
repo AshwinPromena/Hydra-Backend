@@ -3,12 +3,6 @@ using Hydra.Common.Globle;
 using Hydra.Common.Models;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
 {
@@ -35,12 +29,12 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
         public async Task<ApiResponse> UpdateDepartment(int departmentId, string departmentName)
         {
             var department = await _unitOfWork.DepartmentRepository.FindByCondition(x => x.Id == departmentId && x.IsActive).FirstOrDefaultAsync();
-            if (department is  null)
+            if (department is null)
                 return new ApiResponse(404, ResponseConstants.InvalidDepartmentId);
 
             var existingDepartment = await _unitOfWork.DepartmentRepository
-                                                      .FindByCondition(x => x.Name.ToLower().Replace(" ", string.Empty) == departmentName.ToLower().Replace(" ", string.Empty) && 
-                                                                            x.IsActive && 
+                                                      .FindByCondition(x => x.Name.ToLower().Replace(" ", string.Empty) == departmentName.ToLower().Replace(" ", string.Empty) &&
+                                                                            x.IsActive &&
                                                                             x.Id != departmentId)
                                                       .FirstOrDefaultAsync();
 

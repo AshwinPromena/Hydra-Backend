@@ -1,5 +1,4 @@
-﻿using ExcelDataReader;
-using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
+﻿using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
 using Hydra.BusinessLayer.Repository.IService.ILearnerService;
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
@@ -7,9 +6,7 @@ using Hydra.Common.Models;
 using Hydra.Common.Repository.IService;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 {
@@ -24,60 +21,61 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
         {
             var learnerCount = await _unitOfWork.UserRepository
                                                 .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner &&
-                                                x.IsActive)
+                                                                      x.IsActive)
+                                                .Select(x => new
+                                                {
+                                                    x.Id,
+                                                    badgeCount = x.LearnerBadge.Where(x => x.IsActive).Count(),
+                                                    x.CreatedDate,
+                                                })
                                                 .ToListAsync();
-            var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive && x.User.IsActive).Select(s => s.UserId).Distinct().ToListAsync();
+            //var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive && x.User.IsActive).Select(s => s.UserId).Distinct().ToListAsync();
             return new(200, ResponseConstants.Success, new LearnerDashBoardModel
             {
                 LearnerInTotal = learnerCount.Count,
-                LearnerWithBadge = learnerWithBadge.Count,
-                LearnerWithoutBadge = learnerCount.Count - learnerWithBadge.Count,
+                LearnerWithBadge = learnerCount.Where(x => x.badgeCount != 0).Count(),
+                LearnerWithoutBadge = learnerCount.Where(x => x.badgeCount == 0).Count(),
+                AddedTodayCount = learnerCount.Where(x => x.CreatedDate.Date == DateTime.UtcNow.Date).Count()
             });
 
         }
 
-        public async Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLeraner(IFormFile file)
+        public async Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLeraner(List<AddLearnerModel> model)
         {
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-            using (var memoryStream = new MemoryStream())
+            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(l => model.Select(s => s.Email).Contains(l.Email)).Select(s => s.Email).ToListAsync();
+            var newLearners = model.Where(data => !verifyLearner.Contains(data.Email)).ToList();
+            if (verifyLearner.Count > 0)
             {
-                await file.CopyToAsync(memoryStream);
-                IExcelDataReader reader;
-                reader = ExcelReaderFactory.CreateReader(memoryStream);
-
-                var conf = new ExcelDataSetConfiguration
+                return new ServiceResponse<List<ExistingLearnerModel>>
                 {
-                    ConfigureDataTable = _ => new ExcelDataTableConfiguration
-                    {
-                        UseHeaderRow = true
-                    }
+                    Data = verifyLearner.Select(email => new ExistingLearnerModel { Email = email }).ToList(),
+                    Message = ResponseConstants.LearnersExists,
+                    StatusCode = 409,
                 };
-                var dataSet = reader.AsDataSet(conf);
-                var dataTable = dataSet.Tables[0];
-                var json = JsonConvert.SerializeObject(dataTable, Formatting.Indented);
-                List<User> learnerData = JsonConvert.DeserializeObject<List<User>>(json);
-                var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(l => learnerData.Select(s => s.Email).Contains(l.Email)).Select(s => s.Email).ToListAsync();
-                var newLearners = learnerData.Where(data => !verifyLearner.Contains(data.Email)).ToList();
-                if (verifyLearner.Count > 0)
+            }
+            else
+            {
+                var learners = new List<User>();
+                foreach (var user in model)
                 {
-                    return new ServiceResponse<List<ExistingLearnerModel>>
+                    var newUser = new User
                     {
-                        Data = verifyLearner.Select(email => new ExistingLearnerModel { Email = email }).ToList(),
-                        Message = ResponseConstants.LearnersExists,
-                        StatusCode = 409,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        UserRole = new List<UserRole>
+                        {
+                            new UserRole
+                            {
+                                 RoleId = (long)Roles.Learner,
+                            }
+                        }
                     };
+                    learners.Add(newUser);
                 }
-                else
-                {
-                    newLearners.ForEach(x => x.UserRole.Add(new()
-                    {
-                        RoleId = (long)Roles.Learner,
-                        UserId = x.Id,
-                    }));
-                    await _unitOfWork.UserRepository.CreateRange(newLearners);
-                    await _unitOfWork.UserRepository.CommitChanges();
-                    return new(200, ResponseConstants.LearnersAdded.Replace("{count}", newLearners.Count().ToString()));
-                }
+                await _unitOfWork.UserRepository.CreateRange(learners);
+                await _unitOfWork.UserRepository.CommitChanges();
+                return new(200, ResponseConstants.LearnersAdded.Replace("{count}", newLearners.Count.ToString()));
             }
         }
 
@@ -141,15 +139,23 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             return await _badgeService.AssignBadges(model);
         }
 
-        public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(PagedResponseInput model)
+        public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model)
         {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
-            var data = await _unitOfWork.UserRepository
-                                        .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner)
-                                        .Where(x => string.IsNullOrEmpty(model.SearchString) ||
-                                                    (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                    (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
+            var learnersQuery = _unitOfWork.UserRepository
+                                        .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner);
+            learnersQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
+                            learnersQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                     (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : learnersQuery;
+            learnersQuery = model.Type == 0 ?
+                            learnersQuery :
+                            (model.Type == 1 ?
+                                learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() > 0) :
+                                learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() == 0));
+            learnersQuery = model.FromDate != null ? learnersQuery.Where(x => x.CreatedDate.Date >= model.FromDate.Value.Date) : learnersQuery;
+            learnersQuery = model.ToDate != null ? learnersQuery.Where(x => x.CreatedDate.Date <= model.ToDate.Value.Date) : learnersQuery;
+            var learners = await learnersQuery
                                         .GroupBy(x => 1)
                                         .Select(x => new PagedResponseOutput<List<GetLearnerModel>>
                                         {
@@ -164,7 +170,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                         {
                                                             BadgeId = s.Id,
                                                             BadgeName = s.Badge.Name,
-                                                        }).ToList()
+                                                        }).ToList(),
+                                                        ProfilePicture = s.ProfilePicture
                                                     })
                                                     .Skip(model.PageSize * (model.PageIndex - 0))
                                                     .Take(model.PageSize)
@@ -174,10 +181,10 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
             return new PagedResponse<List<GetLearnerModel>>
             {
-                Data = data?.Data ?? [],
-                HasNextPage = data?.TotalCount > (model.PageSize * model.PageIndex),
+                Data = learners?.Data ?? [],
+                HasNextPage = learners?.TotalCount > (model.PageSize * model.PageIndex),
                 HasPreviousPage = model.PageIndex > 1,
-                TotalRecords = data == null ? 0 : data.TotalCount,
+                TotalRecords = learners?.TotalCount ?? 0,
                 SearchString = model.SearchString,
                 PageSize = model.PageSize,
                 PageIndex = model.PageIndex,
@@ -201,50 +208,6 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                                 BadgeName = s.Badge.Name,
                                                                             }).ToList()
                                                                         }).FirstOrDefaultAsync());
-        }
-
-        public async Task<PagedResponse<List<GetLearnerModel>>> GetRecentlyAddedLearner(DateTime fromDate, DateTime toDate, PagedResponseInput model)
-        {
-            var FromDate = fromDate.Date.ToUniversalTime();
-            var ToDate = toDate.Date.AddDays(1).ToUniversalTime();
-            var response = await _unitOfWork.UserRepository
-                                            .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner &&
-                                           x.CreatedDate >= FromDate && x.CreatedDate <= ToDate && x.IsActive)
-                                            .OrderByDescending(x => x.CreatedDate)
-                                            .GroupBy(x => 1)
-                                            .Select(x => new PagedResponseOutput<List<GetLearnerModel>>
-                                            {
-                                                TotalCount = x.Count(),
-                                                Data = x.OrderByDescending(x => x.CreatedDate)
-                                                    .Select(s => new GetLearnerModel
-                                                    {
-                                                        UserId = s.Id,
-                                                        Name = s.FirstName + s.LastName,
-                                                        Email = s.Email,
-                                                        LearnerBadgeModel = s.LearnerBadge
-                                                                             .Select(s => new LearnerBadgeModel
-                                                                             {
-                                                                                 BadgeId = s.BadgeId,
-                                                                                 BadgeName = s.Badge.Name,
-                                                                             }).ToList()
-                                                    })
-                                                    .Skip(model.PageSize * (model.PageIndex - 0))
-                                                    .Take(model.PageSize)
-                                                    .ToList()
-                                            }).FirstOrDefaultAsync();
-
-            return new PagedResponse<List<GetLearnerModel>>
-            {
-                Data = response?.Data ?? [],
-                HasNextPage = response?.TotalCount > (model.PageSize * model.PageIndex),
-                HasPreviousPage = model.PageIndex > 1,
-                TotalRecords = response == null ? 0 : response.TotalCount,
-                SearchString = model.SearchString,
-                PageSize = model.PageSize,
-                PageIndex = model.PageIndex,
-                Message = ResponseConstants.Success,
-                StatusCode = 200
-            };
         }
 
         public async Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model)
@@ -272,7 +235,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                             .FindByCondition(x => model.UserIds.Contains(x.Id) &&
                                            x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner).ToListAsync();
 
-            if(learners == null)
+            if (learners == null)
                 return new(400, ResponseConstants.InvalidUserId);
 
             learners.ForEach(x =>

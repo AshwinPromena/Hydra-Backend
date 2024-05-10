@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2013.Drawing.Chart;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Hydra.BusinessLayer.Repository.IService.IAccountService;
+﻿using Hydra.BusinessLayer.Repository.IService.IAccountService;
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
@@ -40,7 +38,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                 MobileNumber = model.MobileNumber,
                 Password = Encipher(model.Password),
                 IsActive = true,
-                IsApproved = true,
+                IsApproved = false,
                 AccessLevelId = model.AccessLevelId,
                 DepartmentId = model.DepartmentId,
                 CreatedDate = DateTime.UtcNow,
@@ -182,19 +180,19 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ApiResponse> ResetPassword(ResetPasswordModel model)
         {
-            var user = await _unitOfWork.PasswordResetTokenRepository
+            var userPasswordResetToken = await _unitOfWork.PasswordResetTokenRepository
                                         .FindByCondition(x => x.ResetToken == model.Token &&
-                                       x.UserId == x.User.Id &&
-                                       x.IsTokenActive)
+                                                              x.UserId == x.User.Id &&
+                                                              x.IsTokenActive)
                                         .Include(i => i.User)
                                         .FirstOrDefaultAsync();
-            if (user == null)
+            if (userPasswordResetToken == null)
                 return new(400, ResponseConstants.InvalidToken);
 
-            var newPassword = Encipher(model.Password);
-            user.User.Password = newPassword;
+            userPasswordResetToken.User.Password = Encipher(model.Password);
+            userPasswordResetToken.IsTokenActive = false;
 
-            _unitOfWork.UserRepository.Update(user.User);
+            _unitOfWork.UserRepository.Update(userPasswordResetToken.User);
             await _unitOfWork.UserRepository.CommitChanges();
 
             return new(200, ResponseConstants.Password);

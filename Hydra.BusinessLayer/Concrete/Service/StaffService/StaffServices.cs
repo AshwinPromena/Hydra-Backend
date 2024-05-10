@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Hydra.BusinessLayer.Concrete.IService.IStaffService;
+﻿using Hydra.BusinessLayer.Concrete.IService.IStaffService;
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
@@ -7,15 +6,10 @@ using Hydra.Common.Repository.IService;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 {
-    public  class StaffServices(IUnitOfWork unitOfWork, IStorageService storageService) : IStaffService
+    public class StaffServices(IUnitOfWork unitOfWork, IStorageService storageService) : IStaffService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -49,7 +43,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
             if (!string.IsNullOrEmpty(model.ProfilePicture))
                 user.ProfilePicture = _storageService.UploadFile(ResponseConstants.Mediapath, model.ProfilePicture).Result.Data;
-            
+
             await _unitOfWork.UserRepository.Create(user);
             await _unitOfWork.UserRepository.CommitChanges();
 
@@ -169,25 +163,25 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                                         .Select(x => new PagedResponseOutput<List<GetStaffModel>>
                                         {
                                             TotalCount = x.Count(),
-                                            Data = x.OrderBy(x => x.UserName)
-                                                    .Select(s => new GetStaffModel
-                                                    {
-                                                        UserId = s.Id,
-                                                        UserName = s.UserName,
-                                                        FirstName = s.FirstName,
-                                                        LastName = s.LastName,
-                                                        Email = s.Email,
-                                                        IsArchived = s.IsArchived,
-                                                        IsApproved = s.IsApproved,
-                                                        MobileNumber = s.MobileNumber,
-                                                        AccessLevelId = s.AccessLevelId,
-                                                        AccessLevelName = s.AccessLevel.Name,
-                                                        DepartmentId = s.DepartmentId,
-                                                        DepartmentName = s.Department.Name,
-                                                        ProfilePicture = s.ProfilePicture,
-                                                        CreatedDate = s.CreatedDate,
-                                                        UpdatedDate = s.UpdatedDate
-                                                    }).Skip(model.PageSize * (model.PageIndex - 1))
+                                            Data = x.Select(s => new GetStaffModel
+                                            {
+                                                UserId = s.Id,
+                                                UserName = s.UserName,
+                                                FirstName = s.FirstName,
+                                                LastName = s.LastName,
+                                                Email = s.Email,
+                                                IsArchived = s.IsArchived,
+                                                IsApproved = s.IsApproved,
+                                                MobileNumber = s.MobileNumber,
+                                                AccessLevelId = s.AccessLevelId,
+                                                //AccessLevelName = s.AccessLevel.Name,
+                                                DepartmentId = s.DepartmentId,
+                                                //DepartmentName = s.Department.Name,
+                                                ProfilePicture = s.ProfilePicture,
+                                                CreatedDate = s.CreatedDate,
+                                                UpdatedDate = s.UpdatedDate
+                                            })
+                                                    .Skip(model.PageSize * (model.PageIndex))
                                                       .Take(model.PageSize)
                                                       .ToList()
                                         }).FirstOrDefaultAsync();

@@ -26,11 +26,11 @@ namespace Hydra.Controllers.LearnerController
         }
 
         [HttpPost("[action]")]
-        public async Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLearner(IFormFile file)
+        public async Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLearner(List<AddLearnerModel> model)
         {
-            if (file == null)
+            if (!ModelState.IsValid)
                 return new(400, ResponseConstants.BadRequest);
-            return await _learnerManagmentService.BatchUploadLeraner(file);
+            return await _learnerManagmentService.BatchUploadLeraner(model);
         }
 
         [HttpPost("[action]")]
@@ -75,7 +75,7 @@ namespace Hydra.Controllers.LearnerController
             if (!ModelState.IsValid)
                 return new(400, ResponseConstants.BadRequest);
 
-            return await  _learnerManagmentService.RevokeBadgeFromLearner(model);
+            return await _learnerManagmentService.RevokeBadgeFromLearner(model);
         }
 
         [HttpPost("[action]")]

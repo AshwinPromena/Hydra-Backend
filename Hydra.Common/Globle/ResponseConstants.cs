@@ -30,7 +30,7 @@
         public const string OtpExpired = "OTP expired";
         public const string AccountInactive = "Account is disabled, Please contact admin";
         public const string NotApproved = "Account still not approved";
-        public const string InvalidToken = "Invalid password reset token";
+        public const string InvalidToken = "Invalid password reset token or token expired";
         public const string TokenExpired = "Token has been expired";
 
         #endregion

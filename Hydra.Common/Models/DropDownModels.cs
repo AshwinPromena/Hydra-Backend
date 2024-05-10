@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hydra.Common.Models
 {
@@ -37,7 +32,7 @@ namespace Hydra.Common.Models
     public class BadgeDropDownModel
     {
         [JsonProperty("badgeId")]
-        public long BadgeId { get; set;}
+        public long BadgeId { get; set; }
 
         [JsonProperty("badgeName")]
         public string BadgeName { get; set; }

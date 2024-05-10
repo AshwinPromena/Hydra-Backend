@@ -12,7 +12,7 @@ namespace Hydra.Controllers.BadgeController
     {
         private readonly IBadgeService _badgeService = badgeService;
 
-        [HttpPost("[action]"),Authorize(Roles = "Admin, Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ApiResponse> AddBadge(AddBadgeModel model)
         {
             if (!ModelState.IsValid)

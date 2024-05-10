@@ -1,11 +1,4 @@
-﻿using DocumentFormat.OpenXml.Presentation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hydra.Common.Globle
+﻿namespace Hydra.Common.Globle
 {
     public class TemplateConstatnt
     {

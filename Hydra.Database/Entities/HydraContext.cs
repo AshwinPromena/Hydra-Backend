@@ -24,7 +24,7 @@ namespace Hydra.Database.Entities
 
         public virtual DbSet<University> University { get; set; }
 
-        public virtual DbSet<Verification> Verification {  get; set; }
+        public virtual DbSet<Verification> Verification { get; set; }
 
         public virtual DbSet<PasswordResetToken> PasswordResetToken { get; set; }
 

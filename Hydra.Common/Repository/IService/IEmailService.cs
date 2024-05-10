@@ -3,7 +3,7 @@ namespace Hydra.Common.Repository.IService
 {
     public interface IEmailService
     {
-        Task<ApiResponse> SendPasswordResetLink(string email, long userId,string userName,string token);
+        Task<ApiResponse> SendPasswordResetLink(string email, long userId, string userName, string token);
 
         Task<string> SendPasswordResetOTP(string email, string userName);
 

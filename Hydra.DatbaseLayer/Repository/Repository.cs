@@ -1,18 +1,12 @@
 ﻿using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hydra.DatbaseLayer.Repository
 {
     public class AccessLevelRepository(HydraContext context) : CommonRepository<AccessLevel>(context), IAccessLevelRepository { }
 
     public class BadgeRepository(HydraContext context) : CommonRepository<Badge>(context), IBadgeRepository { }
-   
+
     public class BadgeFieldRepository(HydraContext context) : CommonRepository<BadgeField>(context), IBadgeFieldRepository { }
 
     public class LearnerBadgeRepository(HydraContext context) : CommonRepository<LearnerBadge>(context), ILearnerBadgeRepository { }
@@ -29,7 +23,7 @@ namespace Hydra.DatbaseLayer.Repository
 
     public class UserRoleRepository(HydraContext context) : CommonRepository<UserRole>(context), IUserRoleRepository { }
 
-    public class VerificationRepository(HydraContext context) : CommonRepository<Verification>(context) , IVerificationRepository { }
+    public class VerificationRepository(HydraContext context) : CommonRepository<Verification>(context), IVerificationRepository { }
 
     public class PasswordResetTokenRepository(HydraContext context) : CommonRepository<PasswordResetToken>(context), IPasswordResetTokenRepository { }
 }

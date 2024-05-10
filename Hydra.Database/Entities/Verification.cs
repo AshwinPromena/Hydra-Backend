@@ -19,7 +19,7 @@ namespace Hydra.Database.Entities
 
         [Column("otp")]
         [MaxLength(6)]
-        public string OTP {  get; set; }
+        public string OTP { get; set; }
 
         [Column("otp_expiry_date")]
         public DateTime OtpExpiryDate { get; set; }

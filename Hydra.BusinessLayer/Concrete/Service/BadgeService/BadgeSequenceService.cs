@@ -4,12 +4,6 @@ using Hydra.Common.Models;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
 {
@@ -41,8 +35,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 return new ApiResponse(404, ResponseConstants.InvalidBadgeSequenceId);
 
             var existingSequence = await _unitOfWork.BadgeSequenceRepository
-                                                    .FindByCondition(x => x.Name.ToLower().Replace(" ", string.Empty) == sequenceName.ToLower().Replace(" ", string.Empty) && 
-                                                                          x.IsActive && 
+                                                    .FindByCondition(x => x.Name.ToLower().Replace(" ", string.Empty) == sequenceName.ToLower().Replace(" ", string.Empty) &&
+                                                                          x.IsActive &&
                                                                           x.Id != sequenceId)
                                                     .FirstOrDefaultAsync();
 

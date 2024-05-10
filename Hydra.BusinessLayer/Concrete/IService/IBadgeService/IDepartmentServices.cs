@@ -1,10 +1,4 @@
-﻿using Hydra.BusinessLayer.Concrete.Service.BadgeService;
-using Hydra.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hydra.Common.Models;
 
 namespace Hydra.BusinessLayer.Concrete.IService.IBadgeService
 {

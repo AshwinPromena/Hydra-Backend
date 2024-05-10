@@ -45,7 +45,7 @@ namespace Hydra.Database.Entities
         public static void SeedUserRoleMasterData(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserRole>().HasData(
-            new UserRole { Id = 1, UserId = 1, RoleId = 1});
+            new UserRole { Id = 1, UserId = 1, RoleId = 1 });
         }
 
         public static void SeedAccessLevelMasterData(ModelBuilder modelBuilder)

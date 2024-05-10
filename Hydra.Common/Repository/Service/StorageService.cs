@@ -2,14 +2,9 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Hydra.Common.Globle;
 using Hydra.Common.Models;
 using Hydra.Common.Repository.IService;
-using Hydra.Database.Entities;
-using Hydra.DatbaseLayer.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
@@ -47,7 +42,7 @@ namespace Hydra.Common.Repository.Service
             {
                 using IAmazonS3 client = new AmazonS3Client(_configuration.GetConnectionString("AccessKey"), _configuration.GetConnectionString("SecretKey"), bucketRegion);
                 if (file == null)
-                    return new ServiceResponse<string>(StatusCodes.Status400BadRequest,"File was null", null);
+                    return new ServiceResponse<string>(StatusCodes.Status400BadRequest, "File was null", null);
 
                 if (ValidateFilesSize(file) == false)
                     return new ServiceResponse<string>(StatusCodes.Status413RequestEntityTooLarge, "Entity Too Large", null);
@@ -115,7 +110,7 @@ namespace Hydra.Common.Repository.Service
         public async Task<ApiResponse> DeleteFile(string path)
         {
             if (path is null)
-                return new ApiResponse(400,"Path cannot be null");
+                return new ApiResponse(400, "Path cannot be null");
             using IAmazonS3 client = new AmazonS3Client(_configuration.GetConnectionString("AccessKey"), _configuration.GetConnectionString("SecretKey"), bucketRegion);
             DeleteObjectRequest request = new()
             {

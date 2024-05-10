@@ -11,6 +11,6 @@
     public enum FieldType
     {
         LearningOutcomes = 1,
-        Competencies = 2, 
+        Competencies = 2,
     }
 }

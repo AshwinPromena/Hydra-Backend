@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
 namespace Hydra.Common.Models
 {
@@ -95,7 +89,7 @@ namespace Hydra.Common.Models
         public List<long> UserIds { get; set; }
 
         [JsonProperty("badges")]
-        public List<long> BadgeIds { get; set;}
+        public List<long> BadgeIds { get; set; }
     }
 
     public class BadgeSequenceOutputModel

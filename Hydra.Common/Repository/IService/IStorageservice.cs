@@ -1,5 +1,4 @@
 ﻿using Hydra.Common.Models;
-using Hydra.Common.Repository.Service;
 using Microsoft.AspNetCore.Http;
 
 namespace Hydra.Common.Repository.IService
