@@ -8,12 +8,11 @@ namespace Hydra.Controllers.BadgeController
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class DepartmentController(IDepartmentServices departmentServices) : ControllerBase
     {
         private readonly IDepartmentServices _departmentServices = departmentServices;
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ApiResponse> AddDepartment(string departmentName)
         {
             if (!ModelState.IsValid)
@@ -22,7 +21,7 @@ namespace Hydra.Controllers.BadgeController
             return await _departmentServices.AddDepartment(departmentName);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ApiResponse> UpdateDepartment(int departmentId, string departmentName)
         {
             if (!ModelState.IsValid)
@@ -31,7 +30,7 @@ namespace Hydra.Controllers.BadgeController
             return await _departmentServices.UpdateDepartment(departmentId, departmentName);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ApiResponse> DeleteDepartment(int departmentId)
         {
             if (!ModelState.IsValid)
@@ -40,7 +39,7 @@ namespace Hydra.Controllers.BadgeController
             return await _departmentServices.DeleteDepartment(departmentId);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<ServiceResponse<DepartmentOutputModel>> GetDepartmentById(long departmentId)
         {
             if (!ModelState.IsValid)
@@ -49,7 +48,7 @@ namespace Hydra.Controllers.BadgeController
             return await _departmentServices.GetDepartmentById(departmentId);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
         public async Task<PagedResponse<List<DepartmentOutputModel>>> GetAllDepartments(PagedResponseInput model)
         {
             if (!ModelState.IsValid)

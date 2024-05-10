@@ -23,13 +23,15 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
         public async Task<ServiceResponse<LearnerDashBoardModel>> LearnerDashBoard()
         {
             var learnerCount = await _unitOfWork.UserRepository
-                                                .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner)
+                                                .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner &&
+                                                x.IsActive)
                                                 .ToListAsync();
+            var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive && x.User.IsActive).Select(s => s.UserId).Distinct().ToListAsync();
             return new(200, ResponseConstants.Success, new LearnerDashBoardModel
             {
                 LearnerInTotal = learnerCount.Count,
-                LearnerWithBadge = _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive).Count(),
-                LearnerWithoutBadge = _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive == false).Count(),
+                LearnerWithBadge = learnerWithBadge.Count,
+                LearnerWithoutBadge = learnerCount.Count - learnerWithBadge.Count,
             });
 
         }
@@ -155,11 +157,16 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                             Data = x.OrderByDescending(x => x.CreatedDate)
                                                     .Select(s => new GetLearnerModel
                                                     {
-                                                        UserId = x.FirstOrDefault().Id,
-                                                        Name = x.FirstOrDefault().FirstName + x.FirstOrDefault().LastName,
-                                                        Email = s.Email
+                                                        UserId = s.Id,
+                                                        Name = s.FirstName + s.LastName,
+                                                        Email = s.Email,
+                                                        LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
+                                                        {
+                                                            BadgeId = s.Id,
+                                                            BadgeName = s.Badge.Name,
+                                                        }).ToList()
                                                     })
-                                                    .Skip(model.PageSize * (model.PageIndex - 1))
+                                                    .Skip(model.PageSize * (model.PageIndex - 0))
                                                     .Take(model.PageSize)
                                                     .ToList()
 
@@ -179,5 +186,105 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             };
         }
 
+        public async Task<ServiceResponse<GetLearnerModel>> GetLearnerById(long userId)
+        {
+            return new(200, ResponseConstants.Success, await _unitOfWork.UserRepository
+                                                                        .FindByCondition(x => x.Id == userId && x.IsActive)
+                                                                        .Select(s => new GetLearnerModel
+                                                                        {
+                                                                            UserId = s.Id,
+                                                                            Name = s.FirstName + s.LastName,
+                                                                            Email = s.Email,
+                                                                            LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
+                                                                            {
+                                                                                BadgeId = s.BadgeId,
+                                                                                BadgeName = s.Badge.Name,
+                                                                            }).ToList()
+                                                                        }).FirstOrDefaultAsync());
+        }
+
+        public async Task<PagedResponse<List<GetLearnerModel>>> GetRecentlyAddedLearner(DateTime fromDate, DateTime toDate, PagedResponseInput model)
+        {
+            var FromDate = fromDate.Date.ToUniversalTime();
+            var ToDate = toDate.Date.AddDays(1).ToUniversalTime();
+            var response = await _unitOfWork.UserRepository
+                                            .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner &&
+                                           x.CreatedDate >= FromDate && x.CreatedDate <= ToDate && x.IsActive)
+                                            .OrderByDescending(x => x.CreatedDate)
+                                            .GroupBy(x => 1)
+                                            .Select(x => new PagedResponseOutput<List<GetLearnerModel>>
+                                            {
+                                                TotalCount = x.Count(),
+                                                Data = x.OrderByDescending(x => x.CreatedDate)
+                                                    .Select(s => new GetLearnerModel
+                                                    {
+                                                        UserId = s.Id,
+                                                        Name = s.FirstName + s.LastName,
+                                                        Email = s.Email,
+                                                        LearnerBadgeModel = s.LearnerBadge
+                                                                             .Select(s => new LearnerBadgeModel
+                                                                             {
+                                                                                 BadgeId = s.BadgeId,
+                                                                                 BadgeName = s.Badge.Name,
+                                                                             }).ToList()
+                                                    })
+                                                    .Skip(model.PageSize * (model.PageIndex - 0))
+                                                    .Take(model.PageSize)
+                                                    .ToList()
+                                            }).FirstOrDefaultAsync();
+
+            return new PagedResponse<List<GetLearnerModel>>
+            {
+                Data = response?.Data ?? [],
+                HasNextPage = response?.TotalCount > (model.PageSize * model.PageIndex),
+                HasPreviousPage = model.PageIndex > 1,
+                TotalRecords = response == null ? 0 : response.TotalCount,
+                SearchString = model.SearchString,
+                PageSize = model.PageSize,
+                PageIndex = model.PageIndex,
+                Message = ResponseConstants.Success,
+                StatusCode = 200
+            };
+        }
+
+        public async Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model)
+        {
+            var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository
+                                                    .FindByCondition(x => model.UserIds.Contains(x.UserId) && x.User.IsActive)
+                                                    .ToListAsync();
+            if (learnerWithBadge == null)
+                return new(400, ResponseConstants.InvalidUserId);
+
+            learnerWithBadge.ForEach(x =>
+            {
+                x.IsRevoked = true;
+                x.UpdatedDate = DateTime.UtcNow;
+            });
+
+            _unitOfWork.LearnerBadgeRepository.UpdateRange(learnerWithBadge);
+            await _unitOfWork.LearnerBadgeRepository.CommitChanges();
+            return new(200, ResponseConstants.BadgeRevoked);
+        }
+
+        public async Task<ApiResponse> RemoveLearners(RemoveLearnerModel model)
+        {
+            var learners = await _unitOfWork.UserRepository
+                                            .FindByCondition(x => model.UserIds.Contains(x.Id) &&
+                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner).ToListAsync();
+
+            if(learners == null)
+                return new(400, ResponseConstants.InvalidUserId);
+
+            learners.ForEach(x =>
+            {
+                x.IsActive = false;
+                x.UpdatedDate = DateTime.UtcNow;
+            });
+
+            _unitOfWork.UserRepository.UpdateRange(learners);
+            await _unitOfWork.UserRepository.CommitChanges();
+
+            return new(200, ResponseConstants.LearnersRemoved);
+        }
     }
 }

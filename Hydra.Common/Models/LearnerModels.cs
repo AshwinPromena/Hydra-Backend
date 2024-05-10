@@ -58,5 +58,28 @@ namespace Hydra.Common.Models
         [JsonProperty("email")]
         public string Email { get; set; }
 
+        [JsonProperty("learnerBadgeModel")]
+        public List<LearnerBadgeModel> LearnerBadgeModel { get; set; }
+    }
+
+    public class LearnerBadgeModel
+    {
+        [JsonProperty("badgeId")]
+        public long BadgeId { get; set; }
+
+        [JsonProperty("badgeName")]
+        public string BadgeName { get; set; }
+    }
+
+    public class RevokeBadgeModel
+    {
+        [JsonProperty("userIds")]
+        public List<long> UserIds { get; set; }
+    }
+
+    public class RemoveLearnerModel
+    {
+        [JsonProperty("userIds")]
+        public List<long> UserIds { get; set; }
     }
 }

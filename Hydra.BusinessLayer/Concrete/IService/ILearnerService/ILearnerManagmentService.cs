@@ -15,5 +15,13 @@ namespace Hydra.BusinessLayer.Repository.IService.ILearnerService
         Task<ApiResponse> AssignBadgeToLearners(AssignBadgeModel model);
 
         Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(PagedResponseInput model);
+
+        Task<ServiceResponse<GetLearnerModel>> GetLearnerById(long userId);
+
+        Task<PagedResponse<List<GetLearnerModel>>> GetRecentlyAddedLearner(DateTime fromDate, DateTime toDate,PagedResponseInput model);
+
+        Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model);
+
+        Task<ApiResponse> RemoveLearners(RemoveLearnerModel model);
     }
 }
