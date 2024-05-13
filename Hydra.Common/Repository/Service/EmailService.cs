@@ -34,6 +34,18 @@ namespace Hydra.Common.Repository.Service
             return Otp;
         }
 
+        public async Task<ApiResponse> SendContactSupportMail(ContactSupportModel model)
+        {
+            string template = await ReadTemplate(TemplateConstatnt.ContactSupport);
+            string content = template.Replace(ReplaceStringConstant.Name, model.Name)
+                                     .Replace(ReplaceStringConstant.Email, model.Email)
+                                     .Replace(ReplaceStringConstant.MobileNumber, model.MobileNumber);
+
+            var email = "hydra@yopmail.com";
+            await SendMail(email, TemplateSubjectConstant.ContactSupport, content);
+            return new(200, ResponseConstants.Success);
+        }
+
         public async Task<string> ReadTemplate(string templateName)
         {
             var pathToFile = $"{_environment.ContentRootPath}{Path.DirectorySeparatorChar}Templates{Path.DirectorySeparatorChar}{templateName}";
