@@ -127,21 +127,17 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                 return new(400, ResponseConstants.TokenExpired);
 
             var Otp = await _emailService.SendPasswordResetOTP(user.User.Email, user.User.UserName);
-
-            var verification = new Verification
-            {
-                OTP = Otp,
-                OtpExpiryDate = DateTime.UtcNow.AddMinutes(10),
-                UserId = user.User.Id,
-                IsActive = true,
-            };
-
+            var userAuthentication = user.User.Verification.FirstOrDefault() == null ? new() : user.User.Verification.FirstOrDefault();
+            userAuthentication.OTP = Otp;
+            userAuthentication.OtpExpiryDate = DateTime.UtcNow.AddMinutes(5);
+            userAuthentication.UserId = user.User.Id;
+            userAuthentication.IsActive = true;
             user.IsTokenActive = false;
             var userToken = user.IsTokenActive == false ? Guid.NewGuid().ToString() : user.ResetToken;
             user.IsTokenActive = true;
             user.TokenExpiryDate = DateTime.UtcNow.AddMinutes(10);
             user.UserId = user.User.Id;
-            await _unitOfWork.VerificationRepository.Create(verification);
+            _unitOfWork.VerificationRepository.Update(userAuthentication);
             _unitOfWork.PasswordResetTokenRepository.Update(user);
             await _unitOfWork.VerificationRepository.CommitChanges();
 
@@ -156,23 +152,27 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                                         .FindByCondition(x => x.ResetToken == model.Token &&
                                        x.IsTokenActive)
                                         .Include(i => i.User)
-                                        .ThenInclude(ti => ti.Verification)
                                         .FirstOrDefaultAsync();
 
             if (user == null)
                 return new(400, ResponseConstants.InvalidToken);
 
-            if (user.User.Verification.FirstOrDefault().OTP != model.Otp && user.User.Verification.FirstOrDefault().IsActive == true)
+            var userVerification = await _unitOfWork.VerificationRepository
+                                                    .FindByCondition(x => x.OTP == model.Otp && 
+                                                   x.IsActive).FirstOrDefaultAsync();
+
+            if (userVerification == null)
                 return new(400, ResponseConstants.InvalidOtp);
 
-            if (user.User.Verification.FirstOrDefault().OtpExpiryDate <= DateTime.UtcNow && user.User.Verification.FirstOrDefault().IsActive == true)
+            if (userVerification.OtpExpiryDate <= DateTime.UtcNow)
                 return new(400, ResponseConstants.OtpExpired);
 
-            user.User.Verification.FirstOrDefault().IsActive = false;
+             userVerification.IsActive= false;
 
             user.ResetToken = token;
             user.IsTokenActive = true;
             _unitOfWork.PasswordResetTokenRepository.Update(user);
+            _unitOfWork.VerificationRepository.Update(userVerification);
             await _unitOfWork.UserRepository.CommitChanges();
 
             return new(200, ResponseConstants.Success, token);
