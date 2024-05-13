@@ -226,6 +226,9 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                                 SequenceName = s.Badge.BadgeSequence.Name,
                                                                             }).ToList(),
                                                                             ProfilePicture = s.ProfilePicture,
+                                                                            Active = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate >= DateTime.UtcNow).ToList().Count,
+                                                                            Expiring = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate > DateTime.UtcNow).ToList().Count,
+                                                                            Expired = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow).ToList().Count,
                                                                         }).FirstOrDefaultAsync());
         }
 
