@@ -170,7 +170,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                     .Select(s => new GetLearnerModel
                                                     {
                                                         UserId = s.Id,
-                                                        Name = s.FirstName + s.LastName,
+                                                        Name = $"{s.FirstName} {s.LastName}",
                                                         Email = s.Email,
                                                         LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
                                                         {
@@ -212,7 +212,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                         .Select(s => new GetLearnerByIdModel
                                                                         {
                                                                             UserId = s.Id,
-                                                                            Name = s.FirstName + s.LastName,
+                                                                            Name = $"{s.FirstName} {s.LastName}",
                                                                             Email = s.Email,
                                                                             LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
                                                                             {
@@ -246,6 +246,11 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             _unitOfWork.LearnerBadgeRepository.UpdateRange(learnerWithBadge);
             await _unitOfWork.LearnerBadgeRepository.CommitChanges();
             return new(200, ResponseConstants.BadgeRevoked);
+        }
+
+        public async Task<ApiResponse> DeleteBadge(DeleteBadgeModel model)
+        {
+            return await _badgeService.DeleteBadge(model);
         }
 
         public async Task<ApiResponse> RemoveLearners(RemoveLearnerModel model)

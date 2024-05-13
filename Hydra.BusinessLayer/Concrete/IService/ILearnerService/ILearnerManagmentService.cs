@@ -19,6 +19,8 @@ namespace Hydra.BusinessLayer.Repository.IService.ILearnerService
 
         Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model);
 
+        Task<ApiResponse> DeleteBadge(DeleteBadgeModel model);
+
         Task<ApiResponse> RemoveLearners(RemoveLearnerModel model);
     }
 }

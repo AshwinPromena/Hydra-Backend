@@ -73,6 +73,15 @@ namespace Hydra.Controllers.LearnerController
         }
 
         [HttpPost("[action]")]
+        public async Task<ApiResponse> DeleteBadge(DeleteBadgeModel model)
+        {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+
+            return await _learnerManagmentService.DeleteBadge(model);
+        }
+
+        [HttpPost("[action]")]
         public async Task<ApiResponse> RemoveLearners(RemoveLearnerModel model)
         {
             if (!ModelState.IsValid)
