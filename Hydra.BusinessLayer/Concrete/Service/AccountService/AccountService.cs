@@ -80,7 +80,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ApiResponse> ForgotPassword(ForgotPasswordModel model)
         {
-            var Token = GenerateRefereshToken();
+            var Token = Guid.NewGuid().ToString();
             var user = await _unitOfWork.UserRepository
                                         .FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) &&
                                        x.IsActive && x.IsApproved)
@@ -137,7 +137,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             };
 
             user.IsTokenActive = false;
-            var userToken = user.IsTokenActive == false ? GenerateRefereshToken() : user.ResetToken;
+            var userToken = user.IsTokenActive == false ? Guid.NewGuid().ToString() : user.ResetToken;
             user.IsTokenActive = true;
             user.TokenExpiryDate = DateTime.UtcNow.AddMinutes(10);
             user.UserId = user.User.Id;
@@ -151,7 +151,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
 
         public async Task<ServiceResponse<string>> ValidateOtp(ValidateOtpModel model)
         {
-            var token = GenerateRefereshToken();
+            var token = Guid.NewGuid().ToString();
             var user = await _unitOfWork.PasswordResetTokenRepository
                                         .FindByCondition(x => x.ResetToken == model.Token &&
                                        x.IsTokenActive)
