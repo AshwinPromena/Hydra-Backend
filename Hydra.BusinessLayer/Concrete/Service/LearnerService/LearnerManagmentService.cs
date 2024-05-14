@@ -174,7 +174,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                         Email = s.Email,
                                                         LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
                                                         {
-                                                            BadgeId = s.Id,
+                                                            BadgeId = s.BadgeId,
                                                             BadgeName = s.Badge.Name,
                                                             DepartmentId = s.Badge.DepartmentId,
                                                             DepartmentName = s.Badge.Department.Name,
