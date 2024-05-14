@@ -7,15 +7,16 @@ using Hydra.Common.Repository.IService;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 {
-    public class LearnerManagmentService(IUnitOfWork unitOfWork, IReportService reportService, IBadgeService badgeService) : ILearnerManagmentService
+    public class LearnerManagmentService(IUnitOfWork unitOfWork, IReportService reportService, IBadgeService badgeService, IStorageService storageService) : ILearnerManagmentService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IReportService _reportService = reportService;
         private readonly IBadgeService _badgeService = badgeService;
-
+        private readonly IStorageService _storageService = storageService;
 
         public async Task<ServiceResponse<LearnerDashBoardModel>> LearnerDashBoard()
         {
@@ -92,13 +93,14 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 Email = model.Email,
                 Email2 = model.Email2,
                 Email3 = model.Email3,
-                MobileNumber = model.MobileNumber
+                MobileNumber = model.MobileNumber,
             };
             learner.UserRole.Add(new()
             {
                 RoleId = (long)Roles.Learner,
                 UserId = learner.Id,
             });
+            learner.ProfilePicture = (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data;
             await _unitOfWork.UserRepository.Create(learner);
             await _unitOfWork.UserRepository.CommitChanges();
             return new(200, ResponseConstants.LearnerAdded);
@@ -112,9 +114,9 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 {
                     FirstName = "Mary",
                     LastName = "Johnson",
-                    Email = "maryjohnson@yopmail.com",
-                    Email2 = "johson@yopmail.com",
-                    Email3 = "mary@yopmail.com",
+                    Email = "mailto:maryjohnson@yopmail.com",
+                    Email2 = "mailto:johson@yopmail.com",
+                    Email3 = "mailto:mary@yopmail.com",
                     MobileNumber ="(555) 123-4567",
                 }
             };
@@ -230,6 +232,28 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                             Expiring = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate > DateTime.UtcNow).ToList().Count,
                                                                             Expired = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow).ToList().Count,
                                                                         }).FirstOrDefaultAsync());
+        }
+
+        public async Task<ApiResponse> UpdateLearner(UpdateLearnerModel model)
+        {
+            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == model.UserId).FirstOrDefaultAsync();
+
+            if (verifyLearner == null)
+                return new(400, ResponseConstants.InvalidUserId);
+
+            verifyLearner.FirstName = model.FirstName;
+            verifyLearner.LastName = model.LastName;
+            verifyLearner.Email = model.Email;
+            verifyLearner.Email2 = model.Email2;
+            verifyLearner.Email3 = model.Email3;
+
+            verifyLearner.ProfilePicture = !string.IsNullOrEmpty(model.ProfilePicture)
+                                           ? (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data
+                                           : verifyLearner.ProfilePicture;
+            _unitOfWork.UserRepository.Update(verifyLearner);
+            await _unitOfWork.UserRepository.CommitChanges();
+
+            return new(200, ResponseConstants.LearnerUpdated);
         }
 
         public async Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model)

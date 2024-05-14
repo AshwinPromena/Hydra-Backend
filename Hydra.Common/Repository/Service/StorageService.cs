@@ -16,7 +16,7 @@ namespace Hydra.Common.Repository.Service
 
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.APSouth1;
 
-        private static int MAX_FILE_SIZE = 1024 * 1024 * 70; // 70 MB
+        private static int MAX_FILE_SIZE = 1024  1024  70; // 70 MB
 
         private static string[] EXTENSION_LOWER_CASE = new string[] { "pdf", "jpg", "png", "jpeg", "gif", "mp4", "webp", "txt" };
 
@@ -83,19 +83,18 @@ namespace Hydra.Common.Repository.Service
                 var stream = new MemoryStream(inBytes);
                 Random random = new Random();
                 var fileName = random.Next(100000, 199999).ToString();
-
-                using IAmazonS3 client = new AmazonS3Client(_configuration.GetConnectionString("AccessKey"), _configuration.GetConnectionString("SecretKey"), bucketRegion);
+                using IAmazonS3 client = new AmazonS3Client(_configuration.GetValue<string>("AWS:accessKey"), _configuration.GetValue<string>("AWS:secretKey"), Amazon.RegionEndpoint.APSouth1);
                 var filetransferutility = new TransferUtility(client);
                 var extension = GetExtension(file[..5]);
                 var filePath = GenerateS3Path(path, $"{fileName}{extension}");
-                await filetransferutility.UploadAsync(stream, _configuration.GetConnectionString("BucketName"), filePath);
+                await filetransferutility.UploadAsync(stream, _configuration.GetValue<string>("AWS:bucketName"), filePath);
                 await client.PutACLAsync(new PutACLRequest
                 {
-                    BucketName = _configuration.GetConnectionString("BucketName"),
+                    BucketName = _configuration.GetValue<string>("AWS:bucketName"),
                     CannedACL = S3CannedACL.PublicRead,
                     Key = filePath
                 });
-                return new ServiceResponse<string>(StatusCodes.Status200OK, "", $"{_configuration.GetConnectionString("AWSBasePath")}{filePath}");
+                return new ServiceResponse<string>(StatusCodes.Status200OK, "", $"{_configuration.GetValue<string>("AWS:base_url")}{filePath}");
             }
             catch (AmazonS3Exception e)
             {

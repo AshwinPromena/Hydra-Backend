@@ -24,13 +24,16 @@ namespace Hydra.Common.Models
         public string Email { get; set; }
 
         [JsonProperty("email2")]
-        public string? Email2 { get; set; }
+        public string Email2 { get; set; }
 
         [JsonProperty("email3")]
-        public string? Email3 { get; set; }
+        public string Email3 { get; set; }
 
         [JsonProperty("mobileNumber")]
-        public string? MobileNumber { get; set; }
+        public string MobileNumber { get; set; }
+
+        [JsonProperty("profilePicture")]
+        public string ProfilePicture { get; set; }
     }
 
     public class ExistingLearnerModel
@@ -62,7 +65,6 @@ namespace Hydra.Common.Models
         [JsonProperty("addedTodayCount")]
         public int AddedTodayCount { get; set; }
     }
-
 
     public class GetAllLearnerInputModel : PagedResponseInput
     {
@@ -109,7 +111,7 @@ namespace Hydra.Common.Models
         public string ProfilePicture { get; set; }
 
         [JsonProperty("active")]
-        public int Active {  get; set; }
+        public int Active { get; set; }
 
         [JsonProperty("expiring")]
         public int Expiring { get; set; }
@@ -118,6 +120,35 @@ namespace Hydra.Common.Models
         public int Expired { get; set; }
     }
 
+    public class UpdateLearnerModel
+    {
+        [JsonProperty("userId")]
+        public long UserId { get; set; }
+
+        [JsonProperty("firstName")]
+        [Required(ErrorMessage = "This field is required")]
+        public string FirstName { get; set; }
+
+        [JsonProperty("lastName")]
+        [Required(ErrorMessage = "This field is required")]
+        public string LastName { get; set; }
+
+        [JsonProperty("email")]
+        [Required(ErrorMessage = "Email is required")]
+        public string Email { get; set; }
+
+        [JsonProperty("email2")]
+        public string Email2 { get; set; }
+
+        [JsonProperty("email3")]
+        public string Email3 { get; set; }
+
+        [JsonProperty("mobileNumber")]
+        public string MobileNumber { get; set; }
+
+        [JsonProperty("profilePicture")]
+        public string ProfilePicture { get; set; }
+    }
 
     public class LearnerBadgeModel
     {

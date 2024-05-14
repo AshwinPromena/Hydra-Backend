@@ -82,6 +82,7 @@
         public const string LearnersAdded = "{count} Learners added successfully";
         public const string BadgeRevoked = "Badges has been revoked from selected learners";
         public const string LearnersRemoved = "Selected learners has been removed successfully";
+        public const string LearnerUpdated = "Learner details updated successfully";
         #endregion
     }
 }
