@@ -67,11 +67,19 @@ namespace Hydra.Controllers.StaffController
             return await _staffService.GetAllStaff(model, isArchived);
         }
 
-
         [HttpGet("[action]")]
         public async Task<ApiResponse> ApproveStaffUser(long staffUserId)
         {
             return await _staffService.ApproveStaffUser(staffUserId);
+        }
+
+        [HttpPost("[action]"), Authorize(Roles = "Admin ,Staff")]
+        public async Task<ApiResponse> ApproveBadge(ApproveBadgeModel model)
+        {
+            if (!ModelState.IsValid)
+                return new(400, ResponseConstants.BadRequest);
+
+            return await _staffService.ApproveBadge(model);
         }
 
     }

@@ -121,4 +121,10 @@ namespace Hydra.Common.Models
         [JsonProperty("updatedDate")]
         public DateTime UpdatedDate { get; set; }
     }
+
+    public class ApproveBadgeModel
+    {
+        [JsonProperty("badgeIds")]
+        public List<long> BadgeIds { get; set; }
+    }
 }
