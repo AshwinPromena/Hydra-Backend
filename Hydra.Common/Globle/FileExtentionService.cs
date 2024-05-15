@@ -53,12 +53,5 @@
             public const string srtSubStringa = "MQOWM";
             public const string srtSubStringb = "77U/M";
         }
-
-        public const string Mediapath = "hydra/{guid}/media";
-
-        public static string GetMediapath()
-        {
-            return Mediapath.Replace("{guid}", Guid.NewGuid().ToString());
-        }
     }
 }

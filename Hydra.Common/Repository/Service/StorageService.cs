@@ -16,7 +16,7 @@ namespace Hydra.Common.Repository.Service
 
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.APSouth1;
 
-        private static int MAX_FILE_SIZE = 1024  1024  70; // 70 MB
+        private static int MAX_FILE_SIZE = 1024 * 1024 * 70; // 70 MB
 
         private static string[] EXTENSION_LOWER_CASE = new string[] { "pdf", "jpg", "png", "jpeg", "gif", "mp4", "webp", "txt" };
 

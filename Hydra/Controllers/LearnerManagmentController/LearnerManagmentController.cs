@@ -73,15 +73,6 @@ namespace Hydra.Controllers.LearnerController
         }
 
         [HttpPost("[action]")]
-        public async Task<ApiResponse> UpdateLearner(UpdateLearnerModel model)
-        {
-            if (!ModelState.IsValid)
-                return new(400, ResponseConstants.BadRequest);
-
-            return await _learnerManagmentService.UpdateLearner(model);
-        }
-
-        [HttpPost("[action]")]
         public async Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model)
         {
             if (!ModelState.IsValid)
