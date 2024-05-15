@@ -229,29 +229,44 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             };
         }
 
-        public async Task<ApiResponse> AssignBadges(AssignBadgeModel model)
+        public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadges(AssignBadgeModel model)
         {
             var currentUserId = _currentUserService.UserId;
             var dateTime = DateTime.UtcNow;
-            var learnerBadges = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => model.UserIds.Contains(x.UserId) && x.IsActive).ToListAsync();
-            foreach (var userId in model.UserIds)
+            var learnerBadges = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => model.UserIds.Contains(x.UserId) && x.IsActive).Include(i => i.Badge).ToListAsync();
+            var notApprovedBadge = await _unitOfWork.BadgeRepository
+                                                   .FindByCondition(x => model.BadgeIds.Contains(x.Id) && x.IsActive && x.IsApproved == false)
+                                                   .Select(s => new NotApprovedBadgeModel
+                                                   {
+                                                       BadgeId = s.Id,
+                                                       BadgeName = s.Name,
+                                                   })
+                                                   .ToListAsync();
+            if (notApprovedBadge.Count == 0)
             {
-                foreach (var badgeId in model.BadgeIds)
+                foreach (var userId in model.UserIds)
                 {
-                    if (!learnerBadges.Any(x => x.UserId == userId && x.BadgeId == badgeId))
+                    foreach (var badgeId in model.BadgeIds)
                     {
-                        learnerBadges.Add(new LearnerBadge
+                        if (!learnerBadges.Any(x => x.UserId == userId && x.BadgeId == badgeId))
                         {
-                            UserId = userId,
-                            BadgeId = badgeId,
-                            CreatedDate = dateTime,
-                            UpdatedDate = dateTime,
-                            IsActive = true,
-                            IsRevoked = false,
-                            IssuedBy = currentUserId
-                        });
+                            learnerBadges.Add(new LearnerBadge
+                            {
+                                UserId = userId,
+                                BadgeId = badgeId,
+                                CreatedDate = dateTime,
+                                UpdatedDate = dateTime,
+                                IsActive = true,
+                                IsRevoked = false,
+                                IssuedBy = currentUserId
+                            });
+                        }
                     }
                 }
+            }
+            else
+            {
+                return new ServiceResponse<List<NotApprovedBadgeModel>>(400, ResponseConstants.NotApprovedBadge, notApprovedBadge);
             }
 
             _unitOfWork.LearnerBadgeRepository.UpdateRange(learnerBadges);

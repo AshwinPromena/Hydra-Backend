@@ -74,6 +74,7 @@
         public const string InvalidBadgeId = "Invalid badge id";
         public const string BadgesApproved = "All badges has been approved";
         public const string ApprovedBadges = "{badgeCount} badges has been approved";
+        public const string NotApprovedBadge = "These badges are not been approved you can't issue this to learner";
 
         #endregion
 

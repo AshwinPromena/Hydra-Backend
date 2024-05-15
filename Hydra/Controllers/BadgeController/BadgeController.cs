@@ -58,7 +58,7 @@ namespace Hydra.Controllers.BadgeController
         }
 
         [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
-        public async Task<ApiResponse> AssignBadges(AssignBadgeModel model)
+        public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadges(AssignBadgeModel model)
         {
             if (!ModelState.IsValid)
                 return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };

@@ -127,4 +127,13 @@ namespace Hydra.Common.Models
         [JsonProperty("badgeIds")]
         public List<long> BadgeIds { get; set; }
     }
+
+    public class NotApprovedBadgeModel
+    {
+        [JsonProperty("badgeId")]
+        public long BadgeId { get; set; }
+
+        [JsonProperty("badgeName")]
+        public string BadgeName { get; set; }
+    }
 }
