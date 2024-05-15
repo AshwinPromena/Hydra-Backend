@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 {
-    public class StaffServices(IUnitOfWork unitOfWork, IStorageService storageService) : IStaffService
+    public class StaffServices(IUnitOfWork unitOfWork, IStorageService storageService,ICurrentUserService currentUserService) : IStaffService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
         private readonly IStorageService _storageService = storageService;
+        private readonly ICurrentUserService _currentUserService = currentUserService;
 
         public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
@@ -139,7 +139,6 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             return new ServiceResponse<GetStaffModel>(200, ResponseConstants.Success, staff);
         }
 
-
         public async Task<ApiResponse> ApproveStaffUser(long staffUserId)
         {
             var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == staffUserId).FirstOrDefaultAsync();
@@ -198,6 +197,29 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 Message = ResponseConstants.Success,
                 StatusCode = 200,
             };
+        }
+
+        public async Task<ApiResponse> ApproveBadge(ApproveBadgeModel model)
+        {
+            var currentUser = _currentUserService.UserId;
+            var badge = await _unitOfWork.BadgeRepository
+                                         .FindByCondition(x => model.BadgeIds.Contains(x.Id) &&
+                                        x.IsActive && x.IsApproved == false &&
+                                        x.ApprovalUserId == currentUser).ToListAsync();
+
+            if (badge == null)
+                return new(204, ResponseConstants.BadgesApproved);
+
+            badge.ForEach(x =>
+            {
+                x.IsApproved = true;
+                x.UpdatedDate = DateTime.UtcNow;
+            });
+
+            _unitOfWork.BadgeRepository.UpdateRange(badge);
+            await _unitOfWork.BadgeRepository.CommitChanges();
+
+            return new(200, ResponseConstants.ApprovedBadges.Replace("{badgeCount}",badge.Count.ToString()));
         }
     }
 }

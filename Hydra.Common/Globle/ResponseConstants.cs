@@ -72,6 +72,8 @@
         public const string BadgeUpdated = "Badge updated successfully.";
         public const string BadgeDeleted = "Badge removed successfully.";
         public const string InvalidBadgeId = "Invalid badge id";
+        public const string BadgesApproved = "All badges has been approved";
+        public const string ApprovedBadges = "{badgeCount} badges has been approved";
 
         #endregion
 
