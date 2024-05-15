@@ -11,106 +11,39 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task<PagedResponse<List<DepartmentDropDownModel>>> GetAllDepartment(PagedResponseInput model)
+        public async Task<ServiceResponse<List<DepartmentDropDownModel>>> GetAllDepartment()
         {
-            model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
-            var data = await _unitOfWork.DepartmentRepository
-                                        .FindByCondition(x => x.IsActive)
-                                        .Where(x => string.IsNullOrEmpty(model.SearchString) ||
-                                                   (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
-                                        .GroupBy(x => 1)
-                                        .Select(x => new PagedResponseOutput<List<DepartmentDropDownModel>>
-                                        {
-                                            TotalCount = x.Count(),
-                                            Data = x.OrderBy(x => x.Name)
-                                                    .Select(s => new DepartmentDropDownModel
-                                                    {
-                                                        DepartmentId = s.Id,
-                                                        DepartmentName = s.Name
-                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
-                                                      .Take(model.PageSize)
-                                                      .ToList()
-                                        }).FirstOrDefaultAsync();
-            return new PagedResponse<List<DepartmentDropDownModel>>
-            {
-                Data = data?.Data ?? [],
-                HasNextPage = data?.TotalCount > (model.PageSize * model.PageIndex),
-                HasPreviousPage = model.PageIndex > 1,
-                TotalRecords = data == null ? 0 : data.TotalCount,
-                SearchString = model.SearchString,
-                PageSize = model.PageSize,
-                PageIndex = model.PageIndex,
-                Message = ResponseConstants.Success,
-                StatusCode = 200
-            };
+            return new(200, ResponseConstants.Success, await _unitOfWork.DepartmentRepository
+                                                                  .FindByCondition(x => x.IsActive)
+                                                                  .Select(s => new DepartmentDropDownModel
+                                                                  {
+                                                                      DepartmentId = s.Id,
+                                                                      DepartmentName = s.Name
+                                                                  }).ToListAsync());
         }
 
-        public async Task<PagedResponse<List<AccessLevelDropDownModel>>> GetAllAccessLevel(PagedResponseInput model)
+        public async Task<ServiceResponse<List<AccessLevelDropDownModel>>> GetAllAccessLevel()
         {
-            model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
-            var data = await _unitOfWork.AccessLevelRepository
-                                        .FindByCondition(x => x.Id > 0)
-                                        .Where(x => string.IsNullOrEmpty(model.SearchString) ||
-                                                   (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
-                                        .GroupBy(x => 1)
-                                        .Select(x => new PagedResponseOutput<List<AccessLevelDropDownModel>>
-                                        {
-                                            TotalCount = x.Count(),
-                                            Data = x.OrderBy(x => x.Id)
-                                                    .Select(s => new AccessLevelDropDownModel
-                                                    {
-                                                        AccessLevelId = s.Id,
-                                                        AccessLevelName = s.Name
-                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
-                                                      .Take(model.PageSize)
-                                                      .ToList()
-                                        }).FirstOrDefaultAsync();
-            return new PagedResponse<List<AccessLevelDropDownModel>>
-            {
-                Data = data?.Data ?? [],
-                HasNextPage = data?.TotalCount > (model.PageSize * model.PageIndex),
-                HasPreviousPage = model.PageIndex > 1,
-                TotalRecords = data == null ? 0 : data.TotalCount,
-                SearchString = model.SearchString,
-                PageSize = model.PageSize,
-                PageIndex = model.PageIndex,
-                Message = ResponseConstants.Success,
-                StatusCode = 200
-            };
+            return new(200, ResponseConstants.Success, await _unitOfWork.AccessLevelRepository
+                                                                  .FindByCondition(x => x.Id > 0)
+                                                                  .Select(s => new AccessLevelDropDownModel
+                                                                  {
+                                                                      AccessLevelId = s.Id,
+                                                                      AccessLevelName = s.Name
+                                                                  }).ToListAsync());
         }
 
-        public async Task<PagedResponse<List<UserDropDownModel>>> GetAllApprovalUsers(PagedResponseInput model)
+        public async Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers()
         {
-            model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
-            var data = await _unitOfWork.UserRepository
-                                        .FindByCondition(x => x.IsActive && x.IsApproved && x.UserRole.FirstOrDefault().RoleId != (long)Roles.Learner)
-                                        .Where(x => string.IsNullOrEmpty(model.SearchString) ||
-                                                   ((x.FirstName + x.LastName) ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
-                                        .GroupBy(x => 1)
-                                        .Select(x => new PagedResponseOutput<List<UserDropDownModel>>
-                                        {
-                                            TotalCount = x.Count(),
-                                            Data = x.OrderBy(x => x.FirstName + x.LastName)
-                                                    .Select(s => new UserDropDownModel
-                                                    {
-                                                        UserId = s.Id,
-                                                        UserName = (string.IsNullOrEmpty(s.FirstName) ? null : s.FirstName) + (!string.IsNullOrEmpty(s.FirstName) && !string.IsNullOrEmpty(s.LastName) ? " " : null) + (string.IsNullOrEmpty(s.LastName) ? null : s.LastName)
-                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
-                                                      .Take(model.PageSize)
-                                                      .ToList()
-                                        }).FirstOrDefaultAsync();
-            return new PagedResponse<List<UserDropDownModel>>
-            {
-                Data = data?.Data ?? [],
-                HasNextPage = data?.TotalCount > (model.PageSize * model.PageIndex),
-                HasPreviousPage = model.PageIndex > 1,
-                TotalRecords = data == null ? 0 : data.TotalCount,
-                SearchString = model.SearchString,
-                PageSize = model.PageSize,
-                PageIndex = model.PageIndex,
-                Message = ResponseConstants.Success,
-                StatusCode = 200
-            };
+            return new(200, ResponseConstants.Success, await _unitOfWork.UserRepository
+                                                                        .FindByCondition(x => x.IsActive &&
+                                                                       x.IsApproved &&
+                                                                       x.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
+                                                                        .Select(s => new UserDropDownModel
+                                                                        {
+                                                                            UserId = s.Id,
+                                                                            UserName = (string.IsNullOrEmpty(s.FirstName) ? null : s.FirstName) + (!string.IsNullOrEmpty(s.FirstName) && !string.IsNullOrEmpty(s.LastName) ? " " : null) + (string.IsNullOrEmpty(s.LastName) ? null : s.LastName)
+                                                                        }).ToListAsync());
         }
 
         public async Task<PagedResponse<List<UserDropDownModel>>> GetLearnersForBadgeAssign(PagedResponseInput model, long? badgeId = null)

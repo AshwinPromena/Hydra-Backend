@@ -3,11 +3,11 @@ namespace Hydra.BusinessLayer.Repository.IService.IDropDownService
 {
     public interface IDropDownService
     {
-        Task<PagedResponse<List<DepartmentDropDownModel>>> GetAllDepartment(PagedResponseInput model);
+        Task<ServiceResponse<List<DepartmentDropDownModel>>> GetAllDepartment();
 
-        Task<PagedResponse<List<AccessLevelDropDownModel>>> GetAllAccessLevel(PagedResponseInput model);
+        Task<ServiceResponse<List<AccessLevelDropDownModel>>> GetAllAccessLevel();
 
-        Task<PagedResponse<List<UserDropDownModel>>> GetAllApprovalUsers(PagedResponseInput model);
+        Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers();
 
         Task<PagedResponse<List<UserDropDownModel>>> GetLearnersForBadgeAssign(PagedResponseInput model, long? badgeId = null);
 

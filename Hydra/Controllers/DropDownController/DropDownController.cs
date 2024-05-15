@@ -13,30 +13,24 @@ namespace Hydra.Controllers.DropDownController
         private readonly IDropDownService _dropDownService = dropDownService;
 
         [HttpPost("[action]")]
-        public async Task<PagedResponse<List<DepartmentDropDownModel>>> GetAllDepartment(PagedResponseInput model)
+        public async Task<ServiceResponse<List<DepartmentDropDownModel>>> GetAllDepartment()
         {
-            if (!ModelState.IsValid)
-                return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
-
-            return await _dropDownService.GetAllDepartment(model);
+            return await _dropDownService.GetAllDepartment();
         }
 
         [HttpPost("[action]")]
-        public async Task<PagedResponse<List<AccessLevelDropDownModel>>> GetAllAccessLevel(PagedResponseInput model)
+        public async Task<ServiceResponse<List<AccessLevelDropDownModel>>> GetAllAccessLevel()
         {
-            if (!ModelState.IsValid)
-                return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
-
-            return await _dropDownService.GetAllAccessLevel(model);
+            return await _dropDownService.GetAllAccessLevel();
         }
 
         [HttpPost("[action]"), Authorize]
-        public async Task<PagedResponse<List<UserDropDownModel>>> GetAllApprovalUsers(PagedResponseInput model)
+        public async Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers()
         {
             if (!ModelState.IsValid)
                 return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
 
-            return await _dropDownService.GetAllApprovalUsers(model);
+            return await _dropDownService.GetAllApprovalUsers();
         }
 
         [HttpPost("[action]"), Authorize]
