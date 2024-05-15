@@ -52,7 +52,7 @@ namespace Hydra.Controllers.LearnerController
         }
 
         [HttpPost("[action]"), Authorize(Roles = "Staff")]
-        public async Task<ApiResponse> AssignBadgeToLearners(AssignBadgeModel model)
+        public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadgeToLearners(AssignBadgeModel model)
         {
             if (!ModelState.IsValid)
                 return new(400, ResponseConstants.BadRequest);

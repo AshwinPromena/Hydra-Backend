@@ -64,6 +64,10 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Email = user.Email,
+                        Email2 = user.Email2,
+                        Email3 = user.Email3,
+                        MobileNumber = user.MobileNumber,
+                        IsApproved = true,
                         UserRole = new List<UserRole>
                         {
                             new UserRole
@@ -94,6 +98,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 Email2 = model.Email2,
                 Email3 = model.Email3,
                 MobileNumber = model.MobileNumber,
+                IsApproved = true
             };
             learner.UserRole.Add(new()
             {
@@ -114,9 +119,9 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 {
                     FirstName = "Mary",
                     LastName = "Johnson",
-                    Email = "mailto:maryjohnson@yopmail.com",
-                    Email2 = "mailto:johson@yopmail.com",
-                    Email3 = "mailto:mary@yopmail.com",
+                    Email = "maryjohnson@yopmail.com",
+                    Email2 = "johson@yopmail.com",
+                    Email3 = "mary@yopmail.com",
                     MobileNumber ="(555) 123-4567",
                 }
             };
@@ -142,7 +147,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             return excelString;
         }
 
-        public async Task<ApiResponse> AssignBadgeToLearners(AssignBadgeModel model)
+        public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadgeToLearners(AssignBadgeModel model)
         {
             return await _badgeService.AssignBadges(model);
         }
