@@ -176,7 +176,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                         UserId = s.Id,
                                                         Name = $"{s.FirstName} {s.LastName}",
                                                         Email = s.Email,
-                                                        LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
+                                                        LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
                                                         {
                                                             BadgeId = s.BadgeId,
                                                             BadgeName = s.Badge.Name,
@@ -218,7 +218,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                             UserId = s.Id,
                                                                             Name = $"{s.FirstName} {s.LastName}",
                                                                             Email = s.Email,
-                                                                            LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
+                                                                            LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
                                                                             {
                                                                                 BadgeId = s.BadgeId,
                                                                                 BadgeName = s.Badge.Name,
@@ -230,9 +230,53 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                                 SequenceName = s.Badge.BadgeSequence.Name,
                                                                             }).ToList(),
                                                                             ProfilePicture = s.ProfilePicture,
-                                                                            Active = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate >= DateTime.UtcNow).ToList().Count,
-                                                                            Expiring = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate > DateTime.UtcNow).ToList().Count,
-                                                                            Expired = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow).ToList().Count,
+                                                                            Active = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate >= DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
+                                                                            Expiring = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate > DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
+                                                                            Expired = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
+                                                                            GetActiveCredentialModel = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow &&
+                                                                                                       x.Badge.ExpirationDate >= DateTime.UtcNow &&
+                                                                                                       x.IsActive &&
+                                                                                                       x.IsRevoked == false)
+                                                                                                        .Select(s => new GetActiveCredentialModel
+                                                                                                        {
+                                                                                                            BadgeId = s.BadgeId,
+                                                                                                            BadgeName = s.Badge.Name,
+                                                                                                            DepartmentId = s.Badge.DepartmentId,
+                                                                                                            DepartmentName = s.Badge.Department.Name,
+                                                                                                            IssuedDate = s.Badge.IssueDate,
+                                                                                                            ExpirationDate = s.Badge.ExpirationDate,
+                                                                                                            SequenceId = s.Badge.BadgeSequenceId,
+                                                                                                            SequenceName = s.Badge.BadgeSequence.Name,
+                                                                                                        }).ToList(),
+                                                                            GetExpirinyCredentialModel = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow &&
+                                                                                                         x.Badge.ExpirationDate > DateTime.UtcNow &&
+                                                                                                         x.IsActive &&
+                                                                                                         x.IsRevoked == false)
+                                                                                                          .Select(s => new GetExpirinyCredentialModel
+                                                                                                          {
+                                                                                                              BadgeId = s.BadgeId,
+                                                                                                              BadgeName = s.Badge.Name,
+                                                                                                              DepartmentId = s.Badge.DepartmentId,
+                                                                                                              DepartmentName = s.Badge.Department.Name,
+                                                                                                              IssuedDate = s.Badge.IssueDate,
+                                                                                                              ExpirationDate = s.Badge.ExpirationDate,
+                                                                                                              SequenceId = s.Badge.BadgeSequenceId,
+                                                                                                              SequenceName = s.Badge.BadgeSequence.Name,
+                                                                                                          }).ToList(),
+                                                                            GetexpiredCredentialModel = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow &&
+                                                                                                        x.IsActive &&
+                                                                                                        x.IsRevoked == false)
+                                                                                                         .Select(s => new GetexpiredCredentialModel
+                                                                                                         {
+                                                                                                             BadgeId = s.BadgeId,
+                                                                                                             BadgeName = s.Badge.Name,
+                                                                                                             DepartmentId = s.Badge.DepartmentId,
+                                                                                                             DepartmentName = s.Badge.Department.Name,
+                                                                                                             IssuedDate = s.Badge.IssueDate,
+                                                                                                             ExpirationDate = s.Badge.ExpirationDate,
+                                                                                                             SequenceId = s.Badge.BadgeSequenceId,
+                                                                                                             SequenceName = s.Badge.BadgeSequence.Name,
+                                                                                                         }).ToList()
                                                                         }).FirstOrDefaultAsync());
         }
 

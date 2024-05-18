@@ -118,6 +118,93 @@ namespace Hydra.Common.Models
 
         [JsonProperty("expired")]
         public int Expired { get; set; }
+
+        [JsonProperty("getActiveCredentialModel")]
+        public List<GetActiveCredentialModel> GetActiveCredentialModel {  get; set; }
+
+        [JsonProperty("getExpirinyCredentialModel")]
+        public List<GetExpirinyCredentialModel> GetExpirinyCredentialModel { get; set; }
+
+        [JsonProperty("getexpiredCredentialModel")]
+        public List<GetexpiredCredentialModel> GetexpiredCredentialModel { get; set; }
+    }
+
+    public class GetActiveCredentialModel
+    {
+        [JsonProperty("badgeId")]
+        public long BadgeId { get; set; }
+
+        [JsonProperty("badgeName")]
+        public string BadgeName { get; set; }
+
+        [JsonProperty("departmentId")]
+        public long DepartmentId { get; set; }
+
+        [JsonProperty("departmentName")]
+        public string DepartmentName { get; set; }
+        [JsonProperty("issuedDate")]
+        public DateTime IssuedDate { get; set; }
+
+        [JsonProperty("expirationDate")]
+        public DateTime ExpirationDate { get; set; }
+
+        [JsonProperty("sequenceId")]
+        public long? SequenceId { get; set; }
+
+        [JsonProperty("sequenceName")]
+        public string SequenceName { get; set; }
+    }
+
+    public class GetExpirinyCredentialModel
+    {
+        [JsonProperty("badgeId")]
+        public long BadgeId { get; set; }
+
+        [JsonProperty("badgeName")]
+        public string BadgeName { get; set; }
+
+        [JsonProperty("departmentId")]
+        public long DepartmentId { get; set; }
+
+        [JsonProperty("departmentName")]
+        public string DepartmentName { get; set; }
+        [JsonProperty("issuedDate")]
+        public DateTime IssuedDate { get; set; }
+
+        [JsonProperty("expirationDate")]
+        public DateTime ExpirationDate { get; set; }
+
+        [JsonProperty("sequenceId")]
+        public long? SequenceId { get; set; }
+
+        [JsonProperty("sequenceName")]
+        public string SequenceName { get; set; }
+    }
+
+    public class GetexpiredCredentialModel
+    {
+        [JsonProperty("badgeId")]
+        public long BadgeId { get; set; }
+
+        [JsonProperty("badgeName")]
+        public string BadgeName { get; set; }
+
+        [JsonProperty("departmentId")]
+        public long DepartmentId { get; set; }
+
+        [JsonProperty("departmentName")]
+        public string DepartmentName { get; set; }
+        [JsonProperty("issuedDate")]
+        public DateTime IssuedDate { get; set; }
+
+        [JsonProperty("expirationDate")]
+        public DateTime ExpirationDate { get; set; }
+
+        [JsonProperty("sequenceId")]
+        public long? SequenceId { get; set; }
+
+        [JsonProperty("sequenceName")]
+        public string SequenceName { get; set; }
     }
 
     public class UpdateLearnerModel
@@ -174,7 +261,6 @@ namespace Hydra.Common.Models
 
         [JsonProperty("sequenceName")]
         public string SequenceName { get; set; }
-
     }
 
     public class RevokeBadgeModel
