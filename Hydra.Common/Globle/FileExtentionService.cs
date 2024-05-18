@@ -6,6 +6,7 @@
         {
             string extension = subString.ToUpper() switch
             {
+                ExtententionConstants.xlsxSubString => ExtententionConstants.XlsxExt,
                 ExtententionConstants.PngSubString => ExtententionConstants.PngExt,
                 ExtententionConstants.JpgSubString => ExtententionConstants.JpgExt,
                 ExtententionConstants.mp4SubString => ExtententionConstants.mp4Ext,
@@ -52,6 +53,8 @@
             public const string srtExt = ".srt";
             public const string srtSubStringa = "MQOWM";
             public const string srtSubStringb = "77U/M";
+            public const string XlsxExt = ".xlsx";
+            public const string xlsxSubString = "UESDB";
         }
     }
 }

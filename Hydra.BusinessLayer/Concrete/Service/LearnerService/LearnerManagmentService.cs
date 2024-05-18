@@ -142,9 +142,11 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             }
             var excelString = string.Empty;
 
-            excelString = await Task.Run(() => _reportService.DownloadExcelFromJson(convertedList));
+            excelString = _reportService.DownloadExcelFromJson(convertedList);
 
-            return excelString;
+            var s3Url = (await _storageService.UploadFile(FileExtentionService.GetMediapath(), excelString)).Data;
+
+            return s3Url;
         }
 
         public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadgeToLearners(AssignBadgeModel model)

@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Hydra.Common.Models;
 
 namespace Hydra.Common.Repository.IService
 {

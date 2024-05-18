@@ -1,14 +1,17 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Hydra.Common.Globle;
+using Hydra.Common.Models;
 using Hydra.Common.Repository.IService;
 using Hydra.DatbaseLayer.IRepository;
 
 namespace Hydra.Common.Repository.Service
 {
-    public class ReportService(IUnitOfWork unitOfWork) : IReportService
+    public class ReportService(IUnitOfWork unitOfWork,IStorageService storageService) : IReportService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IStorageService _storageService = storageService;
 
         public string DownloadExcelFromJson(List<Dictionary<string, string>> jsonData, string reportName, string reportDescription, string fromDate, string toDate)
         {
@@ -75,6 +78,7 @@ namespace Hydra.Common.Repository.Service
 
             byte[] byteArray = mem.ToArray();
             string temp_inBase64 = Convert.ToBase64String(byteArray);
+
             return temp_inBase64;
         }
 
