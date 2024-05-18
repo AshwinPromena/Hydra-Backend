@@ -11,8 +11,6 @@ namespace Hydra.BusinessLayer.Repository.IService.ILearnerService
 
         Task<ApiResponse> AddLearner(AddLearnerModel model);
 
-        Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadgeToLearners(AssignBadgeModel model);
-
         Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model);
 
         Task<ServiceResponse<GetLearnerByIdModel>> GetLearnerById(long userId);

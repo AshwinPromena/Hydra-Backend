@@ -8,6 +8,7 @@ namespace Hydra.Controllers.LearnerController
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class LearnerManagmentController(ILearnerManagmentService learnerManagmentService) : ControllerBase
     {
         private readonly ILearnerManagmentService _learnerManagmentService = learnerManagmentService;
@@ -49,15 +50,6 @@ namespace Hydra.Controllers.LearnerController
                 return new(400, ResponseConstants.BadRequest);
 
             return await _learnerManagmentService.UpdateLearner(model);
-        }
-
-        [HttpPost("[action]"), Authorize(Roles = "Staff")]
-        public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadgeToLearners(AssignBadgeModel model)
-        {
-            if (!ModelState.IsValid)
-                return new(400, ResponseConstants.BadRequest);
-
-            return await _learnerManagmentService.AssignBadgeToLearners(model);
         }
 
         [HttpPost("[action]")]

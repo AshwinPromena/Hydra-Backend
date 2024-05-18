@@ -73,7 +73,7 @@ namespace Hydra.Controllers.StaffController
             return await _staffService.ApproveStaffUser(staffUserId);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin ,Staff")]
+        [HttpPost("[action]")]
         public async Task<ApiResponse> ApproveBadge(ApproveBadgeModel model)
         {
             if (!ModelState.IsValid)

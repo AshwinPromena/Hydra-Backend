@@ -149,11 +149,6 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             return s3Url;
         }
 
-        public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadgeToLearners(AssignBadgeModel model)
-        {
-            return await _badgeService.AssignBadges(model);
-        }
-
         public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model)
         {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
