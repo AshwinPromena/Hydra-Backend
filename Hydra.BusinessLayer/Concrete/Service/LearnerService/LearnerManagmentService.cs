@@ -111,7 +111,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             return new(200, ResponseConstants.LearnerAdded);
         }
 
-        public async Task<string> DownloadSampleExcelFile()
+        public async Task<ServiceResponse<GetS3UrlModel>> DownloadSampleExcelFile()
         {
             var data = new List<SampleExcelDataModel>()
             {
@@ -146,7 +146,10 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
             var s3Url = (await _storageService.UploadFile(FileExtentionService.GetMediapath(), excelString)).Data;
 
-            return s3Url;
+            return new(200, ResponseConstants.Success, new GetS3UrlModel
+            {
+                S3Url = s3Url
+            });
         }
 
         public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model)
@@ -332,7 +335,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                             .FindByCondition(x => model.UserIds.Contains(x.Id) &&
                                            x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner).ToListAsync();
 
-            if (learners == null)
+            if (learners.Count == 0)
                 return new(400, ResponseConstants.InvalidUserId);
 
             learners.ForEach(x =>

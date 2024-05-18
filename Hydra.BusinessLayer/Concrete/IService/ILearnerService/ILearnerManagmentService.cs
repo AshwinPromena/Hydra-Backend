@@ -7,7 +7,7 @@ namespace Hydra.BusinessLayer.Repository.IService.ILearnerService
 
         Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLeraner(List<AddLearnerModel> model);
 
-        Task<string> DownloadSampleExcelFile();
+        Task<ServiceResponse<GetS3UrlModel>> DownloadSampleExcelFile();
 
         Task<ApiResponse> AddLearner(AddLearnerModel model);
 

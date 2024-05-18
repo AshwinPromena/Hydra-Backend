@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hydra.Common.Models
 {
-    public class Base64String
+    public class GetS3UrlModel
     {
-        [JsonProperty("filrBase64String")]
-        public string FileBase64String { get; set; }
+        [JsonProperty("s3Url")]
+        public string S3Url { get; set; }
     }
 
     public class AddLearnerModel

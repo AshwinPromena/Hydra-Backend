@@ -21,7 +21,7 @@ namespace Hydra.Controllers.LearnerController
         }
 
         [HttpGet("[action]")]
-        public async Task<string> DownloadSampleExcelFile()
+        public async Task<ServiceResponse<GetS3UrlModel>> DownloadSampleExcelFile()
         {
             return await _learnerManagmentService.DownloadSampleExcelFile();
         }
