@@ -83,23 +83,8 @@ namespace Hydra.Common.Models
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("firstName")]
-        public string FirstName { get; set; }
-
-        [JsonProperty("lastName")]
-        public string LastName { get; set; }
-
         [JsonProperty("email")]
         public string Email { get; set; }
-
-        [JsonProperty("email2")]
-        public string Email2 { get; set; }
-
-        [JsonProperty("email3")]
-        public string Email3 { get; set; }
-
-        [JsonProperty("mobileNumber")]
-        public string MobileNumber { get; set; }
 
         [JsonProperty("learnerBadgeModel")]
         public List<LearnerBadgeModel> LearnerBadgeModel { get; set; }
@@ -124,15 +109,6 @@ namespace Hydra.Common.Models
 
         [JsonProperty("email")]
         public string Email { get; set; }
-
-        [JsonProperty("email2")]
-        public string Email2 { get; set; }
-
-        [JsonProperty("email3")]
-        public string Email3 { get; set; }
-
-        [JsonProperty("mobileNumber")]
-        public string MobileNumber { get; set; }
 
         [JsonProperty("learnerBadgeModel")]
         public List<LearnerBadgeModel> LearnerBadgeModel { get; set; }

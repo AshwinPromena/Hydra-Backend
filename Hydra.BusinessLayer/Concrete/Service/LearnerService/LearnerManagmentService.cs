@@ -178,12 +178,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                     {
                                                         UserId = s.Id,
                                                         Name = $"{s.FirstName} {s.LastName}",
-                                                        FirstName = s.FirstName,
-                                                        LastName = s.LastName,
                                                         Email = s.Email,
-                                                        Email2 = s.Email2,
-                                                        Email3 = s.Email3,
-                                                        MobileNumber = s.MobileNumber,
                                                         LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
                                                         {
                                                             BadgeId = s.BadgeId,
@@ -228,10 +223,6 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                             FirstName = s.FirstName,
                                                                             LastName = s.LastName,
                                                                             Email = s.Email,
-                                                                            Email = s.Email,
-                                                                            Email2 = s.Email2,
-                                                                            Email3 = s.Email3,
-                                                                            MobileNumber = s.MobileNumber,
                                                                             LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
                                                                             {
                                                                                 BadgeId = s.BadgeId,
