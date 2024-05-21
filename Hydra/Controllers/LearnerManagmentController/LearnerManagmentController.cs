@@ -53,6 +53,12 @@ namespace Hydra.Controllers.LearnerController
         }
 
         [HttpPost("[action]")]
+        public async Task<ApiResponse> RemoveProfilePicture(long userId)
+        {
+            return await _learnerManagmentService.RemoveProfilePicture(userId);
+        }
+
+        [HttpPost("[action]")]
         public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model)
         {
             return await _learnerManagmentService.GetAllLearners(model);

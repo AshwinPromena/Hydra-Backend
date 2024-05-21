@@ -315,6 +315,19 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             return new(200, ResponseConstants.LearnerUpdated);
         }
 
+        public async Task<ApiResponse> RemoveProfilePicture(long userId)
+        {
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == userId && x.IsActive).FirstOrDefaultAsync();
+            if (user == null)
+                return new(200, ResponseConstants.InvalidUserId);
+
+            user.ProfilePicture = null;
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.UserRepository.CommitChanges();
+
+            return new(200, ResponseConstants.Success);
+        }
+
         public async Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model)
         {
             var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository
