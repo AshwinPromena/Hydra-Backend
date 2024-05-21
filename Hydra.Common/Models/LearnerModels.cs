@@ -51,6 +51,15 @@ namespace Hydra.Common.Models
         public List<long> BadgeIds { get; set; }
     }
 
+    public class RemoveBadgeModel
+    {
+        [JsonProperty("userIds")]
+        public List<long> UserIds { get; set; }
+
+        [JsonProperty("badgeIds")]
+        public List<long> BadgeIds { get; set; }
+    }
+
     public class LearnerDashBoardModel
     {
         [JsonProperty("learnerInTotal")]
@@ -297,6 +306,9 @@ namespace Hydra.Common.Models
     {
         [JsonProperty("userIds")]
         public List<long> UserIds { get; set; }
+
+        [JsonProperty("badgeIds")]
+        public List<long> BadgeIds { get; set; }
     }
 
     public class RemoveLearnerModel

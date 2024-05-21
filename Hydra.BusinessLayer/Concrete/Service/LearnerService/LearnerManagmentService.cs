@@ -331,10 +331,13 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
         public async Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model)
         {
             var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository
-                                                    .FindByCondition(x => model.UserIds.Contains(x.UserId) && x.User.IsActive)
+                                                    .FindByCondition(x => model.UserIds.Contains(x.UserId) &&
+                                                   x.User.IsActive &&
+                                               model.BadgeIds.Contains(x.BadgeId) &&
+                                                   x.IsRevoked == false)
                                                     .ToListAsync();
             if (learnerWithBadge == null)
-                return new(400, ResponseConstants.InvalidUserId);
+                return new(400, ResponseConstants.InvalidBadgeId);
 
             learnerWithBadge.ForEach(x =>
             {
@@ -347,9 +350,26 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             return new(200, ResponseConstants.BadgeRevoked);
         }
 
-        public async Task<ApiResponse> DeleteBadge(DeleteBadgeModel model)
+        public async Task<ApiResponse> RemoveBadge(RemoveBadgeModel model)
         {
-            return await _badgeService.DeleteBadge(model);
+            var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository
+                                                    .FindByCondition(x => model.UserIds.Contains(x.UserId) &&
+                                                    model.BadgeIds.Contains(x.BadgeId) && x.IsActive)
+                                                    .ToListAsync();
+
+            if (learnerWithBadge == null)
+                return new(400, ResponseConstants.InvalidBadgeId);
+
+            learnerWithBadge.ForEach(x =>
+            {
+                x.IsActive = false;
+                x.UpdatedDate = DateTime.UtcNow;
+            });
+
+            _unitOfWork.LearnerBadgeRepository.UpdateRange(learnerWithBadge);
+            await _unitOfWork.LearnerBadgeRepository.CommitChanges();
+
+            return new(200, ResponseConstants.BadgeRemoved);
         }
 
         public async Task<ApiResponse> RemoveLearners(RemoveLearnerModel model)
