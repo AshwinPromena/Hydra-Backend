@@ -7,7 +7,6 @@ using Hydra.Common.Repository.IService;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 {
@@ -164,7 +163,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             learnersQuery = model.Type == (int)GetLearnerType.All ?
                             learnersQuery :
                             (model.Type == (int)GetLearnerType.Assigned ?
-                                learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() > 0) :
+                                learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Count() > 0) :
                                 learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() == 0));
             learnersQuery = model.FromDate != null ? learnersQuery.Where(x => x.CreatedDate.Date >= model.FromDate.Value.Date) : learnersQuery;
             learnersQuery = model.ToDate != null ? learnersQuery.Where(x => x.CreatedDate.Date <= model.ToDate.Value.Date) : learnersQuery;
@@ -184,7 +183,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                         Email2 = s.Email2,
                                                         Email3 = s.Email3,
                                                         MobileNumber = s.MobileNumber,
-                                                        LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive || x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
+                                                        LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
                                                         {
                                                             BadgeId = s.BadgeId,
                                                             BadgeName = s.Badge.Name,
@@ -231,7 +230,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                             Email2 = s.Email2,
                                                                             Email3 = s.Email3,
                                                                             MobileNumber = s.MobileNumber,
-                                                                            LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive || x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
+                                                                            LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
                                                                             {
                                                                                 BadgeId = s.BadgeId,
                                                                                 BadgeName = s.Badge.Name,
@@ -342,6 +341,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             learnerWithBadge.ForEach(x =>
             {
                 x.IsRevoked = true;
+                x.IsActive = false;
                 x.UpdatedDate = DateTime.UtcNow;
             });
 
