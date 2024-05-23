@@ -173,9 +173,9 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                                                 IsApproved = s.IsApproved,
                                                 MobileNumber = s.MobileNumber,
                                                 AccessLevelId = s.AccessLevelId,
-                                                //AccessLevelName = s.AccessLevel.Name,
+                                                AccessLevelName = s.AccessLevel.Name,
                                                 DepartmentId = s.DepartmentId,
-                                                //DepartmentName = s.Department.Name,
+                                                DepartmentName = s.Department.Name,
                                                 ProfilePicture = s.ProfilePicture,
                                                 CreatedDate = s.CreatedDate,
                                                 UpdatedDate = s.UpdatedDate
