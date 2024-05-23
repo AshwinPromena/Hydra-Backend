@@ -184,7 +184,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                         Email2 = s.Email2,
                                                         Email3 = s.Email3,
                                                         MobileNumber = s.MobileNumber,
-                                                        LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
+                                                        LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive || x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
                                                         {
                                                             BadgeId = s.BadgeId,
                                                             BadgeName = s.Badge.Name,
@@ -231,7 +231,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                             Email2 = s.Email2,
                                                                             Email3 = s.Email3,
                                                                             MobileNumber = s.MobileNumber,
-                                                                            LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
+                                                                            LearnerBadgeModel = s.LearnerBadge.Where(x => x.IsActive || x.IsActive && x.IsRevoked == false).Select(s => new LearnerBadgeModel
                                                                             {
                                                                                 BadgeId = s.BadgeId,
                                                                                 BadgeName = s.Badge.Name,

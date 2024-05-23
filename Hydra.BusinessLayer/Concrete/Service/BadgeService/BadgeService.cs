@@ -210,7 +210,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                                       ((string.IsNullOrEmpty(b.ApprovalUser.FirstName) ? "" : b.ApprovalUser.FirstName) +
                                                                       (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
                                                                       (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName))
-                                                    }).Skip(model.PageSize * (model.PageIndex - 1))
+                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
                                                       .Take(model.PageSize)
                                                       .ToList()
                                         }).FirstOrDefaultAsync();

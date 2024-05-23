@@ -1,5 +1,7 @@
-﻿using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
+﻿using Hydra.BusinessLayer.ActionFilters;
+using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
 using Hydra.Common.Globle;
+using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,13 +10,14 @@ namespace Hydra.Controllers.BadgeController
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
 
     public class BadgeController(IBadgeService badgeService) : ControllerBase
     {
         private readonly IBadgeService _badgeService = badgeService;
+        private static List<int> ParseRole = new List<int>();
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete, [(int)Roles.Admin, (int)Roles.Staff])]
         public async Task<ApiResponse> AddBadge(AddBadgeModel model)
         {
             if (!ModelState.IsValid)
@@ -23,7 +26,8 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.AddBadge(model);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete, [(int)Roles.Admin, (int)Roles.Staff])]
         public async Task<ApiResponse> UpdateBadge(UpdateBadgeModel model)
         {
             if (!ModelState.IsValid)
@@ -32,7 +36,8 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.UpdateBadge(model);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete, [(int)Roles.Admin, (int)Roles.Staff])]
         public async Task<ApiResponse> DeleteBadge(DeleteBadgeModel model)
         {
             if (!ModelState.IsValid)
@@ -41,7 +46,8 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.DeleteBadge(model);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewOnly, [(int)Roles.Admin, (int)Roles.Staff])]
         public async Task<ServiceResponse<GetBadgeModel>> GetBadgeById(long badgeId)
         {
             if (!ModelState.IsValid)
@@ -50,7 +56,9 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.GetBadgeById(badgeId);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewOnly, [
+            (int)Roles.Staff])]
         public async Task<PagedResponse<List<GetBadgeModel>>> GetAllBadges(PagedResponseInput model)
         {
             if (!ModelState.IsValid)
@@ -59,7 +67,8 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.GetAllBadges(model);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete, [(int)Roles.Admin, (int)Roles.Staff])]
         public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadges(AssignBadgeModel model)
         {
             if (!ModelState.IsValid)

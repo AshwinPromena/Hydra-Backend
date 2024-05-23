@@ -7,6 +7,5 @@
         public string UserName { get; }
         public int RoleId { get; }
         public int AccessLevelId { get; }
-
     }
 }
