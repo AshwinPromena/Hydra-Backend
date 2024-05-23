@@ -9,16 +9,20 @@ namespace Hydra.BusinessLayer.ActionFilters
     public class CustomAuthorizationFilterAttribute : Attribute, IAuthorizationFilter
     {
         private readonly int _accessLevelPermission;
+        private readonly int _roleId;
         private readonly ICurrentUserService _currentUserService;
 
-        public CustomAuthorizationFilterAttribute(int accessLevelPermission, ICurrentUserService currentUserService)
+        public CustomAuthorizationFilterAttribute(int accessLevelPermission, int roleId, ICurrentUserService currentUserService)
         {
             _accessLevelPermission = accessLevelPermission;
+            _roleId = roleId;
             _currentUserService = currentUserService;
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            if (GetUserAccessLevelId() != _accessLevelPermission)
+            var accessLevelId = GetUserAccessLevelId();
+            var roleId = GetUserRoleId();
+            if (accessLevelId != _accessLevelPermission && roleId != _roleId)
             {
                 var response = new
                 {
@@ -37,8 +41,12 @@ namespace Hydra.BusinessLayer.ActionFilters
 
         private int GetUserAccessLevelId()
         {
-            var accessLevelId = _currentUserService.AccessLevelId;
-            return accessLevelId;
+            return _currentUserService.AccessLevelId;
+        }
+
+        private int GetUserRoleId()
+        {
+            return _currentUserService.RoleId;
         }
     }
 }

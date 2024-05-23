@@ -8,15 +8,17 @@ namespace Hydra.BusinessLayer.ActionFilters
     public class CustomAuthorizationFilterAttributeFilterFactory : Attribute, IFilterFactory
     {
         private readonly int _accessLevelPermission;
+        private readonly int _roleId;
 
-        public CustomAuthorizationFilterAttributeFilterFactory(int accessLevelPermission)
+        public CustomAuthorizationFilterAttributeFilterFactory(int accessLevelPermission, int roleId)
         {
             _accessLevelPermission = accessLevelPermission;
+            _roleId = roleId;
         }
         public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
         {
             var currentUserService = serviceProvider.GetService<ICurrentUserService>();
-            return new CustomAuthorizationFilterAttribute(_accessLevelPermission, currentUserService);
+            return new CustomAuthorizationFilterAttribute(_accessLevelPermission, _roleId, currentUserService);
         }
 
         public bool IsReusable => false;
