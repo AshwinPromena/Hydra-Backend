@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Text.Json;
 
 namespace Hydra.BusinessLayer.ActionFilters
 {
@@ -19,11 +20,16 @@ namespace Hydra.BusinessLayer.ActionFilters
         {
             if (GetUserAccessLevelId() != _accessLevelPermission)
             {
+                var response = new
+                {
+                    statusCode = 403,
+                    message = "You do not have permission to perform this action."
+                };
+                var jsonResult = JsonSerializer.Serialize(response);
                 context.Result = new ContentResult
                 {
-                    StatusCode = 403,
-                    Content = "You do not have permission to perform this action.",
-                    ContentType = "application/json",
+                    Content = jsonResult,
+                    ContentType = "application/json"
                 };
                 return;
             }

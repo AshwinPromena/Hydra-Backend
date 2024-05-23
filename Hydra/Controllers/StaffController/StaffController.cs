@@ -16,7 +16,7 @@ namespace Hydra.Controllers.StaffController
         private readonly IStaffService _staffService = staffService;
 
         [HttpPost("[action]"), Authorize(Roles = "Admin")]
-        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete)]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewOnly)]
         public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
             if (!ModelState.IsValid)
