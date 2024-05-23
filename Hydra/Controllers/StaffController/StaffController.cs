@@ -1,5 +1,7 @@
-﻿using Hydra.BusinessLayer.Concrete.IService.IStaffService;
+﻿using Hydra.BusinessLayer.ActionFilters;
+using Hydra.BusinessLayer.Concrete.IService.IStaffService;
 using Hydra.Common.Globle;
+using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +15,8 @@ namespace Hydra.Controllers.StaffController
     {
         private readonly IStaffService _staffService = staffService;
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete)]
         public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
             if (!ModelState.IsValid)
@@ -22,7 +25,8 @@ namespace Hydra.Controllers.StaffController
             return await _staffService.AddStaff(model);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete)]
         public async Task<ApiResponse> UpdateStaff(UpdateStaffModel model)
         {
             if (!ModelState.IsValid)
@@ -31,7 +35,8 @@ namespace Hydra.Controllers.StaffController
             return await _staffService.UpdateStaff(model);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete)]
         public async Task<ApiResponse> DeleteStaff(DeleteStaffModel model)
         {
             if (!ModelState.IsValid)
@@ -49,7 +54,7 @@ namespace Hydra.Controllers.StaffController
             return await _staffService.ArchivedStaffs(model);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
         public async Task<ServiceResponse<GetStaffModel>> GetStaffById(long userId)
         {
             if (!ModelState.IsValid)
@@ -58,7 +63,8 @@ namespace Hydra.Controllers.StaffController
             return await _staffService.GetStaffById(userId);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete)]
         public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(PagedResponseInput model, bool isArchived)
         {
             if (!ModelState.IsValid)
@@ -67,13 +73,15 @@ namespace Hydra.Controllers.StaffController
             return await _staffService.GetAllStaff(model, isArchived);
         }
 
-        [HttpGet("[action]")]
+        [HttpGet("[action]"), Authorize(Roles = "Admin")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete)]
         public async Task<ApiResponse> ApproveStaffUser(long staffUserId)
         {
             return await _staffService.ApproveStaffUser(staffUserId);
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin")]
+        [CustomAuthorizationFilterAttributeFilterFactory((int)AccessLevelType.ViewEditAndDelete)]
         public async Task<ApiResponse> ApproveBadge(ApproveBadgeModel model)
         {
             if (!ModelState.IsValid)

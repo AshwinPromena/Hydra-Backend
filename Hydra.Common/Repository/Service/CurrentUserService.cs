@@ -13,5 +13,7 @@ namespace Hydra.Common.Repository.Service
         public string Email => _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Email).Value;
 
         public string UserName => _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
+
+        public int AccessLevelId => int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("AccessLevelId").Value);
     }
 }

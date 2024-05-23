@@ -20,4 +20,11 @@
         Assigned = 1,
         UnAssigned = 2,
     }
+
+    public enum AccessLevelType
+    {
+        ViewOnly = 1,
+        ViewAndEdit = 2,
+        ViewEditAndDelete = 3,
+    }
 }
