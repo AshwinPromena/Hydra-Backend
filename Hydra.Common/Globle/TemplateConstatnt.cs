@@ -24,5 +24,6 @@ namespace Hydra.Common.Globle
         public const string Name = "{Name}";
         public const string Email = "{Email}";
         public const string MobileNumber = "{MobileNumber}";
+        public const string Description = "{Description}";
     }
 }

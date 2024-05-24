@@ -13,5 +13,7 @@ namespace Hydra.Common.Models
         [JsonProperty("mobileNumber")]
         public string MobileNumber { get; set; }
 
+        [JsonProperty("description")]
+        public string Description { get; set; }
     }
 }

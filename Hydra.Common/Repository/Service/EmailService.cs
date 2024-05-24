@@ -39,7 +39,8 @@ namespace Hydra.Common.Repository.Service
             string template = await ReadTemplate(TemplateConstatnt.ContactSupport);
             string content = template.Replace(ReplaceStringConstant.Name, model.Name)
                                      .Replace(ReplaceStringConstant.Email, model.Email)
-                                     .Replace(ReplaceStringConstant.MobileNumber, model.MobileNumber);
+                                     .Replace(ReplaceStringConstant.MobileNumber, model.MobileNumber)
+                                     .Replace(ReplaceStringConstant.Description, model.Description);
 
             var email = "hydra@yopmail.com";
             await SendMail(email, TemplateSubjectConstant.ContactSupport, content);
