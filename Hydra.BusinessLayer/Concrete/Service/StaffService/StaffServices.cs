@@ -17,7 +17,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower())).FirstOrDefaultAsync();
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive).FirstOrDefaultAsync();
             if (user != null)
                 return new(400, ResponseConstants.UserNameExists);
 

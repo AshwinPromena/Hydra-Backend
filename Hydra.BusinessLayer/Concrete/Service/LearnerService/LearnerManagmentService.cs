@@ -85,7 +85,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ApiResponse> AddLearner(AddLearnerModel model)
         {
-            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.Email == model.Email).FirstOrDefaultAsync();
+            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.Email == model.Email && x.IsActive).FirstOrDefaultAsync();
             if (verifyLearner != null)
                 return new(400, ResponseConstants.LearnerExists);
 
