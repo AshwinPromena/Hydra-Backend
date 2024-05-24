@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 {
-    public class StaffServices(IUnitOfWork unitOfWork, IStorageService storageService,ICurrentUserService currentUserService) : IStaffService
+    public class StaffServices(IUnitOfWork unitOfWork, IStorageService storageService, ICurrentUserService currentUserService) : IStaffService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IStorageService _storageService = storageService;
@@ -29,7 +29,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 LastName = model.LastName,
                 MobileNumber = model.MobileNumber,
                 IsActive = true,
-                IsApproved = true,
+                IsApproved = false,
                 IsArchived = false,
                 AccessLevelId = model.AccessLevelId,
                 DepartmentId = model.DepartmentId,
@@ -162,7 +162,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                                         .Select(x => new PagedResponseOutput<List<GetStaffModel>>
                                         {
                                             TotalCount = x.Count(),
-                                            Data = x.Select(s => new GetStaffModel
+                                            Data = x.OrderByDescending(x => x.UpdatedDate).Select(s => new GetStaffModel
                                             {
                                                 UserId = s.Id,
                                                 UserName = s.UserName,
@@ -219,7 +219,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             _unitOfWork.BadgeRepository.UpdateRange(badge);
             await _unitOfWork.BadgeRepository.CommitChanges();
 
-            return new(200, ResponseConstants.ApprovedBadges.Replace("{badgeCount}",badge.Count.ToString()));
+            return new(200, ResponseConstants.ApprovedBadges.Replace("{badgeCount}", badge.Count.ToString()));
         }
     }
 }
