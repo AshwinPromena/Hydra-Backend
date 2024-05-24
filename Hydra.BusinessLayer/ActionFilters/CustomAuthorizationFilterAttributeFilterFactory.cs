@@ -7,10 +7,10 @@ namespace Hydra.BusinessLayer.ActionFilters
 {
     public class CustomAuthorizationFilterAttributeFilterFactory : Attribute, IFilterFactory
     {
-        private readonly int _accessLevelPermission;
+        private readonly int [] _accessLevelPermission;
         private readonly int [] _roleId;
 
-        public CustomAuthorizationFilterAttributeFilterFactory(int accessLevelPermission, int [] roleId)
+        public CustomAuthorizationFilterAttributeFilterFactory(int [] accessLevelPermission, int [] roleId)
         {
             _accessLevelPermission = accessLevelPermission;
             _roleId = roleId;
