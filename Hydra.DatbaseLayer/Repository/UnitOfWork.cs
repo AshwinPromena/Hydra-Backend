@@ -30,5 +30,7 @@ namespace Hydra.DatbaseLayer.Repository
         public IVerificationRepository VerificationRepository => new VerificationRepository(_context);
 
         public IPasswordResetTokenRepository PasswordResetTokenRepository => new PasswordResetTokenRepository(_context);
+
+        public IDeletedLearnerRepository DeletedLearnerRepository => new DeletedLearnerRepository(_context);
     }
 }

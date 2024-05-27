@@ -7,15 +7,21 @@ using Hydra.Common.Repository.IService;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 {
-    public class LearnerManagmentService(IUnitOfWork unitOfWork, IReportService reportService, IBadgeService badgeService, IStorageService storageService) : ILearnerManagmentService
+    public class LearnerManagmentService(IUnitOfWork unitOfWork,
+                                         IReportService reportService,
+                                         IBadgeService badgeService,
+                                         IStorageService storageService,
+                                         ICurrentUserService currentUserService) : ILearnerManagmentService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IReportService _reportService = reportService;
         private readonly IBadgeService _badgeService = badgeService;
         private readonly IStorageService _storageService = storageService;
+        private readonly ICurrentUserService _currentUserService = currentUserService;
 
         public async Task<ServiceResponse<LearnerDashBoardModel>> LearnerDashBoard()
         {
@@ -372,20 +378,35 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             return new(200, ResponseConstants.BadgeRemoved);
         }
 
-        public async Task<ApiResponse> RemoveLearners(RemoveLearnerModel model)
+        public async Task<ApiResponse> RemoveLearners(List<RemoveLearnerModel> model)
         {
             var learners = await _unitOfWork.UserRepository
-                                            .FindByCondition(x => model.UserIds.Contains(x.Id) &&
-                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner).ToListAsync();
+                                            .FindByCondition(x => model.Select(s => s.UserIds).Contains(x.Id) &&
+                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner)
+                                            .Include(i => i.DeletedLearner).AsNoTracking()
+                                            .ToListAsync();
 
-            if (learners.Count == 0)
+            if (learners.IsNullOrEmpty())
                 return new(400, ResponseConstants.InvalidUserId);
 
-            learners.ForEach(x =>
+            foreach (var learner in learners)
             {
-                x.IsActive = false;
-                x.UpdatedDate = DateTime.UtcNow;
-            });
+                var currentDate = DateTime.UtcNow;
+                learner.IsActive = false;
+                learner.UpdatedDate = currentDate;
+
+                var reasonModel = model.FirstOrDefault(m => m.UserIds == learner.Id);
+                if (reasonModel is not null)
+                {
+                    learner.DeletedLearner.Add(new DeletedLearner
+                    {
+                        UserId = _currentUserService.UserId,
+                        LearnerId = learner.Id,
+                        Reason = reasonModel.Reason,
+                        DeleteDate = currentDate
+                    });
+                }
+            }
 
             _unitOfWork.UserRepository.UpdateRange(learners);
             await _unitOfWork.UserRepository.CommitChanges();

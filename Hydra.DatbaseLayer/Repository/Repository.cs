@@ -26,4 +26,6 @@ namespace Hydra.DatbaseLayer.Repository
     public class VerificationRepository(HydraContext context) : CommonRepository<Verification>(context), IVerificationRepository { }
 
     public class PasswordResetTokenRepository(HydraContext context) : CommonRepository<PasswordResetToken>(context), IPasswordResetTokenRepository { }
+
+    public class DeletedLearnerRepository(HydraContext context) : CommonRepository<DeletedLearner>(context), IDeletedLearnerRepository { }
 }

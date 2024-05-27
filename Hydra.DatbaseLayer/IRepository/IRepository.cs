@@ -25,4 +25,6 @@ namespace Hydra.DatbaseLayer.IRepository
     public interface IVerificationRepository : ICommonRepository<Verification> { }
 
     public interface IPasswordResetTokenRepository : ICommonRepository<PasswordResetToken> { }
+
+    public interface IDeletedLearnerRepository : ICommonRepository<DeletedLearner> { }
 }

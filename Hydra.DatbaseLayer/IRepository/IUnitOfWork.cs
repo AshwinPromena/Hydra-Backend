@@ -25,5 +25,7 @@
         IVerificationRepository VerificationRepository { get; }
 
         IPasswordResetTokenRepository PasswordResetTokenRepository { get; }
+
+        IDeletedLearnerRepository DeletedLearnerRepository { get; }
     }
 }

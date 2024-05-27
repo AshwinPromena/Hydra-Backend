@@ -314,6 +314,9 @@ namespace Hydra.Common.Models
     public class RemoveLearnerModel
     {
         [JsonProperty("userIds")]
-        public List<long> UserIds { get; set; }
+        public long UserIds { get; set; }
+
+        [JsonProperty("reason")]
+        public string Reason { get; set; }
     }
 }

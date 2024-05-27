@@ -4,6 +4,7 @@ using Hydra.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hydra.Database.Migrations
 {
     [DbContext(typeof(HydraContext))]
-    partial class HydraContextModelSnapshot : ModelSnapshot
+    [Migration("20240527062019_NewTableDeletedLearnerAdded")]
+    partial class NewTableDeletedLearnerAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,7 +226,7 @@ namespace Hydra.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LearnerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("deleted_learner");
                 });
@@ -632,7 +635,7 @@ namespace Hydra.Database.Migrations
                 {
                     b.HasOne("Hydra.Database.Entities.User", "User")
                         .WithMany("DeletedLearner")
-                        .HasForeignKey("LearnerId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
