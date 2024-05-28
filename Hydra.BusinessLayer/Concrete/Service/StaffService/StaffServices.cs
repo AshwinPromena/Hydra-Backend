@@ -69,12 +69,9 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             user.DepartmentId = model.DepartmentId;
             user.UpdatedDate = DateTime.UtcNow;
 
-            if (!string.IsNullOrEmpty(model.ProfilePicture))
-            {
-                if (!string.IsNullOrEmpty(user.ProfilePicture))
-                    await _storageService.DeleteFile(user.ProfilePicture);
-                user.ProfilePicture = _storageService.UploadFile(ResponseConstants.Mediapath, model.ProfilePicture).Result.Data;
-            }
+            user.ProfilePicture = !string.IsNullOrEmpty(model.ProfilePicture)
+                                           ? (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data
+                                           : user.ProfilePicture;
 
             _unitOfWork.UserRepository.Update(user);
             await _unitOfWork.UserRepository.CommitChanges();
