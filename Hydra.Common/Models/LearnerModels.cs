@@ -34,6 +34,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("profilePicture")]
         public string ProfilePicture { get; set; }
+
+        [JsonProperty("learnerId")]
+        public long LearnerId { get; set; }
     }
 
     public class ExistingLearnerModel
@@ -115,6 +118,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("profilePicture")]
         public string ProfilePicture { get; set; }
+
+        [JsonProperty("learnerId")]
+        public long LearnerId { get; set; }
     }
 
     public class GetLearnerByIdModel
@@ -148,6 +154,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("profilePicture")]
         public string ProfilePicture { get; set; }
+
+        [JsonProperty("learnerId")]
+        public long LearnerId { get; set; }
 
         [JsonProperty("active")]
         public int Active { get; set; }
@@ -274,6 +283,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("profilePicture")]
         public string ProfilePicture { get; set; }
+
+        [JsonProperty("learnerId")]
+        public long LearnerId { get; set; }
     }
 
     public class LearnerBadgeModel

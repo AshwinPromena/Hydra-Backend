@@ -73,6 +73,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                         Email3 = user.Email3,
                         MobileNumber = user.MobileNumber,
                         IsApproved = true,
+                        LearnerId = user.LearnerId,
                         UserRole = new List<UserRole>
                         {
                             new UserRole
@@ -103,7 +104,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 Email2 = model.Email2,
                 Email3 = model.Email3,
                 MobileNumber = model.MobileNumber,
-                IsApproved = true
+                IsApproved = true,
+                LearnerId = model.LearnerId,
             };
             learner.UserRole.Add(new()
             {
@@ -200,7 +202,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                             SequenceId = s.Badge.BadgeSequenceId,
                                                             SequenceName = s.Badge.BadgeSequence.Name,
                                                         }).ToList(),
-                                                        ProfilePicture = s.ProfilePicture
+                                                        ProfilePicture = s.ProfilePicture,
+                                                        LearnerId = s.LearnerId,
                                                     })
                                                     .Skip(model.PageSize * (model.PageIndex - 0))
                                                     .Take(model.PageSize)
@@ -248,6 +251,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                                 SequenceName = s.Badge.BadgeSequence.Name,
                                                                             }).ToList(),
                                                                             ProfilePicture = s.ProfilePicture,
+                                                                            LearnerId = s.LearnerId,
                                                                             Active = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate >= DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
                                                                             Expiring = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate > DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
                                                                             Expired = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
@@ -310,6 +314,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             verifyLearner.Email = model.Email;
             verifyLearner.Email2 = model.Email2;
             verifyLearner.Email3 = model.Email3;
+            verifyLearner.LearnerId = model.LearnerId;
 
             verifyLearner.ProfilePicture = !string.IsNullOrEmpty(model.ProfilePicture)
                                            ? (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data
