@@ -10,7 +10,7 @@ namespace Hydra.BusinessLayer.Concrete.IService.IStaffService
 
         Task<ApiResponse> DeleteStaff(List<DeleteStaffModel> model);
 
-        Task<ApiResponse> ArchivedStaffs(DeleteStaffModel model);
+        Task<ApiResponse> ArchivedStaffs(ArchiveStaffModel model);
 
         Task<ServiceResponse<GetStaffModel>> GetStaffById(long userId);
 

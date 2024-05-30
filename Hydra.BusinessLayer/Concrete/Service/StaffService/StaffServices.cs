@@ -117,7 +117,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             return new ApiResponse(200, ResponseConstants.StaffDeleted);
         }
 
-        public async Task<ApiResponse> ArchivedStaffs(DeleteStaffModel model)
+        public async Task<ApiResponse> ArchivedStaffs(ArchiveStaffModel model)
         {
             var userList = await _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && model.UserIds.Contains(x.Id)).ToListAsync();
 
