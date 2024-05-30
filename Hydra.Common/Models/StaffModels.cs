@@ -52,6 +52,12 @@ namespace Hydra.Common.Models
         public string Reason { get; set; }
     }
 
+    public class ArchiveStaffModel
+    {
+        [JsonProperty("userIds")]
+        public List<long> UserIds { get; set; }
+    }
+
     public class GetStaffModel : UpdateStaffModel
     {
         [JsonProperty("createdDate")]
