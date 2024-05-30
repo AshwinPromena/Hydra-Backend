@@ -406,9 +406,13 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                     learner.DeletedUser.Add(new DeletedUser
                     {
                         UserId = _currentUserService.UserId,
+                        Name = _currentUserService.Name,
+                        Email = _currentUserService.Email,
                         DeletedUserId = learner.Id,
                         Reason = reasonModel.Reason,
-                        DeletedDate = currentDate
+                        DeletedDate = currentDate,
+                        DeletedUserName = $"{learner.FirstName} {learner.LastName}",
+                        DeletedUserEmail = learner.Email,
                     });
                 }
             }
