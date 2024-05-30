@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hydra.Database.Entities
 {
-    [Table("deleted_learner")]
-    public class DeletedLearner
+    [Table("deleted_user")]
+    public class DeletedUser
     {
         [Key]
         [Column("id")]
@@ -13,11 +13,17 @@ namespace Hydra.Database.Entities
         [Column("user_id")]
         public long UserId { get; set; }
 
-        [Column("learner_id")]
-        public long LearnerId { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
-        [ForeignKey("LearnerId")]
-        [InverseProperty("DeletedLearner")]
+        [Column("email")]
+        public string Email { get; set; }
+
+        [Column("deleted_user_id")]
+        public long DeletedUserId { get; set; }
+
+        [ForeignKey("DeletedUserId")]
+        [InverseProperty("DeletedUser")]
         public virtual User User { get; set; }
 
         [Column("reason")]

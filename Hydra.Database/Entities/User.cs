@@ -14,7 +14,7 @@ namespace Hydra.Database.Entities
             Badge = new HashSet<Badge>();
             Verification = new HashSet<Verification>();
             PasswordResetToken = new HashSet<PasswordResetToken>();
-            DeletedLearner = new HashSet<DeletedLearner>();
+            DeletedUser = new HashSet<DeletedUser>();
         }
 
         [Key]
@@ -105,6 +105,6 @@ namespace Hydra.Database.Entities
         public virtual ICollection<PasswordResetToken> PasswordResetToken { get; set; }
 
         [InverseProperty("User")]
-        public virtual ICollection<DeletedLearner> DeletedLearner { get; set; }
+        public virtual ICollection<DeletedUser> DeletedUser { get; set; }
     }
 }

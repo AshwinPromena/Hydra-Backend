@@ -31,6 +31,6 @@ namespace Hydra.DatbaseLayer.Repository
 
         public IPasswordResetTokenRepository PasswordResetTokenRepository => new PasswordResetTokenRepository(_context);
 
-        public IDeletedLearnerRepository DeletedLearnerRepository => new DeletedLearnerRepository(_context);
+        public IDeletedUserRepository DeletedUserRepository => new DeletedUserRepository(_context);
     }
 }

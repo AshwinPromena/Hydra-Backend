@@ -28,7 +28,7 @@ namespace Hydra.Database.Entities
 
         public virtual DbSet<PasswordResetToken> PasswordResetToken { get; set; }
 
-        public virtual DbSet<DeletedLearner> DeletedLearner { get; set; }
+        public virtual DbSet<DeletedUser> DeletedUser { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

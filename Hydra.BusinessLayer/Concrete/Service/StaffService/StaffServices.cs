@@ -6,6 +6,7 @@ using Hydra.Common.Repository.IService;
 using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 {
@@ -79,17 +80,39 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             return new ApiResponse(200, ResponseConstants.StaffUpdated);
         }
 
-        public async Task<ApiResponse> DeleteStaff(DeleteStaffModel model)
+        public async Task<ApiResponse> DeleteStaff(List<DeleteStaffModel> model)
         {
-            var userList = await _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && model.UserIds.Contains(x.Id)).ToListAsync();
+            var userList = await _unitOfWork.UserRepository
+                                            .FindByCondition(x => model.Select(s => s.UserIds).Contains(x.Id) &&
+                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner)
+                                            .Include(i => i.DeletedUser).AsNoTracking()
+                                            .ToListAsync();
+
+            if (userList.IsNullOrEmpty())
+                return new(400, ResponseConstants.InvalidUserId);
 
             foreach (var staff in userList)
             {
+                var currentDate = DateTime.UtcNow;
                 staff.IsActive = false;
-                staff.UpdatedDate = DateTime.UtcNow;
-                _unitOfWork.UserRepository.Update(staff);
+                staff.UpdatedDate = currentDate;
+
+                var reasonModel = model.FirstOrDefault(m => m.UserIds == staff.Id);
+                if (reasonModel is not null)
+                {
+                    staff.DeletedUser.Add(new DeletedUser
+                    {
+                        UserId = _currentUserService.UserId,
+                        Name = _currentUserService.Name,
+                        Email = _currentUserService.Email,
+                        DeletedUserId = staff.Id,
+                        Reason = reasonModel.Reason,
+                        DeleteDate = currentDate
+                    });
+                }
             }
 
+            _unitOfWork.UserRepository.UpdateRange(userList);
             await _unitOfWork.UserRepository.CommitChanges();
             return new ApiResponse(200, ResponseConstants.StaffDeleted);
         }

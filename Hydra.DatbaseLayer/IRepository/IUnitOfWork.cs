@@ -26,6 +26,6 @@
 
         IPasswordResetTokenRepository PasswordResetTokenRepository { get; }
 
-        IDeletedLearnerRepository DeletedLearnerRepository { get; }
+        IDeletedUserRepository DeletedUserRepository { get; }
     }
 }

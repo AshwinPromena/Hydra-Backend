@@ -388,7 +388,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             var learners = await _unitOfWork.UserRepository
                                             .FindByCondition(x => model.Select(s => s.UserIds).Contains(x.Id) &&
                                            x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner)
-                                            .Include(i => i.DeletedLearner).AsNoTracking()
+                                            .Include(i => i.DeletedUser).AsNoTracking()
                                             .ToListAsync();
 
             if (learners.IsNullOrEmpty())
@@ -403,10 +403,10 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 var reasonModel = model.FirstOrDefault(m => m.UserIds == learner.Id);
                 if (reasonModel is not null)
                 {
-                    learner.DeletedLearner.Add(new DeletedLearner
+                    learner.DeletedUser.Add(new DeletedUser
                     {
                         UserId = _currentUserService.UserId,
-                        LearnerId = learner.Id,
+                        DeletedUserId = learner.Id,
                         Reason = reasonModel.Reason,
                         DeleteDate = currentDate
                     });

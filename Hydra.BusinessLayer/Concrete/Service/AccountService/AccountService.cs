@@ -158,7 +158,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                 return new(400, ResponseConstants.InvalidToken);
 
             var userVerification = await _unitOfWork.VerificationRepository
-                                                    .FindByCondition(x => x.OTP == model.Otp && 
+                                                    .FindByCondition(x => x.OTP == model.Otp &&
                                                    x.IsActive).FirstOrDefaultAsync();
 
             if (userVerification == null)
@@ -167,7 +167,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             if (userVerification.OtpExpiryDate <= DateTime.UtcNow)
                 return new(400, ResponseConstants.OtpExpired);
 
-             userVerification.IsActive= false;
+            userVerification.IsActive = false;
 
             user.ResetToken = token;
             user.IsTokenActive = true;
@@ -214,6 +214,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                     new(ClaimTypes.Email, appUser.Email),
                     new(ClaimTypes.NameIdentifier, $"{appUser.Id}"),
                     new("userName",appUser.UserName),
+                    new("name",$"{appUser.FirstName} {appUser.LastName}"),
                     new("roles", $"{appUser.UserRole.FirstOrDefault().Role.Name}"),
                     new("roleId", $"{appUser.UserRole.FirstOrDefault().RoleId}"),
                     new("accessLevelId",$"{appUser.AccessLevelId}"),

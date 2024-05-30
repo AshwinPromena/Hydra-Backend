@@ -46,7 +46,10 @@ namespace Hydra.Common.Models
     public class DeleteStaffModel
     {
         [JsonProperty("userIds")]
-        public List<long> UserIds { get; set; }
+        public long UserIds { get; set; }
+
+        [JsonProperty("reason")]
+        public string Reason { get; set; }
     }
 
     public class GetStaffModel : UpdateStaffModel

@@ -36,7 +36,7 @@ namespace Hydra.Controllers.StaffController
 
         [HttpPost("[action]"), Authorize(Roles = "Admin,Staff")]
         [CustomAuthorizationFilterAttributeFilterFactory([(int)AccessLevelType.ViewEditAndDelete, (int)AccessLevelType.ViewAndEdit], [(int)Roles.Admin, (int)Roles.Staff])]
-        public async Task<ApiResponse> DeleteStaff(DeleteStaffModel model)
+        public async Task<ApiResponse> DeleteStaff(List<DeleteStaffModel> model)
         {
             if (!ModelState.IsValid)
                 return new(400, ResponseConstants.BadRequest);

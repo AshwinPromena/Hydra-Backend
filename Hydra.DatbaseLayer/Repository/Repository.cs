@@ -27,5 +27,5 @@ namespace Hydra.DatbaseLayer.Repository
 
     public class PasswordResetTokenRepository(HydraContext context) : CommonRepository<PasswordResetToken>(context), IPasswordResetTokenRepository { }
 
-    public class DeletedLearnerRepository(HydraContext context) : CommonRepository<DeletedLearner>(context), IDeletedLearnerRepository { }
+    public class DeletedUserRepository(HydraContext context) : CommonRepository<DeletedUser>(context), IDeletedUserRepository { }
 }
