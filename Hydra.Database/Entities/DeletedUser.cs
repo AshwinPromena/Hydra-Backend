@@ -26,10 +26,16 @@ namespace Hydra.Database.Entities
         [InverseProperty("DeletedUser")]
         public virtual User User { get; set; }
 
+        [Column("deleted_user_name")]
+        public string DeletedUserName { get; set; }
+
+        [Column("deleted_user_email")]
+        public string DeletedUserEmail { get; set; }
+
         [Column("reason")]
         public string Reason { get; set; }
 
         [Column("deleted_date")]
-        public DateTime DeleteDate { get; set; }
+        public DateTime DeletedDate { get; set; }
     }
 }

@@ -81,4 +81,10 @@ namespace Hydra.Common.Models
         [JsonProperty("otp")]
         public string Otp { get; set; }
     }
+
+    public class ChangePasswordModel
+    {
+        [JsonProperty("newPassword")]
+        public string NewPassword { get; set; }
+    }
 }

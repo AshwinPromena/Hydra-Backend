@@ -408,7 +408,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                         UserId = _currentUserService.UserId,
                         DeletedUserId = learner.Id,
                         Reason = reasonModel.Reason,
-                        DeleteDate = currentDate
+                        DeletedDate = currentDate
                     });
                 }
             }

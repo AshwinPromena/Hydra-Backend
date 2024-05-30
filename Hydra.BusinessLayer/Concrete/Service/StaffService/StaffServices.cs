@@ -107,7 +107,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                         Email = _currentUserService.Email,
                         DeletedUserId = staff.Id,
                         Reason = reasonModel.Reason,
-                        DeleteDate = currentDate
+                        DeletedDate = currentDate
                     });
                 }
             }
