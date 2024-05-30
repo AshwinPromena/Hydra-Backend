@@ -107,7 +107,9 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                         Email = _currentUserService.Email,
                         DeletedUserId = staff.Id,
                         Reason = reasonModel.Reason,
-                        DeletedDate = currentDate
+                        DeletedDate = currentDate,
+                        DeletedUserName = $"{staff.FirstName} {staff.LastName}",
+                        DeletedUserEmail = staff.Email,
                     });
                 }
             }
