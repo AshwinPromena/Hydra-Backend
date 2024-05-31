@@ -78,4 +78,16 @@ namespace Hydra.Common.Models
         [JsonProperty("departmentName")]
         public string DepartmentName { get; set; }
     }
+
+    public class GetAllStaffInputModel : PagedResponseInput
+    {
+        [JsonProperty("sortBy")]
+        public int SortBy { get; set; }
+    }
+
+    public class GetAllUnApprovedStaffInputModel : PagedResponseInput 
+    {
+        [JsonProperty("sortBy")]
+        public int SortBy { get; set; }
+    }
 }

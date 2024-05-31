@@ -172,47 +172,54 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             return new(200, ResponseConstants.Success);
         }
 
-        public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(PagedResponseInput model, bool IsArchived = false)
+        public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model, bool IsArchived = false)
         {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
-            var data = await _unitOfWork.UserRepository
-                                        .FindByCondition(x => x.IsActive && x.IsArchived == IsArchived && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff)
-                                        .Where(x => string.IsNullOrEmpty(model.SearchString) ||
-                                                    ((x.FirstName + x.LastName) ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
-                                        .GroupBy(x => 1)
-                                        .Select(x => new PagedResponseOutput<List<GetStaffModel>>
-                                        {
-                                            TotalCount = x.Count(),
-                                            Data = x.OrderByDescending(x => x.UpdatedDate).Select(s => new GetStaffModel
-                                            {
-                                                UserId = s.Id,
-                                                UserName = s.UserName,
-                                                FirstName = s.FirstName,
-                                                LastName = s.LastName,
-                                                Email = s.Email,
-                                                IsArchived = s.IsArchived,
-                                                IsApproved = s.IsApproved,
-                                                MobileNumber = s.MobileNumber,
-                                                AccessLevelId = s.AccessLevelId,
-                                                AccessLevelName = s.AccessLevel.Name,
-                                                DepartmentId = s.DepartmentId,
-                                                DepartmentName = s.Department.Name,
-                                                ProfilePicture = s.ProfilePicture,
-                                                CreatedDate = s.CreatedDate,
-                                                UpdatedDate = s.UpdatedDate
-                                            })
+            var staffQuery = _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && x.IsArchived == IsArchived && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff);
+
+            staffQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
+                         staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : staffQuery;
+
+            staffQuery = model.SortBy == (int)StaffSortBy.All ? staffQuery :
+                                         (model.SortBy == (int)StaffSortBy.Email ? staffQuery.OrderBy(x => x.Email) :
+                                         (model.SortBy == (int)StaffSortBy.Name) ? staffQuery.OrderBy(x => x.FirstName + x.LastName) :
+                                         (model.SortBy == (int)StaffSortBy.AccessLevel ? staffQuery.OrderBy(x => x.AccessLevel.Name) : staffQuery));
+
+            var staffs = await staffQuery.GroupBy(x => 1)
+                                         .Select(x => new PagedResponseOutput<List<GetStaffModel>>
+                                         {
+                                             TotalCount = x.Count(),
+                                             Data = x.OrderByDescending(x => x.UpdatedDate).Select(s => new GetStaffModel
+                                             {
+                                                 UserId = s.Id,
+                                                 UserName = s.UserName,
+                                                 FirstName = s.FirstName,
+                                                 LastName = s.LastName,
+                                                 Email = s.Email,
+                                                 IsArchived = s.IsArchived,
+                                                 IsApproved = s.IsApproved,
+                                                 MobileNumber = s.MobileNumber,
+                                                 AccessLevelId = s.AccessLevelId,
+                                                 AccessLevelName = s.AccessLevel.Name,
+                                                 DepartmentId = s.DepartmentId,
+                                                 DepartmentName = s.Department.Name,
+                                                 ProfilePicture = s.ProfilePicture,
+                                                 CreatedDate = s.CreatedDate,
+                                                 UpdatedDate = s.UpdatedDate
+                                             })
                                                     .Skip(model.PageSize * (model.PageIndex))
                                                       .Take(model.PageSize)
                                                       .ToList()
-                                        }).FirstOrDefaultAsync();
+                                         }).FirstOrDefaultAsync();
+                                        
 
             return new PagedResponse<List<GetStaffModel>>
             {
-                Data = data?.Data ?? [],
-                HasNextPage = data?.TotalCount > (model.PageSize * model.PageIndex),
+                Data = staffs?.Data ?? [],
+                HasNextPage = staffs?.TotalCount > (model.PageSize * model.PageIndex),
                 HasPreviousPage = model.PageIndex > 1,
-                TotalRecords = data == null ? 0 : data.TotalCount,
+                TotalRecords = staffs == null ? 0 : staffs.TotalCount,
                 SearchString = model.SearchString,
                 PageSize = model.PageSize,
                 PageIndex = model.PageIndex,
