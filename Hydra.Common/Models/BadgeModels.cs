@@ -2,6 +2,27 @@
 
 namespace Hydra.Common.Models
 {
+    public class BadgeFactoryDashBoardModel
+    {
+        [JsonProperty("totalCredentials")]
+        public int TotalCredentials { get; set; }
+
+        [JsonProperty("recentCredentials")]
+        public int RecentCredentials { get; set; }
+
+        [JsonProperty("totalLearnerCount")]
+        public int TotalLearnerCount { get; set; }
+
+        [JsonProperty("learnerWithBadge")]
+        public int LearnerWithBadge { get; set; }
+
+        [JsonProperty("learnerWithoutBadge")]
+        public int LearnerWithoutBadge { get; set; }
+
+        [JsonProperty("pendingApproval")]
+        public int PendingApproval {  get; set; }   
+    }
+
     public class AddBadgeModel
     {
         [JsonProperty("badgeName")]
@@ -135,5 +156,17 @@ namespace Hydra.Common.Models
 
         [JsonProperty("badgeName")]
         public string BadgeName { get; set; }
+    }
+
+    public class GetUnApprovedBadgeInputModel : PagedResponseInput
+    {
+        [JsonProperty("sortBy")]
+        public int SortBy { get; set; }
+    }
+
+    public class GetAllBadgeInputModel : PagedResponseInput
+    {
+        [JsonProperty("sortBy")]
+        public int SortBy { get; set; }
     }
 }

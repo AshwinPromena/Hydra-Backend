@@ -27,4 +27,19 @@
         ViewAndEdit = 2,
         ViewEditAndDelete = 3,
     }
+
+    public enum BadgeSortBy
+    {
+        All = 0,
+        IssuedDate = 1,
+        ExpirationDate = 2,
+    }
+
+    public enum StaffSortBy
+    {
+        All = 0,
+        Email = 1,
+        Name = 2,
+        AccessLevel = 3,
+    }
 }

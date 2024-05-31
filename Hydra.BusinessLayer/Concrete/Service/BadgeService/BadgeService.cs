@@ -17,6 +17,30 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
 
         private readonly ICurrentUserService _currentUserService = currentUserService;
 
+        public async Task<ServiceResponse<BadgeFactoryDashBoardModel>> BadgeFactoryDashBoard()
+        {
+            var userBadge = await _unitOfWork.BadgeRepository.FindByCondition(x => x.Id > 0).ToListAsync();
+            var learnerCount = await _unitOfWork.UserRepository
+                                                .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner &&
+                                                                      x.IsActive)
+                                                .Select(x => new
+                                                {
+                                                    x.Id,
+                                                    badgeCount = x.LearnerBadge.Where(x => x.IsActive).Count(),
+                                                    x.CreatedDate,
+                                                })
+                                                .ToListAsync();
+            return new(200, ResponseConstants.Success, new BadgeFactoryDashBoardModel()
+            {
+                TotalCredentials = userBadge.Count,
+                RecentCredentials = userBadge.Where(x => x.CreatedDate == DateTime.UtcNow).Count(),
+                LearnerWithBadge = learnerCount.Where(x => x.badgeCount != 0).Count(),
+                LearnerWithoutBadge = learnerCount.Where(x => x.badgeCount == 0).Count(),
+                TotalLearnerCount = learnerCount.Count(),
+                PendingApproval = userBadge.Where(x => x.IsApproved is false).Count(),
+            });
+        }
+
         public async Task<ApiResponse> AddBadge(AddBadgeModel model)
         {
             var badge = await _unitOfWork.BadgeRepository.FindByCondition(x => x.Name.ToLower().Replace(" ", string.Empty) == model.BadgeName.ToLower().Replace(" ", string.Empty) && x.IsActive).FirstOrDefaultAsync();
@@ -175,21 +199,27 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             return new(200, ResponseConstants.Success, badge);
         }
 
-        public async Task<PagedResponse<List<GetBadgeModel>>> GetAllBadges(PagedResponseInput model)
+        public async Task<PagedResponse<List<GetBadgeModel>>> GetAllBadges(GetAllBadgeInputModel model)
         {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
-            var data = await _unitOfWork.BadgeRepository
-                                        .FindByCondition(x => x.IsActive)
-                                        .Where(x => string.IsNullOrEmpty(model.SearchString) ||
-                                                    (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                    (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                    (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString))
-                                        .GroupBy(x => 1)
-                                        .Select(x => new PagedResponseOutput<List<GetBadgeModel>>
-                                        {
-                                            TotalCount = x.Count(),
-                                            Data = x.OrderByDescending(x => x.UpdatedDate)
+            var badgesQuery = _unitOfWork.BadgeRepository
+                                        .FindByCondition(x => x.IsActive);
+            badgesQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
+                           badgesQuery.Where(x => (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                  (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                  (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : badgesQuery;
+
+            badgesQuery = model.SortBy == (int)BadgeSortBy.All ? badgesQuery :
+                          (model.SortBy == (int)BadgeSortBy.IssuedDate ? badgesQuery.OrderByDescending(x => x.IssueDate) :
+                          badgesQuery.OrderByDescending(x => x.ExpirationDate));
+
+            var badges = await badgesQuery
+                                          .GroupBy(x => 1)
+                                          .Select(x => new PagedResponseOutput<List<GetBadgeModel>>
+                                          {
+                                              TotalCount = x.Count(),
+                                              Data = x.OrderByDescending(x => x.CreatedDate)
                                                     .Select(b => new GetBadgeModel
                                                     {
                                                         BadgeId = b.Id,
@@ -207,20 +237,23 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                         CreatedDate = b.CreatedDate,
                                                         UpdatedDate = b.UpdatedDate,
                                                         ApprovalUser = b.ApprovalUserId == null ? null :
-                                                                      ((string.IsNullOrEmpty(b.ApprovalUser.FirstName) ? "" : b.ApprovalUser.FirstName) +
-                                                                      (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
-                                                                      (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName))
-                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
-                                                      .Take(model.PageSize)
-                                                      .ToList()
-                                        }).FirstOrDefaultAsync();
+                                                                                                        ((string.IsNullOrEmpty(b.ApprovalUser.FirstName) ? "" : b.ApprovalUser.FirstName) +
+                                                                                                        (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
+                                                                                                        (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName))
+                                                    })
+                                                    .Skip(model.PageSize * (model.PageIndex - 0))
+                                                    .Take(model.PageSize)
+                                                    .ToList()
+
+                                          }).FirstOrDefaultAsync();
+
 
             return new PagedResponse<List<GetBadgeModel>>
             {
-                Data = data?.Data ?? [],
-                HasNextPage = data?.TotalCount > (model.PageSize * model.PageIndex),
+                Data = badges?.Data ?? [],
+                HasNextPage = badges?.TotalCount > (model.PageSize * model.PageIndex),
                 HasPreviousPage = model.PageIndex > 1,
-                TotalRecords = data == null ? 0 : data.TotalCount,
+                TotalRecords = badges == null ? 0 : badges.TotalCount,
                 SearchString = model.SearchString,
                 PageSize = model.PageSize,
                 PageIndex = model.PageIndex,
@@ -273,6 +306,69 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             await _unitOfWork.LearnerBadgeRepository.CommitChanges();
 
             return new(200, ResponseConstants.Success);
+        }
+
+        public async Task<PagedResponse<List<GetBadgeModel>>> GetUnApprovedBadges(GetUnApprovedBadgeInputModel model)
+        {
+            model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
+
+            var badgesQuery = _unitOfWork.BadgeRepository
+                                        .FindByCondition(x => x.IsActive && x.IsApproved == false);
+            badgesQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
+                           badgesQuery.Where(x => (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                  (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                  (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : badgesQuery;
+
+            badgesQuery = model.SortBy == (int)BadgeSortBy.All ? badgesQuery :
+                          (model.SortBy == (int)BadgeSortBy.IssuedDate ? badgesQuery.OrderByDescending(x => x.IssueDate) :
+                          badgesQuery.OrderByDescending(x => x.ExpirationDate));
+
+            var badges = await badgesQuery
+                                          .GroupBy(x => 1)
+                                          .Select(x => new PagedResponseOutput<List<GetBadgeModel>>
+                                          {
+                                              TotalCount = x.Count(),
+                                              Data = x.OrderByDescending(x => x.UpdatedDate)
+                                                    .Select(b => new GetBadgeModel
+                                                    {
+                                                        BadgeId = b.Id,
+                                                        BadgeName = b.Name,
+                                                        BadgeDescription = b.Description,
+                                                        DepartmentId = b.DepartmentId,
+                                                        DepartmentName = b.Department.Name,
+                                                        BadgeSequenceId = b.BadgeSequenceId,
+                                                        BadgeSequenceName = b.BadgeSequence.Name,
+                                                        IssueDate = b.IssueDate,
+                                                        ExpirationDate = b.ExpirationDate,
+                                                        IsApproved = b.IsApproved,
+                                                        ApprovalUserId = b.ApprovalUserId,
+                                                        IsRequiresApproval = b.RequiresApproval,
+                                                        CreatedDate = b.CreatedDate,
+                                                        UpdatedDate = b.UpdatedDate,
+                                                        ApprovalUser = b.ApprovalUserId == null ? null :
+                                                                                                        ((string.IsNullOrEmpty(b.ApprovalUser.FirstName) ? "" : b.ApprovalUser.FirstName) +
+                                                                                                        (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
+                                                                                                        (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName))
+                                                    })
+                                                    .Skip(model.PageSize * (model.PageIndex - 0))
+                                                    .Take(model.PageSize)
+                                                    .ToList()
+
+                                          }).FirstOrDefaultAsync();
+
+
+            return new PagedResponse<List<GetBadgeModel>>
+            {
+                Data = badges?.Data ?? [],
+                HasNextPage = badges?.TotalCount > (model.PageSize * model.PageIndex),
+                HasPreviousPage = model.PageIndex > 1,
+                TotalRecords = badges == null ? 0 : badges.TotalCount,
+                SearchString = model.SearchString,
+                PageSize = model.PageSize,
+                PageIndex = model.PageIndex,
+                Message = ResponseConstants.Success,
+                StatusCode = 200
+            };
         }
     }
 }

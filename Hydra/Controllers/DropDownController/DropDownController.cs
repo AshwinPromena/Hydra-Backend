@@ -50,5 +50,11 @@ namespace Hydra.Controllers.DropDownController
 
             return await _dropDownService.GetBadgesToAssignLearner(model, userId);
         }
+
+        [HttpGet("[action]")]
+        public ServiceResponse<List<BadgeSortByDropDownModel>> GetBadgeSortOptions()
+        {
+            return _dropDownService.GetBadgeSortOptions();
+        }
     }
 }

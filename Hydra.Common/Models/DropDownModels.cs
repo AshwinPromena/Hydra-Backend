@@ -37,4 +37,23 @@ namespace Hydra.Common.Models
         [JsonProperty("badgeName")]
         public string BadgeName { get; set; }
     }
+
+    public class BadgeSortByDropDownModel
+    {
+        [JsonProperty("sortId")]
+        public long SortId { get; set; }
+
+        [JsonProperty("sortName")]
+        public string SortName { get; set; }
+    }
+
+    public class StaffSortByDropDownModel
+    {
+        [JsonProperty("sortId")]
+        public long SortId { get; set; }
+
+        [JsonProperty("sortName")]
+        public string SortName { get; set; }
+    }
+
 }

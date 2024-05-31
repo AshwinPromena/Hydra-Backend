@@ -14,12 +14,12 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
         public async Task<ServiceResponse<List<DepartmentDropDownModel>>> GetAllDepartment()
         {
             return new(200, ResponseConstants.Success, await _unitOfWork.DepartmentRepository
-                                                                  .FindByCondition(x => x.IsActive)
-                                                                  .Select(s => new DepartmentDropDownModel
-                                                                  {
-                                                                      DepartmentId = s.Id,
-                                                                      DepartmentName = s.Name
-                                                                  }).ToListAsync());
+                                                                        .FindByCondition(x => x.IsActive)
+                                                                        .Select(s => new DepartmentDropDownModel
+                                                                        {
+                                                                            DepartmentId = s.Id,
+                                                                            DepartmentName = s.Name
+                                                                        }).ToListAsync());
         }
 
         public async Task<ServiceResponse<List<AccessLevelDropDownModel>>> GetAllAccessLevel()
@@ -127,6 +127,21 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                 Message = ResponseConstants.Success,
                 StatusCode = 200
             };
+        }
+
+        public ServiceResponse<List<BadgeSortByDropDownModel>> GetBadgeSortOptions()
+        {
+            return new(200, ResponseConstants.Success, [new BadgeSortByDropDownModel { SortId = 1, SortName = BadgeSortBy.All.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 2, SortName = BadgeSortBy.IssuedDate.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 3, SortName = BadgeSortBy.ExpirationDate.ToString()}]);
+        }
+
+        public ServiceResponse<List<StaffSortByDropDownModel>> GetStaffSortOptions()
+        {
+            return new(200, ResponseConstants.Success, [new StaffSortByDropDownModel { SortId = 1, SortName = StaffSortBy.All.ToString()} ,
+                                                        new StaffSortByDropDownModel { SortId = 2, SortName = StaffSortBy.Email.ToString()} ,
+                                                        new StaffSortByDropDownModel { SortId = 3, SortName = StaffSortBy.Name.ToString()} ,
+                                                        new StaffSortByDropDownModel { SortId = 3, SortName = StaffSortBy.AccessLevel.ToString()}]);
         }
     }
 }

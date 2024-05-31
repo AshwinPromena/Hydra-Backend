@@ -14,7 +14,14 @@ namespace Hydra.Controllers.BadgeController
     public class BadgeController(IBadgeService badgeService) : ControllerBase
     {
         private readonly IBadgeService _badgeService = badgeService;
-        private static List<int> ParseRole = new List<int>();
+        private static List<int> ParseRole = [];
+
+        [HttpGet("[action]"), Authorize(Roles = "Admin , Staff")]
+        [CustomAuthorizationFilterAttributeFilterFactory([(int)AccessLevelType.ViewEditAndDelete], [(int)Roles.Admin, (int)Roles.Staff])]
+        public async Task<ServiceResponse<BadgeFactoryDashBoardModel>> BadgeFactoryDashBoard()
+        {
+            return await _badgeService.BadgeFactoryDashBoard();
+        }
 
         [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
         [CustomAuthorizationFilterAttributeFilterFactory([(int)AccessLevelType.ViewEditAndDelete], [(int)Roles.Admin, (int)Roles.Staff])]
@@ -58,7 +65,7 @@ namespace Hydra.Controllers.BadgeController
 
         [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
         [CustomAuthorizationFilterAttributeFilterFactory([(int)AccessLevelType.ViewOnly, (int)AccessLevelType.ViewEditAndDelete], [(int)Roles.Staff, (int)Roles.Admin])]
-        public async Task<PagedResponse<List<GetBadgeModel>>> GetAllBadges(PagedResponseInput model)
+        public async Task<PagedResponse<List<GetBadgeModel>>> GetAllBadges(GetAllBadgeInputModel model)
         {
             if (!ModelState.IsValid)
                 return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
@@ -74,6 +81,16 @@ namespace Hydra.Controllers.BadgeController
                 return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
 
             return await _badgeService.AssignBadges(model);
+        }
+
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [CustomAuthorizationFilterAttributeFilterFactory([(int)AccessLevelType.ViewEditAndDelete], [(int)Roles.Admin, (int)Roles.Staff])]
+        public async Task<PagedResponse<List<GetBadgeModel>>> GetUnApprovedBadges(GetUnApprovedBadgeInputModel model)
+        {
+            if (!ModelState.IsValid)
+                return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
+
+            return await _badgeService.GetUnApprovedBadges(model);
         }
     }
 }
