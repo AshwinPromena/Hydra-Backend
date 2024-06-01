@@ -66,12 +66,12 @@ namespace Hydra.Controllers.StaffController
 
         [HttpPost("[action]"), Authorize(Roles = "Admin,Staff")]
         [CustomAuthorizationFilterAttributeFilterFactory([(int)AccessLevelType.ViewEditAndDelete], [(int)Roles.Admin, (int)Roles.Staff])]
-        public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model, bool isArchived)
+        public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model, bool isArchived, bool isApproved)
         {
             if (!ModelState.IsValid)
                 return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
 
-            return await _staffService.GetAllStaff(model, isArchived);
+            return await _staffService.GetAllStaff(model, isArchived, isApproved);
         }
 
         [HttpGet("[action]"), Authorize(Roles = "Admin")]

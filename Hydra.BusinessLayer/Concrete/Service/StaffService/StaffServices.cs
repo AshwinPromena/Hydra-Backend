@@ -172,11 +172,11 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             return new(200, ResponseConstants.Success);
         }
 
-        public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model, bool IsArchived = false)
+        public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model, bool IsArchived = false, bool IsApproved = true)
         {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
-            var staffQuery = _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && x.IsArchived == IsArchived && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff);
+            var staffQuery = _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && x.IsApproved == IsApproved && x.IsArchived == IsArchived && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff);
 
             staffQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
                          staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : staffQuery;
@@ -212,7 +212,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                                                       .Take(model.PageSize)
                                                       .ToList()
                                          }).FirstOrDefaultAsync();
-                                        
+
 
             return new PagedResponse<List<GetStaffModel>>
             {
