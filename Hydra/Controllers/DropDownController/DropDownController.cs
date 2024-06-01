@@ -56,5 +56,11 @@ namespace Hydra.Controllers.DropDownController
         {
             return _dropDownService.GetBadgeSortOptions();
         }
+
+        [HttpGet("[action]")]
+        public ServiceResponse<List<StaffSortByDropDownModel>> GetStaffSortOptions()
+        {
+            return _dropDownService.GetStaffSortOptions();
+        }
     }
 }

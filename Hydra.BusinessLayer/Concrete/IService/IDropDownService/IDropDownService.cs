@@ -14,5 +14,7 @@ namespace Hydra.BusinessLayer.Repository.IService.IDropDownService
         Task<PagedResponse<List<BadgeDropDownModel>>> GetBadgesToAssignLearner(PagedResponseInput model, long? userId = null);
 
         ServiceResponse<List<BadgeSortByDropDownModel>> GetBadgeSortOptions();
+
+        ServiceResponse<List<StaffSortByDropDownModel>> GetStaffSortOptions();
     }
 }
