@@ -62,5 +62,11 @@ namespace Hydra.Controllers.DropDownController
         {
             return _dropDownService.GetStaffSortOptions();
         }
+
+        [HttpGet("[action]")]
+        public async Task<ServiceResponse<List<BadgeSequenceOutputModel>>> GetBadgeSequence()
+        {
+            return await _dropDownService.GetBadgeSequence();
+        }
     }
 }

@@ -104,7 +104,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                         SequenceName = s.Name,
                                                         CreatedDate = s.CreatedDate,
                                                         UpdatedDate = s.UpdatedDate
-                                                    }).Skip(model.PageSize * (model.PageIndex - 1))
+                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
                                                       .Take(model.PageSize)
                                                       .ToList()
                                         }).FirstOrDefaultAsync();

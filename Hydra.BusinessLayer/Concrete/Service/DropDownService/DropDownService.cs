@@ -143,5 +143,16 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                                                         new StaffSortByDropDownModel { SortId = 3, SortName = StaffSortBy.Name.ToString()} ,
                                                         new StaffSortByDropDownModel { SortId = 3, SortName = StaffSortBy.AccessLevel.ToString()}]);
         }
+
+        public async Task<ServiceResponse<List<BadgeSequenceOutputModel>>> GetBadgeSequence()
+        {
+            return new(200, ResponseConstants.Success, await _unitOfWork.BadgeSequenceRepository.FindByCondition(x => x.IsActive).Select(x => new BadgeSequenceOutputModel
+            {
+                SequenceId = x.Id,
+                SequenceName = x.Name,
+                CreatedDate = x.CreatedDate,
+                UpdatedDate = x.UpdatedDate
+            }).ToListAsync());
+        }
     }
 }
