@@ -370,5 +370,40 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 StatusCode = 200
             };
         }
+
+        public async Task<PagedResponse<List<GetBadgePicturesModel>>> GetBadgePictures(PagedResponseInput model)
+        {
+            model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
+
+            var badges = await _unitOfWork.BadgeRepository
+                                        .FindByCondition(x => x.IsActive)
+                                        .Where(x => string.IsNullOrWhiteSpace(model.SearchString))
+                                        .GroupBy(x => 1)
+                                        .Select(x => new PagedResponseOutput<List<GetBadgePicturesModel>>
+                                        {
+                                            TotalCount = x.Count(),
+                                            Data = x.OrderByDescending(x => x.UpdatedDate)
+                                                    .Select(s => new GetBadgePicturesModel
+                                                    {
+                                                        BadgePictureUrl = s.Image,
+                                                    }).Skip(model.PageSize * (model.PageIndex - 0))
+                                                      .Take(model.PageSize)
+                                                      .ToList()
+                                        }).FirstOrDefaultAsync();
+
+
+            return new PagedResponse<List<GetBadgePicturesModel>>
+            {
+                Data = badges?.Data ?? [],
+                HasNextPage = badges?.TotalCount > (model.PageSize * model.PageIndex),
+                HasPreviousPage = model.PageIndex > 1,
+                TotalRecords = badges == null ? 0 : badges.TotalCount,
+                SearchString = model.SearchString,
+                PageSize = model.PageSize,
+                PageIndex = model.PageIndex,
+                Message = ResponseConstants.Success,
+                StatusCode = 200
+            };
+        }
     }
 }

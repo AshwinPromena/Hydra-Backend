@@ -19,5 +19,7 @@ namespace Hydra.BusinessLayer.Concrete.IService.IBadgeService
         Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadges(AssignBadgeModel model);
 
         Task<PagedResponse<List<GetBadgeModel>>> GetUnApprovedBadges(GetUnApprovedBadgeInputModel model);
+
+        Task<PagedResponse<List<GetBadgePicturesModel>>> GetBadgePictures(PagedResponseInput model);
     }
 }

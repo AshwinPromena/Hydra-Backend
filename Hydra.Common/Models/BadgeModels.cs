@@ -20,7 +20,7 @@ namespace Hydra.Common.Models
         public int LearnerWithoutBadge { get; set; }
 
         [JsonProperty("pendingApproval")]
-        public int PendingApproval {  get; set; }   
+        public int PendingApproval { get; set; }
     }
 
     public class AddBadgeModel
@@ -168,5 +168,10 @@ namespace Hydra.Common.Models
     {
         [JsonProperty("sortBy")]
         public int SortBy { get; set; }
+    }
+
+    public class GetBadgePicturesModel
+    {
+        public string BadgePictureUrl { get; set; }
     }
 }
