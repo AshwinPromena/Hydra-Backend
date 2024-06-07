@@ -76,6 +76,10 @@ namespace Hydra.Common.Repository.Service
 
         public async Task<ServiceResponse<string>> UploadFile(string path, string file)
         {
+            if (file.Contains("https://new-hydra.s3.ap-south-1.amazonaws.com/hydra/media/"))
+            {
+                return new(200, ResponseConstants.Success, file);
+            }
             try
             {
                 byte[] inBytes = Convert.FromBase64String(file);

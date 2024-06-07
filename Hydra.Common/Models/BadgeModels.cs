@@ -172,6 +172,7 @@ namespace Hydra.Common.Models
 
     public class GetBadgePicturesModel
     {
+        [JsonProperty("badgePictureUrl")]
         public string BadgePictureUrl { get; set; }
     }
 }
