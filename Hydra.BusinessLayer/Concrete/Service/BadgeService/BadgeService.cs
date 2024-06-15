@@ -126,13 +126,9 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 TypeName = FieldType.Competencies.ToString()
             }));
 
-            if (!string.IsNullOrEmpty(model.BadgeImage))
-            {
-                if (!string.IsNullOrEmpty(badge.Image))
-                    await _storageService.DeleteFile(badge.Image);
-
-                badge.Image = _storageService.UploadFile(ResponseConstants.Mediapath, model.BadgeImage).Result.Data;
-            }
+            badge.Image = !string.IsNullOrEmpty(model.BadgeImage)
+                                           ? (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.BadgeImage)).Data
+                                           : badge.Image;
 
             _unitOfWork.BadgeRepository.Update(badge);
             await _unitOfWork.BadgeRepository.CommitChanges();
