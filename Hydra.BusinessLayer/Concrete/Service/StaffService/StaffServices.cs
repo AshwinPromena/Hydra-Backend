@@ -84,7 +84,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
         {
             var userList = await _unitOfWork.UserRepository
                                             .FindByCondition(x => model.Select(s => s.UserIds).Contains(x.Id) &&
-                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner)
+                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
                                             .Include(i => i.DeletedUser).AsNoTracking()
                                             .ToListAsync();
 
