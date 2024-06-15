@@ -42,4 +42,11 @@
         Name = 2,
         AccessLevel = 3,
     }
+
+    public enum DeletedUserOptions
+    {
+        All = 0,
+        Learner = 1,
+        Staff = 2
+    }
 }

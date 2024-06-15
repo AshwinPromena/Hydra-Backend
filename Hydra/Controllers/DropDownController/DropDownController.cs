@@ -68,5 +68,11 @@ namespace Hydra.Controllers.DropDownController
         {
             return await _dropDownService.GetBadgeSequence();
         }
+
+        [HttpGet("[action]")]
+        public ServiceResponse<List<DeletedUserDropDownModel>> GetDeletedUserSortOptions()
+        {
+            return  _dropDownService.GetDeletedUserSortOptions();
+        }
     }
 }

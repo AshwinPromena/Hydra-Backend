@@ -84,6 +84,9 @@ namespace Hydra.Common.Models
 
     public class ChangePasswordModel
     {
+        [JsonProperty("oldPassword")]
+        public string OldPasssword { get; set; }
+
         [JsonProperty("newPassword")]
         public string NewPassword { get; set; }
     }

@@ -56,4 +56,13 @@ namespace Hydra.Common.Models
         public string SortName { get; set; }
     }
 
+    public class DeletedUserDropDownModel
+    {
+        [JsonProperty("typeId")]
+        public long TypeId { get; set; }
+
+        [JsonProperty("typeName")]
+        public string TypeName  { get; set; }
+    }
+
 }

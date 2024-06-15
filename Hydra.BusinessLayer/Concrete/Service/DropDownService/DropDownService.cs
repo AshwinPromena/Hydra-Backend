@@ -154,5 +154,12 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                 UpdatedDate = x.UpdatedDate
             }).ToListAsync());
         }
+
+        public ServiceResponse<List<DeletedUserDropDownModel>> GetDeletedUserSortOptions()
+        {
+            return new(200, ResponseConstants.Success, [new DeletedUserDropDownModel { TypeId = 1, TypeName = DeletedUserOptions.All.ToString()} ,
+                                                        new DeletedUserDropDownModel { TypeId = 2, TypeName = DeletedUserOptions.Learner.ToString()} ,
+                                                        new DeletedUserDropDownModel { TypeId = 3, TypeName = DeletedUserOptions.Staff.ToString()}]);
+        }
     }
 }

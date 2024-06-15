@@ -17,7 +17,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.SettingsService
         {
             var user = await _unitOfWork.UserRepository
                                         .FindByCondition(x => x.Id == _currentUserService.UserId &&
-                                       x.IsActive)
+                                       x.IsActive &&
+                                       x.Password == model.OldPasssword)
                                         .FirstOrDefaultAsync();
 
             if (user is null)
@@ -41,9 +42,10 @@ namespace Hydra.BusinessLayer.Concrete.Service.SettingsService
                       userList.Where(x => (x.DeletedUserName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                           (x.DeletedUserEmail ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : userList;
 
-            userList = model.Type == 1 ? userList.Where(x => x.User.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner)
-                                       : (model.Type == 1 ? userList.Where(x => x.User.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
-                                       : userList);
+            userList = model.Type == (long)DeletedUserOptions.All ? userList :
+                       model.Type == (long)DeletedUserOptions.Learner ? userList.Where(x => x.User.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner) :
+                       model.Type == 1 ? userList.Where(x => x.User.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
+                                       : userList;
 
             var deletedUsers = await userList
                                              .GroupBy(x => 1)

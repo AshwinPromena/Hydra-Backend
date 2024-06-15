@@ -18,5 +18,7 @@ namespace Hydra.BusinessLayer.Repository.IService.IDropDownService
         ServiceResponse<List<StaffSortByDropDownModel>> GetStaffSortOptions();
 
         Task<ServiceResponse<List<BadgeSequenceOutputModel>>> GetBadgeSequence();
+
+        ServiceResponse<List<DeletedUserDropDownModel>> GetDeletedUserSortOptions();
     }
 }
