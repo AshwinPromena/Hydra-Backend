@@ -18,7 +18,9 @@ namespace Hydra.BusinessLayer.Concrete.Service.SettingsService
             var user = await _unitOfWork.UserRepository
                                         .FindByCondition(x => x.Id == _currentUserService.UserId &&
                                        x.IsActive &&
-                                       x.Password == model.OldPasssword)
+                                       x.Password == model.OldPasssword &&
+                                       x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff ||
+                                       x.UserRole.FirstOrDefault().RoleId == (long)Roles.Admin)
                                         .FirstOrDefaultAsync();
 
             if (user is null)

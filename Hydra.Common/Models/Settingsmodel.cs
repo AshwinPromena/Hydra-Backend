@@ -4,8 +4,8 @@ namespace Hydra.Common.Models
 {
     public class GetAllDeletedUserInputModel : PagedResponseInput
     {
-        [JsonProperty("type")]
-        public int Type { get; set; }
+        [JsonProperty("typeId")]
+        public int TypeId { get; set; }
     }
 
     public class GetAllDeletedUserModel
