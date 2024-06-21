@@ -31,8 +31,10 @@
     public enum BadgeSortBy
     {
         All = 0,
-        IssuedDate = 1,
-        ExpirationDate = 2,
+        Badge = 1,
+        Certificate = 2,
+        License = 3,
+        Miscellaneous = 4,
     }
 
     public enum StaffSortBy

@@ -4,6 +4,7 @@ using Hydra.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hydra.Database.Migrations
 {
     [DbContext(typeof(HydraContext))]
-    partial class HydraContextModelSnapshot : ModelSnapshot
+    [Migration("20240621103018_CreatedNewTableBadgeType")]
+    partial class CreatedNewTableBadgeType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,7 +71,7 @@ namespace Hydra.Database.Migrations
 
                     b.Property<long?>("ApprovalUserId")
                         .HasColumnType("bigint")
-                        .HasColumnName("approval_user_id");
+                        .HasColumnName("approvalUserId");
 
                     b.Property<long?>("BadgeSequenceId")
                         .HasColumnType("bigint")

@@ -45,7 +45,7 @@ namespace Hydra.Database.Entities
         [Column("image")]
         public string Image { get; set; }
 
-        [Column("approvalUserId")]
+        [Column("approval_user_id")]
         public long? ApprovalUserId { get; set; }
 
         [ForeignKey("ApprovalUserId")]
@@ -66,6 +66,13 @@ namespace Hydra.Database.Entities
 
         [Column("updated_date")]
         public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
+
+        [Column("badge_type_id")]
+        public long BadgeTypeId { get; set; }
+
+        [ForeignKey("BadgeTypeId")]
+        [InverseProperty("Badge")]
+        public virtual BadgeType BadgeType { get; set; }
 
         [InverseProperty("Badge")]
         public virtual ICollection<BadgeField> BadgeField { get; set; }

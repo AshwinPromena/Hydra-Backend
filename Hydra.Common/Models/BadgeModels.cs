@@ -57,6 +57,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("competencies")]
         public List<BadgeFieldModel> Competencies { get; set; }
+
+        [JsonProperty("badgeTypeId")]
+        public long BadgeTypeId { get; set; }
     }
 
     public class BadgeFieldModel
@@ -102,6 +105,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("updatedDate")]
         public DateTime UpdatedDate { get; set; }
+
+        [JsonProperty("badgeTypeName")]
+        public string BadgeTypeName { get; set; }
     }
 
     public class AssignBadgeModel

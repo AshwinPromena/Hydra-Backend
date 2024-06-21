@@ -28,4 +28,6 @@ namespace Hydra.DatbaseLayer.Repository
     public class PasswordResetTokenRepository(HydraContext context) : CommonRepository<PasswordResetToken>(context), IPasswordResetTokenRepository { }
 
     public class DeletedUserRepository(HydraContext context) : CommonRepository<DeletedUser>(context), IDeletedUserRepository { }
+
+    public class BadgeTypeRepository(HydraContext context) : CommonRepository<BadgeType>(context) , IBadgeTypeRepository { }
 }

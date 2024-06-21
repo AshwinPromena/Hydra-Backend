@@ -61,6 +61,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 ApprovalUserId = model.ApprovalUserId,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
+                BadgeTypeId = model.BadgeTypeId,
             };
             model.LearningOutcomes.ForEach(x => badge.BadgeField.Add(new()
             {
@@ -108,6 +109,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             badge.RequiresApproval = model.IsRequiresApproval;
             badge.ApprovalUserId = model.ApprovalUserId;
             badge.UpdatedDate = DateTime.UtcNow;
+            badge.BadgeTypeId = model.BadgeTypeId;
 
             var badgeFieldsList = await _unitOfWork.BadgeFieldRepository.FindByCondition(x => x.BadgeId == model.BadgeId).ToListAsync();
             _unitOfWork.BadgeFieldRepository.DeleteRange(badgeFieldsList);
@@ -187,7 +189,9 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                                             (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
                                                                             (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName)),
                                                              CreatedDate = b.CreatedDate,
-                                                             UpdatedDate = b.UpdatedDate
+                                                             UpdatedDate = b.UpdatedDate,
+                                                             BadgeTypeId = b.BadgeTypeId,
+                                                             BadgeTypeName = b.BadgeType.Name,
                                                          }).FirstOrDefaultAsync();
             if (badge is null)
                 return new(404, ResponseConstants.InvalidBadgeId);
@@ -206,9 +210,12 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                   (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : badgesQuery;
 
-            badgesQuery = model.SortBy == (int)BadgeSortBy.All ? badgesQuery :
-                          (model.SortBy == (int)BadgeSortBy.IssuedDate ? badgesQuery.OrderByDescending(x => x.IssueDate) :
-                          badgesQuery.OrderByDescending(x => x.ExpirationDate));
+            badgesQuery = model.SortBy == (long)BadgeSortBy.All ? badgesQuery :
+                          (model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.OrderByDescending(x => x.IssueDate) :
+                          (model.SortBy == (long)BadgeSortBy.Certificate ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (int)BadgeSortBy.Certificate) :
+                          (model.SortBy == (long)BadgeSortBy.License ? badgesQuery.OrderByDescending(x=>x.BadgeTypeId == (long)BadgeSortBy.License) :
+                          (model.SortBy == (long)BadgeSortBy.Miscellaneous ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (long)BadgeSortBy.License) :
+                          badgesQuery.OrderByDescending(x => x.ExpirationDate)))));
 
             var badges = await badgesQuery
                                           .GroupBy(x => 1)
@@ -235,7 +242,10 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                         ApprovalUser = b.ApprovalUserId == null ? null :
                                                                                                         ((string.IsNullOrEmpty(b.ApprovalUser.FirstName) ? "" : b.ApprovalUser.FirstName) +
                                                                                                         (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
-                                                                                                        (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName))
+                                                                                                        (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName)),
+                                                        BadgeImage = b.Image,
+                                                        BadgeTypeId = b.BadgeTypeId,
+                                                        BadgeTypeName = b.BadgeType.Name,
                                                     })
                                                     .Skip(model.PageSize * (model.PageIndex - 0))
                                                     .Take(model.PageSize)
@@ -315,9 +325,12 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                   (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : badgesQuery;
 
-            badgesQuery = model.SortBy == (int)BadgeSortBy.All ? badgesQuery :
-                          (model.SortBy == (int)BadgeSortBy.IssuedDate ? badgesQuery.OrderByDescending(x => x.IssueDate) :
-                          badgesQuery.OrderByDescending(x => x.ExpirationDate));
+            badgesQuery = model.SortBy ==  (long)BadgeSortBy.All ? badgesQuery :
+                          (model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.OrderByDescending(x => x.IssueDate) :
+                          (model.SortBy == (long)BadgeSortBy.Certificate ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (int)BadgeSortBy.Certificate) :
+                          (model.SortBy == (long)BadgeSortBy.License ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (long)BadgeSortBy.License) :
+                          (model.SortBy == (long)BadgeSortBy.Miscellaneous ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (long)BadgeSortBy.License) :
+                          badgesQuery.OrderByDescending(x => x.ExpirationDate)))));
 
             var badges = await badgesQuery
                                           .GroupBy(x => 1)
@@ -344,7 +357,10 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                         ApprovalUser = b.ApprovalUserId == null ? null :
                                                                                                         ((string.IsNullOrEmpty(b.ApprovalUser.FirstName) ? "" : b.ApprovalUser.FirstName) +
                                                                                                         (!string.IsNullOrEmpty(b.ApprovalUser.FirstName) && !string.IsNullOrEmpty(b.ApprovalUser.LastName) ? " " : "") +
-                                                                                                        (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName))
+                                                                                                        (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName)),
+                                                        BadgeImage = b.Image,
+                                                        BadgeTypeId = b.BadgeTypeId,
+                                                        BadgeTypeName = b.BadgeType.Name,
                                                     })
                                                     .Skip(model.PageSize * (model.PageIndex - 0))
                                                     .Take(model.PageSize)

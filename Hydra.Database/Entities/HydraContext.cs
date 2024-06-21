@@ -30,6 +30,8 @@ namespace Hydra.Database.Entities
 
         public virtual DbSet<DeletedUser> DeletedUser { get; set; }
 
+        public virtual DbSet<BadgeType> BadgeType { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.SeedData();

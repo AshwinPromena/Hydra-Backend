@@ -65,4 +65,12 @@ namespace Hydra.Common.Models
         public string TypeName  { get; set; }
     }
 
+    public class BadgeTypeDropDownModel
+    {
+        [JsonProperty("badgeTypeId")]
+        public long BadgeTypeId { get; set; }
+
+        [JsonProperty("badgeTypeName")]
+        public string BadgeTypeName { get; set; }
+    }
 }

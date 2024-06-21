@@ -12,6 +12,7 @@ namespace Hydra.Database.Entities
             SeedRoleMasterData(modelBuilder);
             SeedUserRoleMasterData(modelBuilder);
             SeedAccessLevelMasterData(modelBuilder);
+            SeedBadgeTypeMasterData(modelBuilder);
         }
 
         public static void SeedUserMasterData(ModelBuilder modelBuilder)
@@ -54,6 +55,15 @@ namespace Hydra.Database.Entities
             new AccessLevel { Id = 1, Name = "View only" },
             new AccessLevel { Id = 2, Name = "View and edit" },
             new AccessLevel { Id = 3, Name = "View, edit and delete" });
+        }
+
+        public static void SeedBadgeTypeMasterData(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<BadgeType>().HasData(
+            new BadgeType { Id = 1, Name = "Badge" },
+            new BadgeType { Id = 2, Name = "Certificate" },
+            new BadgeType { Id = 3, Name = "License" },
+            new BadgeType { Id = 4, Name = "Miscellaneous" });
         }
     }
 }

@@ -27,5 +27,7 @@
         IPasswordResetTokenRepository PasswordResetTokenRepository { get; }
 
         IDeletedUserRepository DeletedUserRepository { get; }
+
+        IBadgeTypeRepository BadgeTypeRepository { get; }
     }
 }

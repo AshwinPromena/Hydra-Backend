@@ -132,8 +132,10 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
         public ServiceResponse<List<BadgeSortByDropDownModel>> GetBadgeSortOptions()
         {
             return new(200, ResponseConstants.Success, [new BadgeSortByDropDownModel { SortId = 1, SortName = BadgeSortBy.All.ToString()} ,
-                                                        new BadgeSortByDropDownModel { SortId = 2, SortName = BadgeSortBy.IssuedDate.ToString()} ,
-                                                        new BadgeSortByDropDownModel { SortId = 3, SortName = BadgeSortBy.ExpirationDate.ToString()}]);
+                                                        new BadgeSortByDropDownModel { SortId = 2, SortName = BadgeSortBy.Badge.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 3, SortName = BadgeSortBy.Certificate.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 4, SortName = BadgeSortBy.License.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 5, SortName = BadgeSortBy.Miscellaneous.ToString()}]);
         }
 
         public ServiceResponse<List<StaffSortByDropDownModel>> GetStaffSortOptions()
@@ -160,6 +162,15 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
             return new(200, ResponseConstants.Success, [new DeletedUserDropDownModel { TypeId = 1, TypeName = DeletedUserOptions.All.ToString()} ,
                                                         new DeletedUserDropDownModel { TypeId = 2, TypeName = DeletedUserOptions.Learner.ToString()} ,
                                                         new DeletedUserDropDownModel { TypeId = 3, TypeName = DeletedUserOptions.Staff.ToString()}]);
+        }
+
+        public async Task<ServiceResponse<List<BadgeTypeDropDownModel>>> GetBadgeType()
+        {
+            return new(200, ResponseConstants.Success, await _unitOfWork.BadgeTypeRepository.FindByCondition(x => x.Id > 0).Select(s => new BadgeTypeDropDownModel
+            {
+                BadgeTypeId = s.Id,
+                BadgeTypeName = s.Name,
+            }).ToListAsync());
         }
     }
 }
