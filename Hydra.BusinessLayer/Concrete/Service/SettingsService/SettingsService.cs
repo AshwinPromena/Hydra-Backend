@@ -46,7 +46,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.SettingsService
 
             userList = model.TypeId == (long)DeletedUserOptions.All ? userList :
                        model.TypeId == (long)DeletedUserOptions.Learner ? userList.Where(x => x.User.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner) :
-                       model.TypeId == 1 ? userList.Where(x => x.User.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
+                       model.TypeId == (long)DeletedUserOptions.Staff ? userList.Where(x => x.User.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
                                        : userList;
 
             var deletedUsers = await userList
