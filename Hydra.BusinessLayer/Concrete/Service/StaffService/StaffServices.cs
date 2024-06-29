@@ -234,13 +234,12 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ApiResponse> ApproveBadge(ApproveBadgeModel model)
         {
-            var currentUser = _currentUserService.UserId;
             var badge = await _unitOfWork.BadgeRepository
                                          .FindByCondition(x => model.BadgeIds.Contains(x.Id) &&
-                                        x.IsActive && x.IsApproved == false &&
-                                        x.ApprovalUserId == currentUser).ToListAsync();
+                                        x.IsActive && x.IsApproved == false)
+                                         .ToListAsync();
 
-            if (badge == null)
+            if (badge.Count() <= 0)
                 return new(204, ResponseConstants.BadgesApproved);
 
             badge.ForEach(x =>
