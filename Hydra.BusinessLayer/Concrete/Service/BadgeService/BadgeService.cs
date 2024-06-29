@@ -39,6 +39,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 LearnerWithoutBadge = learnerCount.Where(x => x.badgeCount == 0).Count(),
                 TotalLearnerCount = learnerCount.Count(),
                 PendingApproval = userBadge.Where(x => x.IsApproved is false).Count(),
+                RecentAssignedCredentials = userBadge.Where(x=>x.UpdatedDate.Date == DateTime.UtcNow.Date).Count()
             });
         }
 

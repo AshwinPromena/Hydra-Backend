@@ -24,6 +24,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("pendingApproval")]
         public int PendingApproval { get; set; }
+
+        [JsonProperty("recentAssignedCredentials")]
+        public int RecentAssignedCredentials { get; set; }
     }
 
     public class AddBadgeModel
