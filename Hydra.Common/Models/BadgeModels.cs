@@ -27,6 +27,18 @@ namespace Hydra.Common.Models
 
         [JsonProperty("recentAssignedCredentials")]
         public int RecentAssignedCredentials { get; set; }
+
+        [JsonProperty("badgeCount")]
+        public int BadgeCount { get; set; }
+
+        [JsonProperty("certificateCount")]
+        public int CertificateCount {  get; set; }
+
+        [JsonProperty("licenseCount")]
+        public int LicenseCount { get; set; }
+
+        [JsonProperty("miscellaneousCount")]
+        public int MiscellaneousCount {  get; set; }
     }
 
     public class AddBadgeModel

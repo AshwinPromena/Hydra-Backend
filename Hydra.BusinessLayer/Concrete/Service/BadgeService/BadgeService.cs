@@ -39,7 +39,11 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 LearnerWithoutBadge = learnerCount.Where(x => x.badgeCount == 0).Count(),
                 TotalLearnerCount = learnerCount.Count(),
                 PendingApproval = userBadge.Where(x => x.IsApproved is false).Count(),
-                RecentAssignedCredentials = userBadge.Where(x=>x.UpdatedDate.Date == DateTime.UtcNow.Date).Count()
+                RecentAssignedCredentials = userBadge.Where(x => x.UpdatedDate.Date == DateTime.UtcNow.Date).Count(),
+                BadgeCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Badge).Count(),
+                CertificateCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Certificate).Count(),
+                LicenseCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.License).Count(),
+                MiscellaneousCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Miscellaneous).Count()
             });
         }
 
