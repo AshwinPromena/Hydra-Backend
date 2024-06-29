@@ -131,11 +131,11 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
 
         public ServiceResponse<List<BadgeSortByDropDownModel>> GetBadgeSortOptions()
         {
-            return new(200, ResponseConstants.Success, [new BadgeSortByDropDownModel { SortId = 1, SortName = BadgeSortBy.All.ToString()} ,
-                                                        new BadgeSortByDropDownModel { SortId = 2, SortName = BadgeSortBy.Badge.ToString()} ,
-                                                        new BadgeSortByDropDownModel { SortId = 3, SortName = BadgeSortBy.Certificate.ToString()} ,
-                                                        new BadgeSortByDropDownModel { SortId = 4, SortName = BadgeSortBy.License.ToString()} ,
-                                                        new BadgeSortByDropDownModel { SortId = 5, SortName = BadgeSortBy.Miscellaneous.ToString()}]);
+            return new(200, ResponseConstants.Success, [new BadgeSortByDropDownModel { SortId = 0, SortName = BadgeSortBy.All.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 1, SortName = BadgeSortBy.Badge.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 2, SortName = BadgeSortBy.Certificate.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 3, SortName = BadgeSortBy.License.ToString()} ,
+                                                        new BadgeSortByDropDownModel { SortId = 4, SortName = BadgeSortBy.Miscellaneous.ToString()}]);
         }
 
         public ServiceResponse<List<StaffSortByDropDownModel>> GetStaffSortOptions()
