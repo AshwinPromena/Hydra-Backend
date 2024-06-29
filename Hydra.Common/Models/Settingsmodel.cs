@@ -33,5 +33,8 @@ namespace Hydra.Common.Models
 
         [JsonProperty("profilePicture")]
         public string ProfilePicture { get; set; }
+
+        [JsonProperty("userRole")]
+        public string UserRole { get; set; }
     }
 }
