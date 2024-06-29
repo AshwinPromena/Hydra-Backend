@@ -142,7 +142,7 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
         {
             return new(200, ResponseConstants.Success, [new StaffSortByDropDownModel { SortId = 0, SortName = StaffSortBy.All.ToString()} ,
                                                         new StaffSortByDropDownModel { SortId = 1, SortName = StaffSortBy.Email.ToString()} ,
-                                                        new StaffSortByDropDownModel { SortId = 2, SortName = StaffSortBy.Name.ToString()}]);
+                                                        new StaffSortByDropDownModel { SortId = 2, SortName = StaffSortBy.UserName.ToString()}]);
         }
 
         public async Task<ServiceResponse<List<BadgeSequenceOutputModel>>> GetBadgeSequence()

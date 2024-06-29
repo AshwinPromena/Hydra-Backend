@@ -41,7 +41,7 @@
     {
         All = 0,
         Email = 1,
-        Name = 2,
+        UserName = 2,
         AccessLevel = 3,
     }
 

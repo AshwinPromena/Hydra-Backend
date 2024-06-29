@@ -183,7 +183,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
             staffQuery = model.SortBy == (int)StaffSortBy.All ? staffQuery :
                                          (model.SortBy == (int)StaffSortBy.Email ? staffQuery.OrderBy(x => x.Email) :
-                                         (model.SortBy == (int)StaffSortBy.Name) ? staffQuery.OrderBy(x => x.FirstName + x.LastName) : staffQuery);
+                                         (model.SortBy == (int)StaffSortBy.UserName) ? staffQuery.OrderBy(x => x.UserName) : staffQuery);
 
             staffQuery = model.Type == (int)StaffSortType.All ? staffQuery :
                                        (model.Type == (int)StaffSortType.Archived ? staffQuery.Where(x => x.IsArchived) :
