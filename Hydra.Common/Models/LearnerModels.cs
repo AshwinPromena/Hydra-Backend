@@ -80,10 +80,13 @@ namespace Hydra.Common.Models
 
     public class GetAllLearnerInputModel : PagedResponseInput
     {
+        [JsonProperty("fromDate")]
         public DateTime? FromDate { get; set; }
 
+        [JsonProperty("toDate")]
         public DateTime? ToDate { get; set; }
 
+        [JsonProperty("type")]
         public int Type { get; set; }
     }
 

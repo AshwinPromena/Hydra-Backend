@@ -172,45 +172,49 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             return new(200, ResponseConstants.Success);
         }
 
-        public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model, bool IsArchived = false/*, bool? IsApproved = true*/)
+        public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model)
         {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
-            var staffQuery = _unitOfWork.UserRepository.FindByCondition(x => x.IsActive /*&& x.IsApproved == IsApproved*/ && x.IsArchived == IsArchived && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff);
+            var staffQuery = _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff).AsQueryable();
 
             staffQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
                          staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : staffQuery;
 
             staffQuery = model.SortBy == (int)StaffSortBy.All ? staffQuery :
                                          (model.SortBy == (int)StaffSortBy.Email ? staffQuery.OrderBy(x => x.Email) :
-                                         (model.SortBy == (int)StaffSortBy.Name) ? staffQuery.OrderBy(x => x.FirstName + x.LastName) :
-                                         (model.SortBy == (int)StaffSortBy.AccessLevel ? staffQuery.OrderBy(x => x.AccessLevel.Name) : staffQuery));
+                                         (model.SortBy == (int)StaffSortBy.Name) ? staffQuery.OrderBy(x => x.FirstName + x.LastName) : staffQuery);
+
+            staffQuery = model.Type == (int)StaffSortType.All ? staffQuery :
+                                       (model.Type == (int)StaffSortType.Archived ? staffQuery.Where(x => x.IsArchived) :
+                                       (model.Type == (int)StaffSortType.Active ? staffQuery.Where(x => x.IsArchived == false) : staffQuery));
 
             var staffs = await staffQuery.GroupBy(x => 1)
                                          .Select(x => new PagedResponseOutput<List<GetStaffModel>>
                                          {
                                              TotalCount = x.Count(),
-                                             Data = x.OrderByDescending(x => x.UpdatedDate).Select(s => new GetStaffModel
-                                             {
-                                                 UserId = s.Id,
-                                                 UserName = s.UserName,
-                                                 FirstName = s.FirstName,
-                                                 LastName = s.LastName,
-                                                 Email = s.Email,
-                                                 IsArchived = s.IsArchived,
-                                                 IsApproved = s.IsApproved,
-                                                 MobileNumber = s.MobileNumber,
-                                                 AccessLevelId = s.AccessLevelId,
-                                                 AccessLevelName = s.AccessLevel.Name,
-                                                 DepartmentId = s.DepartmentId,
-                                                 DepartmentName = s.Department.Name,
-                                                 ProfilePicture = s.ProfilePicture,
-                                                 CreatedDate = s.CreatedDate,
-                                                 UpdatedDate = s.UpdatedDate
-                                             })
-                                                    .Skip(model.PageSize * (model.PageIndex))
-                                                      .Take(model.PageSize)
-                                                      .ToList()
+                                             Data = x.OrderByDescending(x => x.UpdatedDate)
+                                                     .Select(s => new GetStaffModel
+                                                     {
+                                                         UserId = s.Id,
+                                                         UserName = s.UserName,
+                                                         FirstName = s.FirstName,
+                                                         LastName = s.LastName,
+                                                         Email = s.Email,
+                                                         IsArchived = s.IsArchived,
+                                                         IsApproved = s.IsApproved,
+                                                         MobileNumber = s.MobileNumber,
+                                                         AccessLevelId = s.AccessLevelId,
+                                                         AccessLevelName = s.AccessLevel.Name,
+                                                         DepartmentId = s.DepartmentId,
+                                                         DepartmentName = s.Department.Name,
+                                                         ProfilePicture = s.ProfilePicture,
+                                                         CreatedDate = s.CreatedDate,
+                                                         UpdatedDate = s.UpdatedDate
+                                                     })
+                                                     .Skip(model.PageSize * (model.PageIndex - 0))
+                                                     .Take(model.PageSize)
+                                                     .ToList()
                                          }).FirstOrDefaultAsync();
 
 

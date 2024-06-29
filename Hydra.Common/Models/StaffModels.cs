@@ -83,6 +83,9 @@ namespace Hydra.Common.Models
     {
         [JsonProperty("sortBy")]
         public int SortBy { get; set; }
+
+        [JsonProperty("type")]
+        public int Type { get; set; }
     }
 
     public class GetAllUnApprovedStaffInputModel : PagedResponseInput 

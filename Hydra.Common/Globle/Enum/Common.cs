@@ -51,4 +51,12 @@
         Learner = 1,
         Staff = 2
     }
+
+    public enum StaffSortType
+    {
+        All = 0,
+        Active = 1,
+        Archived = 2,
+        
+    }
 }
