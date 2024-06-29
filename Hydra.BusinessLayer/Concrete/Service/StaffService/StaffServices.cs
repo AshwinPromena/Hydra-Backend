@@ -240,7 +240,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                                          .ToListAsync();
 
             if (badge.Count() <= 0)
-                return new(204, ResponseConstants.BadgesApproved);
+                return new(400, ResponseConstants.BadRequest);
 
             badge.ForEach(x =>
             {
