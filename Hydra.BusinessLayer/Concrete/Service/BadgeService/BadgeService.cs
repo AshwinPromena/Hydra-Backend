@@ -20,6 +20,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
         public async Task<ServiceResponse<BadgeFactoryDashBoardModel>> BadgeFactoryDashBoard()
         {
             var userBadge = await _unitOfWork.BadgeRepository.FindByCondition(x => x.Id > 0).ToListAsync();
+            var badgeType = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive).Include(i => i.Badge).ToListAsync();
             var learnerCount = await _unitOfWork.UserRepository
                                                 .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner &&
                                                                       x.IsActive)
@@ -43,7 +44,11 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 BadgeCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Badge).Count(),
                 CertificateCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Certificate).Count(),
                 LicenseCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.License).Count(),
-                MiscellaneousCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Miscellaneous).Count()
+                MiscellaneousCount = userBadge.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Miscellaneous).Count(),
+                LearnerBadgeCount = badgeType.Where(x => x.Badge.BadgeTypeId == (long)BadgeSortBy.Badge).Count(),
+                LearnerCertificateCount = badgeType.Where(x => x.Badge.BadgeTypeId == (long)BadgeSortBy.Certificate).Count(),
+                LearnerLicenseCount = badgeType.Where(x => x.Badge.BadgeTypeId == (long)BadgeSortBy.License).Count(),
+                LearnerMiscellaneousCount = badgeType.Where(x => x.Badge.BadgeTypeId == (long)BadgeSortBy.Miscellaneous).Count(),
             });
         }
 

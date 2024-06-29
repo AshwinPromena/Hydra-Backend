@@ -39,6 +39,18 @@ namespace Hydra.Common.Models
 
         [JsonProperty("miscellaneousCount")]
         public int MiscellaneousCount {  get; set; }
+
+        [JsonProperty("learnerBadgeCount")]
+        public int LearnerBadgeCount { get; set; }
+
+        [JsonProperty("learnerCertificateCount")]
+        public int LearnerCertificateCount { get; set; }
+
+        [JsonProperty("learnerLicenseCount")]
+        public int LearnerLicenseCount { get; set; }
+
+        [JsonProperty("learnerMiscellaneousCount")]
+        public int LearnerMiscellaneousCount { get; set; }
     }
 
     public class AddBadgeModel
