@@ -204,18 +204,19 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
             var badgesQuery = _unitOfWork.BadgeRepository
-                                        .FindByCondition(x => x.IsActive);
+                                         .FindByCondition(x => x.IsActive);
+
             badgesQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
                            badgesQuery.Where(x => (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : badgesQuery;
 
             badgesQuery = model.SortBy == (long)BadgeSortBy.All ? badgesQuery :
-                          (model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.OrderByDescending(x => x.IssueDate) :
-                          (model.SortBy == (long)BadgeSortBy.Certificate ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (int)BadgeSortBy.Certificate) :
-                          (model.SortBy == (long)BadgeSortBy.License ? badgesQuery.OrderByDescending(x=>x.BadgeTypeId == (long)BadgeSortBy.License) :
-                          (model.SortBy == (long)BadgeSortBy.Miscellaneous ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (long)BadgeSortBy.License) :
-                          badgesQuery.OrderByDescending(x => x.ExpirationDate)))));
+                          model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Badge).OrderByDescending(x => x.ExpirationDate) :
+                          model.SortBy == (long)BadgeSortBy.Certificate ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Certificate).OrderByDescending(x => x.ExpirationDate) :
+                          model.SortBy == (long)BadgeSortBy.License ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.License).OrderByDescending(x => x.ExpirationDate) :
+                          model.SortBy == (long)BadgeSortBy.Miscellaneous ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Miscellaneous).OrderByDescending(x => x.ExpirationDate) :
+                          badgesQuery.OrderByDescending(x => x.ExpirationDate);
 
             var badges = await badgesQuery
                                           .GroupBy(x => 1)
@@ -325,7 +326,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                   (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : badgesQuery;
 
-            badgesQuery = model.SortBy ==  (long)BadgeSortBy.All ? badgesQuery :
+            badgesQuery = model.SortBy == (long)BadgeSortBy.All ? badgesQuery :
                           (model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.OrderByDescending(x => x.IssueDate) :
                           (model.SortBy == (long)BadgeSortBy.Certificate ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (int)BadgeSortBy.Certificate) :
                           (model.SortBy == (long)BadgeSortBy.License ? badgesQuery.OrderByDescending(x => x.BadgeTypeId == (long)BadgeSortBy.License) :
