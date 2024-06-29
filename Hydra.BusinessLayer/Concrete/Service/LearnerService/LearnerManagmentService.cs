@@ -280,6 +280,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                                                             ExpirationDate = s.Badge.ExpirationDate,
                                                                                                             SequenceId = s.Badge.BadgeSequenceId,
                                                                                                             SequenceName = s.Badge.BadgeSequence.Name,
+                                                                                                            BadgeTypeId = s.Badge.BadgeTypeId,
+                                                                                                            BadgeTypeName = s.Badge.BadgeType.Name
                                                                                                         }).ToList(),
                                                                             GetExpirinyCredentialModel = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow &&
                                                                                                          x.Badge.ExpirationDate > DateTime.UtcNow &&
@@ -295,6 +297,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                                                               ExpirationDate = s.Badge.ExpirationDate,
                                                                                                               SequenceId = s.Badge.BadgeSequenceId,
                                                                                                               SequenceName = s.Badge.BadgeSequence.Name,
+                                                                                                              BadgeTypeId = s.Badge.BadgeTypeId,
+                                                                                                              BadgeTypeName = s.Badge.BadgeType.Name
                                                                                                           }).ToList(),
                                                                             GetexpiredCredentialModel = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow &&
                                                                                                         x.IsActive &&
@@ -309,6 +313,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                                                              ExpirationDate = s.Badge.ExpirationDate,
                                                                                                              SequenceId = s.Badge.BadgeSequenceId,
                                                                                                              SequenceName = s.Badge.BadgeSequence.Name,
+                                                                                                             BadgeTypeId = s.Badge.BadgeTypeId,
+                                                                                                             BadgeTypeName = s.Badge.BadgeType.Name
                                                                                                          }).ToList()
                                                                         }).FirstOrDefaultAsync());
         }
