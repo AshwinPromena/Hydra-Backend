@@ -76,6 +76,18 @@ namespace Hydra.Common.Models
 
         [JsonProperty("addedTodayCount")]
         public int AddedTodayCount { get; set; }
+
+        [JsonProperty("learnerBadgeCount")]
+        public int LearnerBadgeCount { get; set; }
+
+        [JsonProperty("learnerCertificateCount")]
+        public int LearnerCertificateCount { get; set; }
+
+        [JsonProperty("learnerLicenseCount")]
+        public int LearnerLicenseCount { get; set; }
+
+        [JsonProperty("learnerMiscellaneousCount")]
+        public int LearnerMiscellaneousCount { get; set; }
     }
 
     public class GetAllLearnerInputModel : PagedResponseInput
@@ -315,6 +327,12 @@ namespace Hydra.Common.Models
 
         [JsonProperty("sequenceName")]
         public string SequenceName { get; set; }
+
+        [JsonProperty("badgeTypeId")]
+        public long BadgeTypeId { get; set; }
+
+        [JsonProperty("badgeTypeName")]
+        public string BadgeTypeName { get; set; }
     }
 
     public class RevokeBadgeModel

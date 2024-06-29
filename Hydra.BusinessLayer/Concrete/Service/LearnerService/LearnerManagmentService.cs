@@ -28,6 +28,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             var learnerCount = await _unitOfWork.UserRepository
                                                 .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner &&
                                                                       x.IsActive)
+                                                .Include(i => i.LearnerBadge)
+                                                .ThenInclude(ti => ti.Badge)
                                                 .Select(x => new
                                                 {
                                                     x.Id,
@@ -35,12 +37,18 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                     x.CreatedDate,
                                                 })
                                                 .ToListAsync();
+
+            var badgeType = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive).Include(i => i.Badge).ToListAsync();
             return new(200, ResponseConstants.Success, new LearnerDashBoardModel
             {
                 LearnerInTotal = learnerCount.Count,
                 LearnerWithBadge = learnerCount.Where(x => x.badgeCount != 0).Count(),
                 LearnerWithoutBadge = learnerCount.Where(x => x.badgeCount == 0).Count(),
-                AddedTodayCount = learnerCount.Where(x => x.CreatedDate.Date == DateTime.UtcNow.Date).Count()
+                AddedTodayCount = learnerCount.Where(x => x.CreatedDate.Date == DateTime.UtcNow.Date).Count(),
+                LearnerBadgeCount = badgeType.Where(x => x.Badge.BadgeTypeId == (long)BadgeSortBy.Badge).Count(),
+                LearnerCertificateCount = badgeType.Where(x => x.Badge.BadgeTypeId == (long)BadgeSortBy.Certificate).Count(),
+                LearnerLicenseCount = badgeType.Where(x => x.Badge.BadgeTypeId == (long)BadgeSortBy.License).Count(),
+                LearnerMiscellaneousCount = badgeType.Where(x => x.Badge.BadgeTypeId == (long)BadgeSortBy.Miscellaneous).Count(),
             });
 
         }
@@ -200,6 +208,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                             ExpirationDate = s.Badge.ExpirationDate,
                                                             SequenceId = s.Badge.BadgeSequenceId,
                                                             SequenceName = s.Badge.BadgeSequence.Name,
+                                                            BadgeTypeId = s.Badge.BadgeTypeId,
+                                                            BadgeTypeName = s.Badge.BadgeType.Name,
                                                         }).ToList(),
                                                         ProfilePicture = s.ProfilePicture,
                                                         LearnerId = s.LearnerId,
@@ -248,6 +258,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                                 ExpirationDate = s.Badge.ExpirationDate,
                                                                                 SequenceId = s.Badge.BadgeSequenceId,
                                                                                 SequenceName = s.Badge.BadgeSequence.Name,
+                                                                                BadgeTypeId = s.Badge.BadgeTypeId,
+                                                                                BadgeTypeName = s.Badge.BadgeType.Name
                                                                             }).ToList(),
                                                                             ProfilePicture = s.ProfilePicture,
                                                                             LearnerId = s.LearnerId,
