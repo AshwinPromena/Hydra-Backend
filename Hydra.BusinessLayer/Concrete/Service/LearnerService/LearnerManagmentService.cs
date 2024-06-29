@@ -35,7 +35,6 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                     x.CreatedDate,
                                                 })
                                                 .ToListAsync();
-            //var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive && x.User.IsActive).Select(s => s.UserId).Distinct().ToListAsync();
             return new(200, ResponseConstants.Success, new LearnerDashBoardModel
             {
                 LearnerInTotal = learnerCount.Count,

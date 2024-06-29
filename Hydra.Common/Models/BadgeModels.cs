@@ -7,6 +7,9 @@ namespace Hydra.Common.Models
         [JsonProperty("totalCredentials")]
         public int TotalCredentials { get; set; }
 
+        [JsonProperty("activeCredentials")]
+        public int ActiveCredentials { get; set; }
+
         [JsonProperty("recentCredentials")]
         public int RecentCredentials { get; set; }
 
