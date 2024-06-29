@@ -64,6 +64,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.SettingsService
                                                              DeletedUserName = s.DeletedUserName,
                                                              DeletedUserEmail = s.DeletedUserEmail,
                                                              DeletdDate = s.DeletedDate,
+                                                             ProfilePicture = s.User.ProfilePicture,
                                                          })
                                                          .Skip(model.PageSize * (model.PageIndex - 0))
                                                          .Take(model.PageSize)

@@ -30,5 +30,8 @@ namespace Hydra.Common.Models
 
         [JsonProperty("deletedDate")]
         public DateTime DeletdDate { get; set; }
+
+        [JsonProperty("profilePicture")]
+        public string ProfilePicture { get; set; }
     }
 }
