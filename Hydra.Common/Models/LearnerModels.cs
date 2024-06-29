@@ -36,7 +36,7 @@ namespace Hydra.Common.Models
         public string ProfilePicture { get; set; }
 
         [JsonProperty("learnerId")]
-        public long LearnerId { get; set; }
+        public long LearnerId { get; set; } = 0;
     }
 
     public class ExistingLearnerModel
