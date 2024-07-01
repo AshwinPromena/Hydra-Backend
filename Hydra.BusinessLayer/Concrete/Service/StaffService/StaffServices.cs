@@ -211,7 +211,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
             // Apply pagination and projection
             var staffs = await staffQuery
-                .Skip(model.PageSize * (model.PageIndex - 1))
+                .Skip(model.PageSize * (model.PageIndex - 0))
                 .Take(model.PageSize)
                 .Select(s => new GetStaffModel
                 {
