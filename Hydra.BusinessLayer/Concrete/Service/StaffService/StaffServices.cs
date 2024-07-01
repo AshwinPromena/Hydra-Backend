@@ -183,7 +183,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
             staffQuery = model.SortBy == (int)StaffSortBy.All ? staffQuery :
                                          (model.SortBy == (int)StaffSortBy.Email ? staffQuery.OrderBy(x => x.Email) :
-                                         (model.SortBy == (int)StaffSortBy.UserName) ? staffQuery.OrderBy(x => x.UserName) : staffQuery);
+                                         (model.SortBy == (int)StaffSortBy.UserName) ? staffQuery.OrderBy(x => x.UserName) : staffQuery.OrderByDescending(x => x.UpdatedDate));
 
             staffQuery = model.Type == (int)StaffSortType.All ? staffQuery :
                                        (model.Type == (int)StaffSortType.Archived ? staffQuery.Where(x => x.IsArchived) :
@@ -193,8 +193,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                                          .Select(x => new PagedResponseOutput<List<GetStaffModel>>
                                          {
                                              TotalCount = x.Count(),
-                                             Data = x.OrderByDescending(x => x.UpdatedDate)
-                                                     .Select(s => new GetStaffModel
+                                             Data = x.Select(s => new GetStaffModel
                                                      {
                                                          UserId = s.Id,
                                                          UserName = s.UserName,

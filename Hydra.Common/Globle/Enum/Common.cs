@@ -47,9 +47,9 @@
 
     public enum DeletedUserOptions
     {
-        All = 0,
-        Learner = 1,
-        Staff = 2
+        All = 1,
+        Learner = 2,
+        Staff = 3
     }
 
     public enum StaffSortType
