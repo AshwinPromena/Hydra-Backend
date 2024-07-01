@@ -78,7 +78,7 @@ namespace Hydra.Database.Entities
         public string LastName { get; set; }
 
         [Column("learner_id")]
-        public long LearnerId { get; set; }
+        public string LearnerId { get; set; }
 
         [Column("created_date")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;

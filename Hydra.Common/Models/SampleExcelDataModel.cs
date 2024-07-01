@@ -8,5 +8,6 @@
         public string Email2 { get; set; }
         public string Email3 { get; set; }
         public string MobileNumber { get; set; }
+        public string SchoolId { get; set; }
     }
 }

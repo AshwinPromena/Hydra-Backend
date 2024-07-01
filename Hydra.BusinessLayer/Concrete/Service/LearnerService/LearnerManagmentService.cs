@@ -137,6 +137,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                     Email2 = "johson@yopmail.com",
                     Email3 = "mary@yopmail.com",
                     MobileNumber ="(555) 123-4567",
+                    SchoolId = "AD1234",
                 }
             };
             List<Dictionary<string, string>> convertedList = new List<Dictionary<string, string>>();
