@@ -216,6 +216,12 @@ namespace Hydra.Common.Models
 
         [JsonProperty("sequenceName")]
         public string SequenceName { get; set; }
+
+        [JsonProperty("badgeTypeId")]
+        public long BadgeTypeId { get; set; }
+
+        [JsonProperty("badgeTypeName")]
+        public string BadgeTypeName { get; set; }
     }
 
     public class GetExpirinyCredentialModel
@@ -242,6 +248,12 @@ namespace Hydra.Common.Models
 
         [JsonProperty("sequenceName")]
         public string SequenceName { get; set; }
+
+        [JsonProperty("badgeTypeId")]
+        public long BadgeTypeId { get; set; }
+
+        [JsonProperty("badgeTypeName")]
+        public string BadgeTypeName { get; set; }
     }
 
     public class GetexpiredCredentialModel
@@ -268,6 +280,12 @@ namespace Hydra.Common.Models
 
         [JsonProperty("sequenceName")]
         public string SequenceName { get; set; }
+
+        [JsonProperty("badgeTypeId")]
+        public long BadgeTypeId { get; set; }
+
+        [JsonProperty("badgeTypeName")]
+        public string BadgeTypeName { get; set; }
     }
 
     public class UpdateLearnerModel
