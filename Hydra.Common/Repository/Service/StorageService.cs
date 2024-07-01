@@ -7,6 +7,8 @@ using Hydra.Common.Models;
 using Hydra.Common.Repository.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace Hydra.Common.Repository.Service
 {
@@ -18,7 +20,7 @@ namespace Hydra.Common.Repository.Service
         private static int MAX_FILE_SIZE = 1024 * 1024 * 70; // 70 MB
 
         private static string[] EXTENSION_LOWER_CASE = new string[] { "pdf", "jpg", "png", "jpeg", "gif", "mp4", "webp", "txt" };
-
+        private static string[] IMG_EXTENSION_LOWER_CASE = new string[] { "jpg", "png", "jpeg", "gif", "webp" };
         private string GenerateS3Path(string path, string fileName)
         {
             var key = $"{path}/{Guid.NewGuid()}{Path.GetExtension(fileName).ToLower()}";
@@ -82,6 +84,13 @@ namespace Hydra.Common.Repository.Service
             }
             try
             {
+                var extension = GetExtension(file[..5]);
+                if (IMG_EXTENSION_LOWER_CASE.Contains(extension[1..]))
+                {
+                    var res = await GetCompressedImageAsync(file, 300000);
+                    file = res;
+                }
+
                 byte[] inBytes = Convert.FromBase64String(file);
                 var stream = new MemoryStream(inBytes);
                 Random random = new Random();
@@ -95,7 +104,6 @@ namespace Hydra.Common.Repository.Service
                 //using IAmazonS3 client = new AmazonS3Client(_configuration.GetValue<string>("AWS:accessKey"), _configuration.GetValue<string>("AWS:secretKey"), Amazon.RegionEndpoint.APSouth1);
                 using IAmazonS3 client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.APSouth1);
                 var filetransferutility = new TransferUtility(client);
-                var extension = GetExtension(file[..5]);
                 var filePath = GenerateS3Path(path, $"{fileName}{extension}");
                 await filetransferutility.UploadAsync(stream, bucketName, filePath);
                 await client.PutACLAsync(new PutACLRequest
@@ -115,6 +123,46 @@ namespace Hydra.Common.Repository.Service
                 return new ServiceResponse<string>(StatusCodes.Status500InternalServerError, e.Message, null);
             }
         }
+
+        private async Task<string> GetCompressedImageAsync(string base64Image, long targetSizeInBytes)
+        {
+            byte[] imageBytes = Convert.FromBase64String(base64Image);
+            using MemoryStream inStream = new(imageBytes);
+            using MemoryStream outStream = new();
+
+            using (Image image = await Image.LoadAsync(inStream))
+            {
+                int quality = 100;
+                var encoder = new JpegEncoder { Quality = quality };
+
+                do
+                {
+                    outStream.Seek(0, SeekOrigin.Begin);
+                    outStream.SetLength(0);
+
+                    image.Save(outStream, encoder);
+
+                    byte[] compressedBytes = outStream.ToArray();
+                    if (compressedBytes.Length <= targetSizeInBytes)
+                    {
+                        break;
+                    }
+
+                    quality -= 5;
+                    encoder = new JpegEncoder { Quality = quality };
+
+                    if (quality <= 5)
+                    {
+                        break;
+                        //throw new Exception("Compression failed to achieve target size.");
+                    }
+                }
+                while (true);
+            }
+
+            return Convert.ToBase64String(outStream.ToArray());
+        }
+
 
         public async Task<ApiResponse> DeleteFile(string path)
         {

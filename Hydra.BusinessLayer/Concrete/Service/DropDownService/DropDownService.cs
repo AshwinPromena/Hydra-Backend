@@ -1,15 +1,20 @@
-﻿using Hydra.BusinessLayer.Repository.IService.IDropDownService;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using Amazon.Runtime.SharedInterfaces;
+using Hydra.BusinessLayer.Repository.IService.IDropDownService;
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
 using Hydra.Common.Models;
+using Hydra.Common.Repository.IService;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
 
 namespace Hydra.BusinessLayer.Repository.Service.DropDownService
 {
-    public class DropDownService(IUnitOfWork unitOfWork) : IDropDownService
+    public class DropDownService(IUnitOfWork unitOfWork,IStorageService storageService) : IDropDownService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IStorageService _storageService = storageService;
 
         public async Task<ServiceResponse<List<DepartmentDropDownModel>>> GetAllDepartment()
         {

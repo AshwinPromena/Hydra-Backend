@@ -414,24 +414,27 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
             foreach (var learner in learners)
             {
-                var currentDate = DateTime.UtcNow;
-                learner.IsActive = false;
-                learner.UpdatedDate = currentDate;
-
-                var reasonModel = model.FirstOrDefault(m => m.UserIds == learner.Id);
-                if (reasonModel is not null)
+                if (learner.IsActive)
                 {
-                    learner.DeletedUser.Add(new DeletedUser
+                    var currentDate = DateTime.UtcNow;
+                    learner.IsActive = false;
+                    learner.UpdatedDate = currentDate;
+
+                    var reasonModel = model.FirstOrDefault(m => m.UserIds == learner.Id);
+                    if (reasonModel is not null)
                     {
-                        UserId = _currentUserService.UserId,
-                        Name = _currentUserService.Name,
-                        Email = _currentUserService.Email,
-                        DeletedUserId = learner.Id,
-                        Reason = reasonModel.Reason,
-                        DeletedDate = currentDate,
-                        DeletedUserName = $"{learner.FirstName} {learner.LastName}",
-                        DeletedUserEmail = learner.Email,
-                    });
+                        learner.DeletedUser.Add(new DeletedUser
+                        {
+                            UserId = _currentUserService.UserId,
+                            Name = _currentUserService.Name,
+                            Email = _currentUserService.Email,
+                            DeletedUserId = learner.Id,
+                            Reason = reasonModel.Reason,
+                            DeletedDate = currentDate,
+                            DeletedUserName = $"{learner.FirstName} {learner.LastName}",
+                            DeletedUserEmail = learner.Email,
+                        });
+                    }
                 }
             }
 
