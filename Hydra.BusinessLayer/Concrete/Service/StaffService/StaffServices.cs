@@ -174,59 +174,72 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model)
         {
-            model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
+            model.SearchString = model.SearchString?.ToLower().Replace(" ", string.Empty) ?? string.Empty;
 
-            var staffQuery = _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff).AsQueryable();
+            // Build the query with all conditions, sorting, and pagination in one go
+            var staffQuery = _unitOfWork.UserRepository
+                .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff)
+                .AsQueryable();
 
-            staffQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
-                         staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : staffQuery;
+            // Apply filtering by search string
+            if (!string.IsNullOrWhiteSpace(model.SearchString))
+            {
+                staffQuery = staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty)
+                    .ToLower().Replace(" ", string.Empty).Contains(model.SearchString));
+            }
 
-            staffQuery = model.SortBy == (int)StaffSortBy.All 
-                                         ? staffQuery.OrderByDescending(x => x.UpdatedDate) 
-                                         : (model.SortBy == (int)StaffSortBy.Email 
-                                         ? staffQuery.OrderBy(x => x.Email) 
-                                         : staffQuery.OrderBy(x => x.UserName));
+            // Apply filtering by staff type
+            if (model.Type == (int)StaffSortType.Archived)
+            {
+                staffQuery = staffQuery.Where(x => x.IsArchived);
+            }
+            else if (model.Type == (int)StaffSortType.Active)
+            {
+                staffQuery = staffQuery.Where(x => !x.IsArchived);
+            }
 
-            staffQuery = model.Type == (int)StaffSortType.Archived 
-                       ? staffQuery.Where(x => x.IsArchived) 
-                       : (model.Type == (int)StaffSortType.Active 
-                       ? staffQuery.Where(x => x.IsArchived == false) 
-                       : staffQuery);
+            // Get total record count
+            var totalRecords = await staffQuery.CountAsync();
 
-            var staffs = await staffQuery.GroupBy(x => 1)
-                                         .Select(x => new PagedResponseOutput<List<GetStaffModel>>
-                                         {
-                                             TotalCount = x.Count(),
-                                             Data = x.Select(s => new GetStaffModel
-                                                     {
-                                                         UserId = s.Id,
-                                                         UserName = s.UserName,
-                                                         FirstName = s.FirstName,
-                                                         LastName = s.LastName,
-                                                         Email = s.Email,
-                                                         IsArchived = s.IsArchived,
-                                                         IsApproved = s.IsApproved,
-                                                         MobileNumber = s.MobileNumber,
-                                                         AccessLevelId = s.AccessLevelId,
-                                                         AccessLevelName = s.AccessLevel.Name,
-                                                         DepartmentId = s.DepartmentId,
-                                                         DepartmentName = s.Department.Name,
-                                                         ProfilePicture = s.ProfilePicture,
-                                                         CreatedDate = s.CreatedDate,
-                                                         UpdatedDate = s.UpdatedDate
-                                                     })
-                                                     .Skip(model.PageSize * (model.PageIndex - 0))
-                                                     .Take(model.PageSize)
-                                                     .ToList()
-                                         }).FirstOrDefaultAsync();
+            // Apply sorting
+            staffQuery = model.SortBy switch
+            {
+                (int)StaffSortBy.Email => staffQuery.OrderBy(x => x.Email),
+                (int)StaffSortBy.UserName => staffQuery.OrderBy(x => x.UserName),
+                _ => staffQuery.OrderByDescending(x => x.UpdatedDate)
+            };
 
+            // Apply pagination and projection
+            var staffs = await staffQuery
+                .Skip(model.PageSize * (model.PageIndex - 1))
+                .Take(model.PageSize)
+                .Select(s => new GetStaffModel
+                {
+                    UserId = s.Id,
+                    UserName = s.UserName,
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    Email = s.Email,
+                    IsArchived = s.IsArchived,
+                    IsApproved = s.IsApproved,
+                    MobileNumber = s.MobileNumber,
+                    AccessLevelId = s.AccessLevelId,
+                    AccessLevelName = s.AccessLevel.Name,
+                    DepartmentId = s.DepartmentId,
+                    DepartmentName = s.Department.Name,
+                    ProfilePicture = s.ProfilePicture,
+                    CreatedDate = s.CreatedDate,
+                    UpdatedDate = s.UpdatedDate
+                })
+                .ToListAsync();
 
+            // Return paged response
             return new PagedResponse<List<GetStaffModel>>
             {
-                Data = staffs?.Data ?? [],
-                HasNextPage = staffs?.TotalCount > (model.PageSize * model.PageIndex),
+                Data = staffs,
+                HasNextPage = totalRecords > (model.PageSize * model.PageIndex),
                 HasPreviousPage = model.PageIndex > 1,
-                TotalRecords = staffs == null ? 0 : staffs.TotalCount,
+                TotalRecords = totalRecords,
                 SearchString = model.SearchString,
                 PageSize = model.PageSize,
                 PageIndex = model.PageIndex,
@@ -234,6 +247,70 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 StatusCode = 200,
             };
         }
+
+        //public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model)
+        //{
+        //    model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
+
+        //    var staffQuery = _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff).AsQueryable();
+
+        //    staffQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
+        //                 staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : staffQuery;
+
+
+        //    staffQuery = model.Type == (int)StaffSortType.Archived
+        //               ? staffQuery.Where(x => x.IsArchived)
+        //               : (model.Type == (int)StaffSortType.Active
+        //               ? staffQuery.Where(x => x.IsArchived == false)
+        //               : staffQuery);
+
+        //    staffQuery = model.SortBy == (int)StaffSortBy.All
+        //                                ? staffQuery.OrderByDescending(x => x.UpdatedDate)
+        //                                : (model.SortBy == (int)StaffSortBy.Email
+        //                                ? staffQuery.OrderBy(x => x.Email)
+        //                                : staffQuery.OrderBy(x => x.UserName));
+
+        //    var staffs = await staffQuery.GroupBy(x => 1)
+        //                                 .Select(x => new PagedResponseOutput<List<GetStaffModel>>
+        //                                 {
+        //                                     TotalCount = x.Count(),
+        //                                     Data = x.Select(s => new GetStaffModel
+        //                                     {
+        //                                         UserId = s.Id,
+        //                                         UserName = s.UserName,
+        //                                         FirstName = s.FirstName,
+        //                                         LastName = s.LastName,
+        //                                         Email = s.Email,
+        //                                         IsArchived = s.IsArchived,
+        //                                         IsApproved = s.IsApproved,
+        //                                         MobileNumber = s.MobileNumber,
+        //                                         AccessLevelId = s.AccessLevelId,
+        //                                         AccessLevelName = s.AccessLevel.Name,
+        //                                         DepartmentId = s.DepartmentId,
+        //                                         DepartmentName = s.Department.Name,
+        //                                         ProfilePicture = s.ProfilePicture,
+        //                                         CreatedDate = s.CreatedDate,
+        //                                         UpdatedDate = s.UpdatedDate
+        //                                     })
+        //                                             .Skip(model.PageSize * (model.PageIndex - 0))
+        //                                             .Take(model.PageSize)
+        //                                             .ToList()
+        //                                 }).FirstOrDefaultAsync();
+
+
+        //    return new PagedResponse<List<GetStaffModel>>
+        //    {
+        //        Data = staffs?.Data ?? [],
+        //        HasNextPage = staffs?.TotalCount > (model.PageSize * model.PageIndex),
+        //        HasPreviousPage = model.PageIndex > 1,
+        //        TotalRecords = staffs == null ? 0 : staffs.TotalCount,
+        //        SearchString = model.SearchString,
+        //        PageSize = model.PageSize,
+        //        PageIndex = model.PageIndex,
+        //        Message = ResponseConstants.Success,
+        //        StatusCode = 200,
+        //    };
+        //}
 
         public async Task<ApiResponse> ApproveBadge(ApproveBadgeModel model)
         {
