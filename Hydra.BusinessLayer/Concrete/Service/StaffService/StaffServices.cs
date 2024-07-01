@@ -181,13 +181,17 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             staffQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
                          staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : staffQuery;
 
-            staffQuery = model.SortBy == (int)StaffSortBy.All ? staffQuery :
-                                         (model.SortBy == (int)StaffSortBy.Email ? staffQuery.OrderBy(x => x.Email) :
-                                         (model.SortBy == (int)StaffSortBy.UserName) ? staffQuery.OrderBy(x => x.UserName) : staffQuery.OrderByDescending(x => x.UpdatedDate));
+            staffQuery = model.SortBy == (int)StaffSortBy.All 
+                                         ? staffQuery.OrderByDescending(x => x.UpdatedDate) 
+                                         : (model.SortBy == (int)StaffSortBy.Email 
+                                         ? staffQuery.OrderBy(x => x.Email) 
+                                         : staffQuery.OrderBy(x => x.UserName));
 
-            staffQuery = model.Type == (int)StaffSortType.All ? staffQuery :
-                                       (model.Type == (int)StaffSortType.Archived ? staffQuery.Where(x => x.IsArchived) :
-                                       (model.Type == (int)StaffSortType.Active ? staffQuery.Where(x => x.IsArchived == false) : staffQuery));
+            staffQuery = model.Type == (int)StaffSortType.Archived 
+                       ? staffQuery.Where(x => x.IsArchived) 
+                       : (model.Type == (int)StaffSortType.Active 
+                       ? staffQuery.Where(x => x.IsArchived == false) 
+                       : staffQuery);
 
             var staffs = await staffQuery.GroupBy(x => 1)
                                          .Select(x => new PagedResponseOutput<List<GetStaffModel>>
