@@ -47,6 +47,18 @@ namespace Hydra.Common.Repository.Service
             return new(200, ResponseConstants.Success);
         }
 
+        public async Task<ApiResponse> SendStaffLoginCredential(string email, string name, string userName, string password)
+        {
+            string link = $"https://bfactory-react.vercel.app";
+            string template = await ReadTemplate(TemplateConstatnt.StaffLoginCredentialTemplate);
+            string content = template.Replace(ReplaceStringConstant.Link, link)
+                                     .Replace(ReplaceStringConstant.UserName, userName)
+                                     .Replace(ReplaceStringConstant.Password, password)
+                                     .Replace(ReplaceStringConstant.Name, name);
+            await SendMail(email, TemplateSubjectConstant.StaffLoginCredentialSubject, content);
+            return new(200, ResponseConstants.Success);
+        }
+
         public async Task<string> ReadTemplate(string templateName)
         {
             var pathToFile = $"{_environment.ContentRootPath}{Path.DirectorySeparatorChar}Templates{Path.DirectorySeparatorChar}{templateName}";

@@ -38,12 +38,13 @@ namespace Hydra.BusinessLayer.Repository.Service.DropDownService
                                                                   }).ToListAsync());
         }
 
-        public async Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers()
+        public async Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers(long departmentId)
         {
             return new(200, ResponseConstants.Success, await _unitOfWork.UserRepository
                                                                         .FindByCondition(x => x.IsActive &&
-                                                                       x.IsApproved &&
-                                                                       x.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
+                                                                                         x.IsApproved && x.AccessLevelId != (int) AccessLevelType.ViewOnly &&
+                                                                                         x.DepartmentId == departmentId &&
+                                                                                         x.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
                                                                         .Select(s => new UserDropDownModel
                                                                         {
                                                                             UserId = s.Id,

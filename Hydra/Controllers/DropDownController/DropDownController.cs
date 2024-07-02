@@ -25,12 +25,12 @@ namespace Hydra.Controllers.DropDownController
         }
 
         [HttpPost("[action]"), Authorize]
-        public async Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers()
+        public async Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers(long departmentId)
         {
             if (!ModelState.IsValid)
                 return new() { StatusCode = 400, Message = ResponseConstants.BadRequest };
 
-            return await _dropDownService.GetAllApprovalUsers();
+            return await _dropDownService.GetAllApprovalUsers(departmentId);
         }
 
         [HttpPost("[action]"), Authorize]

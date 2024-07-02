@@ -41,6 +41,9 @@ namespace Hydra.Common.Models
     {
         [JsonProperty("userId")]
         public long UserId { get; set; }
+
+        [JsonProperty("isApproved")]
+        public bool IsApproved { get; set; }
     }
 
     public class DeleteStaffModel

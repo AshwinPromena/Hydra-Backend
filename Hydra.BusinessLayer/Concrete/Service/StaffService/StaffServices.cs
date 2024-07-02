@@ -7,20 +7,26 @@ using Hydra.Database.Entities;
 using Hydra.DatbaseLayer.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System;
 
 namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 {
-    public class StaffServices(IUnitOfWork unitOfWork, IStorageService storageService, ICurrentUserService currentUserService) : IStaffService
+    public class StaffServices(IUnitOfWork unitOfWork, IStorageService storageService, ICurrentUserService currentUserService, IEmailService emailService) : EncryptionService, IStaffService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IStorageService _storageService = storageService;
         private readonly ICurrentUserService _currentUserService = currentUserService;
+        private readonly IEmailService _emailService = emailService;
+        private static Random random = new Random();
 
         public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
             var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive).FirstOrDefaultAsync();
             if (user != null)
                 return new(400, ResponseConstants.UserNameExists);
+
+            var password = GeneratePassword();
 
             user = new User
             {
@@ -30,12 +36,13 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 LastName = model.LastName,
                 MobileNumber = model.MobileNumber,
                 IsActive = true,
-                IsApproved = false,
+                IsApproved = true,
                 IsArchived = false,
                 AccessLevelId = model.AccessLevelId,
                 DepartmentId = model.DepartmentId,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
+                Password = Encipher(password)
             };
             user.UserRole.Add(new()
             {
@@ -47,8 +54,44 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
             await _unitOfWork.UserRepository.Create(user);
             await _unitOfWork.UserRepository.CommitChanges();
+            await _emailService.SendStaffLoginCredential(model.Email, $"{model.FirstName} {model.LastName}", model.UserName, password);
 
             return new(200, ResponseConstants.Success);
+        }
+
+        public static string GeneratePassword()
+        {
+            const string upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowerChars = "abcdefghijklmnopqrstuvwxyz";
+            const string digitChars = "0123456789";
+            const string specialChars = "!@#$%^&*()";
+            const string allChars = upperChars + lowerChars + digitChars + specialChars;
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(upperChars[random.Next(upperChars.Length)]);
+            sb.Append(lowerChars[random.Next(lowerChars.Length)]);
+            sb.Append(digitChars[random.Next(digitChars.Length)]);
+            sb.Append(specialChars[random.Next(specialChars.Length)]);
+
+            for (int i = 4; i < 8; i++)
+            {
+                sb.Append(allChars[random.Next(allChars.Length)]);
+            }
+            return Shuffle(sb.ToString());
+        }
+
+        private static string Shuffle(string str)
+        {
+            char[] array = str.ToCharArray();
+            for (int i = array.Length - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+            return new string(array);
         }
 
         public async Task<ApiResponse> UpdateStaff(UpdateStaffModel model)
@@ -69,6 +112,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             user.AccessLevelId = model.AccessLevelId;
             user.DepartmentId = model.DepartmentId;
             user.UpdatedDate = DateTime.UtcNow;
+            user.IsApproved = model.IsApproved;
 
             user.ProfilePicture = !string.IsNullOrEmpty(model.ProfilePicture)
                                            ? (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data

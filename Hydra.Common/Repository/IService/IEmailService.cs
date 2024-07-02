@@ -11,6 +11,8 @@ namespace Hydra.Common.Repository.IService
 
         Task<ApiResponse> SendMail(string email, string subject, string content, List<string> attachments = null);
 
+        Task<ApiResponse> SendStaffLoginCredential(string email, string name, string userName, string password);
+
         Task<string> ReadTemplate(string templateName);
     }
 }

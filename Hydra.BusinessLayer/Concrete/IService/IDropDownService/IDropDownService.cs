@@ -7,7 +7,7 @@ namespace Hydra.BusinessLayer.Repository.IService.IDropDownService
 
         Task<ServiceResponse<List<AccessLevelDropDownModel>>> GetAllAccessLevel();
 
-        Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers();
+        Task<ServiceResponse<List<UserDropDownModel>>> GetAllApprovalUsers(long departmentId);
 
         Task<PagedResponse<List<UserDropDownModel>>> GetLearnersForBadgeAssign(PagedResponseInput model, long? badgeId = null);
 

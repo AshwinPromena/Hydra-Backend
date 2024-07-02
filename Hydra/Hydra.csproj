@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\StaffLoginCredential.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\ContactSupport.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
