@@ -8,6 +8,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
 COPY --from=build-env /App/out .
 #COPY Hydra/Templates/PasswordResetOtp.html
+#COPY Hydra/Templates/StaffLoginCredential.html
 RUN ls
 ENTRYPOINT ["dotnet", "Hydra.dll"]
 EXPOSE 8080
