@@ -176,19 +176,16 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
         {
             model.SearchString = model.SearchString?.ToLower().Replace(" ", string.Empty) ?? string.Empty;
 
-            // Build the query with all conditions, sorting, and pagination in one go
             var staffQuery = _unitOfWork.UserRepository
                 .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff)
                 .AsQueryable();
 
-            // Apply filtering by search string
             if (!string.IsNullOrWhiteSpace(model.SearchString))
             {
                 staffQuery = staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty)
                     .ToLower().Replace(" ", string.Empty).Contains(model.SearchString));
             }
 
-            // Apply filtering by staff type
             if (model.Type == (int)StaffSortType.Archived)
             {
                 staffQuery = staffQuery.Where(x => x.IsArchived);
@@ -198,10 +195,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 staffQuery = staffQuery.Where(x => !x.IsArchived);
             }
 
-            // Get total record count
             var totalRecords = await staffQuery.CountAsync();
 
-            // Apply sorting
             staffQuery = model.SortBy switch
             {
                 (int)StaffSortBy.Email => staffQuery.OrderBy(x => x.Email),
@@ -209,9 +204,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 _ => staffQuery.OrderByDescending(x => x.UpdatedDate)
             };
 
-            // Apply pagination and projection
             var staffs = await staffQuery
-                .Skip(model.PageSize * (model.PageIndex - 1))
+                .Skip(model.PageSize * (model.PageIndex - 0))
                 .Take(model.PageSize)
                 .Select(s => new GetStaffModel
                 {
@@ -233,7 +227,6 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 })
                 .ToListAsync();
 
-            // Return paged response
             return new PagedResponse<List<GetStaffModel>>
             {
                 Data = staffs,
