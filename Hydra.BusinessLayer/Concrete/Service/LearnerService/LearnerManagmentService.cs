@@ -268,7 +268,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                             }).ToList(),
                                                                             ProfilePicture = s.ProfilePicture,
                                                                             LearnerId = s.LearnerId,
-                                                                            Active = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate >= DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
+                                                                            Active = s.LearnerBadge.Where(x =>  x.Badge.ExpirationDate >= DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
                                                                             Expiring = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate > DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
                                                                             Expired = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
                                                                             GetActiveCredentialModel = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow &&
