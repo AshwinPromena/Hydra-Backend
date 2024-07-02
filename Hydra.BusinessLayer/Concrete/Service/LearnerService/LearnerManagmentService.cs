@@ -168,7 +168,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
         }
 
         public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model)
-        {
+            {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
             var learnersQuery = _unitOfWork.UserRepository
@@ -176,11 +176,13 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             learnersQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
                             learnersQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                      (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : learnersQuery;
-            learnersQuery = model.Type == (int)GetLearnerType.All ?
-                            learnersQuery :
-                            (model.Type == (int)GetLearnerType.Assigned ?
-                                learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Count() > 0) :
-                                learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() == 0));
+
+            learnersQuery = model.Type == (int)GetLearnerType.All 
+                          ? learnersQuery 
+                          : (model.Type == (int)GetLearnerType.Assigned 
+                          ? learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Count() > 0) 
+                          : learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() == 0));
+
             learnersQuery = model.FromDate != null ? learnersQuery.Where(x => x.CreatedDate.Date >= model.FromDate.Value.Date) : learnersQuery;
             learnersQuery = model.ToDate != null ? learnersQuery.Where(x => x.CreatedDate.Date <= model.ToDate.Value.Date) : learnersQuery;
             var learners = await learnersQuery
@@ -199,7 +201,9 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                         Email2 = s.Email2,
                                                         Email3 = s.Email3,
                                                         MobileNumber = s.MobileNumber,
-                                                        LearnerBadgeModel = s.LearnerBadge.Select(s => new LearnerBadgeModel
+                                                        LearnerBadgeModel = s.LearnerBadge
+                                                                             .Where(a => a.IsActive)
+                                                                             .Select(s => new LearnerBadgeModel
                                                         {
                                                             BadgeId = s.BadgeId,
                                                             BadgeName = s.Badge.Name,
@@ -384,7 +388,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository
                                                     .FindByCondition(x => model.UserIds.Contains(x.UserId) &&
                                                     model.BadgeIds.Contains(x.BadgeId) && x.IsActive)
-                                                    .ToListAsync();
+                                            .ToListAsync();
 
             if (learnerWithBadge == null)
                 return new(400, ResponseConstants.InvalidBadgeId);
