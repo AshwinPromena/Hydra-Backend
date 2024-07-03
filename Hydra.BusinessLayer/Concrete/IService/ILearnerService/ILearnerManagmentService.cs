@@ -9,7 +9,7 @@ namespace Hydra.BusinessLayer.Repository.IService.ILearnerService
 
         Task<ServiceResponse<GetS3UrlModel>> DownloadSampleExcelFile();
 
-        Task<ApiResponse> AddLearner(AddLearnerModel model);
+        Task<ServiceResponse<long>> AddLearner(AddLearnerModel model);
 
         Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model);
 

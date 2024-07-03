@@ -34,7 +34,7 @@ namespace Hydra.Controllers.LearnerController
         }
 
         [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
-        public async Task<ApiResponse> AddLearner(AddLearnerModel model)
+        public async Task<ServiceResponse<long>> AddLearner(AddLearnerModel model)
         {
             if (!ModelState.IsValid)
                 return new(400, ResponseConstants.BadRequest);

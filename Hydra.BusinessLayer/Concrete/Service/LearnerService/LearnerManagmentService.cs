@@ -97,7 +97,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             }
         }
 
-        public async Task<ApiResponse> AddLearner(AddLearnerModel model)
+        public async Task<ServiceResponse<long>> AddLearner(AddLearnerModel model)
         {
             var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.Email == model.Email && x.IsActive).FirstOrDefaultAsync();
             if (verifyLearner != null)
@@ -122,7 +122,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             learner.ProfilePicture = (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data;
             await _unitOfWork.UserRepository.Create(learner);
             await _unitOfWork.UserRepository.CommitChanges();
-            return new(200, ResponseConstants.LearnerAdded);
+            return new(200, ResponseConstants.LearnerAdded, learner.Id);
         }
 
         public async Task<ServiceResponse<GetS3UrlModel>> DownloadSampleExcelFile()
@@ -168,7 +168,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
         }
 
         public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model)
-            {
+        {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
             var learnersQuery = _unitOfWork.UserRepository
@@ -177,10 +177,10 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                             learnersQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                      (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : learnersQuery;
 
-            learnersQuery = model.Type == (int)GetLearnerType.All 
-                          ? learnersQuery 
-                          : (model.Type == (int)GetLearnerType.Assigned 
-                          ? learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Count() > 0) 
+            learnersQuery = model.Type == (int)GetLearnerType.All
+                          ? learnersQuery
+                          : (model.Type == (int)GetLearnerType.Assigned
+                          ? learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive && x.IsRevoked == false).Count() > 0)
                           : learnersQuery.Where(x => x.LearnerBadge.Where(x => x.IsActive).Count() == 0));
 
             learnersQuery = model.FromDate != null ? learnersQuery.Where(x => x.CreatedDate.Date >= model.FromDate.Value.Date) : learnersQuery;
@@ -204,18 +204,18 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                         LearnerBadgeModel = s.LearnerBadge
                                                                              .Where(a => a.IsActive)
                                                                              .Select(s => new LearnerBadgeModel
-                                                        {
-                                                            BadgeId = s.BadgeId,
-                                                            BadgeName = s.Badge.Name,
-                                                            DepartmentId = s.Badge.DepartmentId,
-                                                            DepartmentName = s.Badge.Department.Name,
-                                                            IssuedDate = s.Badge.IssueDate,
-                                                            ExpirationDate = s.Badge.ExpirationDate,
-                                                            SequenceId = s.Badge.BadgeSequenceId,
-                                                            SequenceName = s.Badge.BadgeSequence.Name,
-                                                            BadgeTypeId = s.Badge.BadgeTypeId,
-                                                            BadgeTypeName = s.Badge.BadgeType.Name,
-                                                        }).ToList(),
+                                                                             {
+                                                                                 BadgeId = s.BadgeId,
+                                                                                 BadgeName = s.Badge.Name,
+                                                                                 DepartmentId = s.Badge.DepartmentId,
+                                                                                 DepartmentName = s.Badge.Department.Name,
+                                                                                 IssuedDate = s.Badge.IssueDate,
+                                                                                 ExpirationDate = s.Badge.ExpirationDate,
+                                                                                 SequenceId = s.Badge.BadgeSequenceId,
+                                                                                 SequenceName = s.Badge.BadgeSequence.Name,
+                                                                                 BadgeTypeId = s.Badge.BadgeTypeId,
+                                                                                 BadgeTypeName = s.Badge.BadgeType.Name,
+                                                                             }).ToList(),
                                                         ProfilePicture = s.ProfilePicture,
                                                         LearnerId = s.LearnerId,
                                                     })
@@ -268,7 +268,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                                                             }).ToList(),
                                                                             ProfilePicture = s.ProfilePicture,
                                                                             LearnerId = s.LearnerId,
-                                                                            Active = s.LearnerBadge.Where(x =>  x.Badge.ExpirationDate >= DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
+                                                                            Active = s.LearnerBadge.Where(x => x.Badge.ExpirationDate >= DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
                                                                             Expiring = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow && x.Badge.ExpirationDate > DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
                                                                             Expired = s.LearnerBadge.Where(x => x.Badge.ExpirationDate < DateTime.UtcNow && x.IsActive && x.IsRevoked == false).ToList().Count,
                                                                             GetActiveCredentialModel = s.LearnerBadge.Where(x => x.Badge.IssueDate <= DateTime.UtcNow &&
