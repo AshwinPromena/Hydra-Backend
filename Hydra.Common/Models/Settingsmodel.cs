@@ -36,5 +36,8 @@ namespace Hydra.Common.Models
 
         [JsonProperty("userRole")]
         public string UserRole { get; set; }
+
+        [JsonProperty("reason")]
+        public string Reason { get; set; }
     }
 }
