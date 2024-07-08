@@ -207,7 +207,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ApiResponse> ApproveStaffUser(long staffUserId)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == staffUserId).FirstOrDefaultAsync();
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == staffUserId && x.UserRole.FirstOrDefault().Role.Id == (long)Roles.Admin).FirstOrDefaultAsync();
             if (user is null)
                 return new(400, ResponseConstants.InvalidUserId);
             user.IsApproved = true;
