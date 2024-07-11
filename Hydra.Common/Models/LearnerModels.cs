@@ -209,7 +209,7 @@ namespace Hydra.Common.Models
         public DateTime IssuedDate { get; set; }
 
         [JsonProperty("expirationDate")]
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         [JsonProperty("sequenceId")]
         public long? SequenceId { get; set; }
@@ -241,7 +241,7 @@ namespace Hydra.Common.Models
         public DateTime IssuedDate { get; set; }
 
         [JsonProperty("expirationDate")]
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         [JsonProperty("sequenceId")]
         public long? SequenceId { get; set; }
@@ -273,7 +273,7 @@ namespace Hydra.Common.Models
         public DateTime IssuedDate { get; set; }
 
         [JsonProperty("expirationDate")]
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         [JsonProperty("sequenceId")]
         public long? SequenceId { get; set; }
@@ -338,7 +338,7 @@ namespace Hydra.Common.Models
         public DateTime IssuedDate { get; set; }
 
         [JsonProperty("expirationDate")]
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         [JsonProperty("sequenceId")]
         public long? SequenceId { get; set; }

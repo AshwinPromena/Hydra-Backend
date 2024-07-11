@@ -30,7 +30,7 @@ namespace Hydra.Database.Entities
         public DateTime IssueDate { get; set; }
 
         [Column("expiration_date")]
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         [Column("description")]
         public string Description { get; set; }

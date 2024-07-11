@@ -65,7 +65,7 @@ namespace Hydra.Common.Models
         public DateTime IssueDate { get; set; }
 
         [JsonProperty("expirationDate")]
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         [JsonProperty("departmentId")]
         public long DepartmentId { get; set; }
