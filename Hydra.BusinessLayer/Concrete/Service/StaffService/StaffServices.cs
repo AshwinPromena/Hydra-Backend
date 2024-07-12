@@ -226,8 +226,10 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
             if (!string.IsNullOrWhiteSpace(model.SearchString))
             {
-                staffQuery = staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty)
-                    .ToLower().Replace(" ", string.Empty).Contains(model.SearchString));
+                staffQuery = staffQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                   (x.UserName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                   (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                   (x.AccessLevel.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString));
             }
 
             if (model.Type == (int)StaffSortType.Archived)
