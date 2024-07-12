@@ -42,7 +42,12 @@ namespace Hydra.BusinessLayer.Concrete.Service.SettingsService
 
             userList = !string.IsNullOrWhiteSpace(model.SearchString) ?
                       userList.Where(x => (x.DeletedUserName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                          (x.DeletedUserEmail ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : userList;
+                                          (x.DeletedUserEmail ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                          (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                          (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                          (x.User.UserRole.FirstOrDefault().Role.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                          (x.Reason ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : userList;
+
 
             userList = model.TypeId == (long)DeletedUserOptions.All ? userList :
                        model.TypeId == (long)DeletedUserOptions.Learner ? userList.Where(x => x.User.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner) :
