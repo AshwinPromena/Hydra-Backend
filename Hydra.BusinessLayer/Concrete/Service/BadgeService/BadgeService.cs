@@ -221,7 +221,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                            badgesQuery.Where(x => (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                  (x.BadgeSequence.Name ?? string.Empty).ToLower().Replace(" ",string.Empty).Contains(model.SearchString)) : badgesQuery;
+                                                  (x.BadgeSequence.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                  (x.BadgeType.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : badgesQuery;
 
             badgesQuery = model.SortBy == (long)BadgeSortBy.All ? badgesQuery :
                           model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Badge).OrderByDescending(x => x.ExpirationDate) :
