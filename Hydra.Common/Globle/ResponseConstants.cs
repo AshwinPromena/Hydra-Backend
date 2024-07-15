@@ -88,5 +88,13 @@
         public const string LearnersRemoved = "Selected learners has been removed successfully";
         public const string LearnerUpdated = "Learner details updated successfully";
         #endregion
+
+        #region University Service Response
+        public const string UniversityExists = "University with this name already exists";
+        public const string UniversityUpdated = "University details has been updated successfully";
+        public const string UniversityAdded = "University details has been added successfully";
+        public const string UniversityDeleted = "University has been deleted";
+        public const string InvalidId = "Invalid university id";
+        #endregion
     }
 }
