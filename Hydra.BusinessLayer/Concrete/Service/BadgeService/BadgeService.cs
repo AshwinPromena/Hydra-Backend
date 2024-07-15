@@ -213,23 +213,34 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
         public async Task<PagedResponse<List<GetBadgeModel>>> GetAllBadges(GetAllBadgeInputModel model)
         {
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
+            string Approved = "approved";
+            string NotApproved = "notapproved";
 
-            var badgesQuery = _unitOfWork.BadgeRepository
+            var badgesQuery = await _unitOfWork.BadgeRepository
                                          .FindByCondition(x => x.IsActive)
                                          .Include(i => i.Department)
                                          .Include(i => i.BadgeType)
                                          .Include(i => i.BadgeSequence)
                                          .Include(i => i.ApprovalUser)
-                                         .ToList();
+                                         .ToListAsync();
+            if (model.SearchString.ToLower().Replace(" ", string.Empty) != Approved && model.SearchString.ToLower().Replace(" ", string.Empty) != NotApproved)
+            {
+                badgesQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
+                               badgesQuery.Where(x => (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                      (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                      (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                      (x.BadgeSequence?.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                      (x.BadgeType.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                      (x.IssueDate.ToString("dd-MM-yy").Contains(model.SearchString.Replace("/", "-")) ||
+                                                      (x.ExpirationDate.HasValue && x.ExpirationDate.Value.ToString("dd-MM-yy").Contains(model.SearchString.Replace("/", "-")))) ||
+                                                      (x.IsApproved)).ToList() : badgesQuery;
+            }
+            else
+            {
+                badgesQuery = badgesQuery.Where(x => model.SearchString.ToLower().Replace(" ", string.Empty) == Approved  ? x.IsApproved : x.IsApproved == false).ToList();
+            }
 
-            badgesQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
-                           badgesQuery.Where(x => (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                  (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                  (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                  (x.BadgeSequence?.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                  (x.BadgeType.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                  (x.IssueDate.ToString("yyyy-MM-dd").Contains(model.SearchString.Replace("/", "-")) ||
-                                                  (x.ExpirationDate.HasValue && x.ExpirationDate.Value.ToString("yyyy-MM-dd").Contains(model.SearchString.Replace("/", "-"))))).ToList() : badgesQuery;
+
 
             badgesQuery = model.SortBy == (long)BadgeSortBy.All ? badgesQuery :
                           model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Badge).OrderByDescending(x => x.ExpirationDate).ToList() :
@@ -250,9 +261,9 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                         BadgeName = b.Name,
                                                         BadgeDescription = b.Description,
                                                         DepartmentId = b.DepartmentId,
-                                                        DepartmentName = b.Department.Name,
+                                                        DepartmentName = b.Department?.Name,
                                                         BadgeSequenceId = b.BadgeSequenceId,
-                                                        BadgeSequenceName = b.BadgeSequence.Name,
+                                                        BadgeSequenceName = b.BadgeSequence?.Name,
                                                         IssueDate = b.IssueDate,
                                                         ExpirationDate = b.ExpirationDate,
                                                         IsApproved = b.IsApproved,
@@ -266,7 +277,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                                                                         (string.IsNullOrEmpty(b.ApprovalUser.LastName) ? "" : b.ApprovalUser.LastName)),
                                                         BadgeImage = b.Image,
                                                         BadgeTypeId = b.BadgeTypeId,
-                                                        BadgeTypeName = b.BadgeType.Name,
+                                                        BadgeTypeName = b.BadgeType?.Name,
                                                     })
                                                     .Skip(model.PageSize * (model.PageIndex - 0))
                                                     .Take(model.PageSize)
