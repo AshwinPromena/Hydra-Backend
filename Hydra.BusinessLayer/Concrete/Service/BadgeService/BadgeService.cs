@@ -215,23 +215,30 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
             var badgesQuery = _unitOfWork.BadgeRepository
-                                         .FindByCondition(x => x.IsActive);
+                                         .FindByCondition(x => x.IsActive)
+                                         .Include(i => i.Department)
+                                         .Include(i => i.BadgeType)
+                                         .Include(i => i.BadgeSequence)
+                                         .Include(i => i.ApprovalUser)
+                                         .ToList();
 
             badgesQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
                            badgesQuery.Where(x => (x.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Description ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                   (x.Department.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                  (x.BadgeSequence.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
-                                                  (x.BadgeType.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : badgesQuery;
+                                                  (x.BadgeSequence?.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                  (x.BadgeType.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
+                                                  (x.IssueDate.ToString("yyyy-MM-dd").Contains(model.SearchString.Replace("/", "-")) ||
+                                                  (x.ExpirationDate.HasValue && x.ExpirationDate.Value.ToString("yyyy-MM-dd").Contains(model.SearchString.Replace("/", "-"))))).ToList() : badgesQuery;
 
             badgesQuery = model.SortBy == (long)BadgeSortBy.All ? badgesQuery :
-                          model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Badge).OrderByDescending(x => x.ExpirationDate) :
-                          model.SortBy == (long)BadgeSortBy.Certificate ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Certificate).OrderByDescending(x => x.ExpirationDate) :
-                          model.SortBy == (long)BadgeSortBy.License ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.License).OrderByDescending(x => x.ExpirationDate) :
-                          model.SortBy == (long)BadgeSortBy.Miscellaneous ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Miscellaneous).OrderByDescending(x => x.ExpirationDate) :
-                          badgesQuery.OrderByDescending(x => x.ExpirationDate);
+                          model.SortBy == (long)BadgeSortBy.Badge ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Badge).OrderByDescending(x => x.ExpirationDate).ToList() :
+                          model.SortBy == (long)BadgeSortBy.Certificate ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Certificate).OrderByDescending(x => x.ExpirationDate).ToList() :
+                          model.SortBy == (long)BadgeSortBy.License ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.License).OrderByDescending(x => x.ExpirationDate).ToList() :
+                          model.SortBy == (long)BadgeSortBy.Miscellaneous ? badgesQuery.Where(x => x.BadgeTypeId == (long)BadgeSortBy.Miscellaneous).OrderByDescending(x => x.ExpirationDate).ToList() :
+                          badgesQuery.OrderByDescending(x => x.ExpirationDate).ToList();
 
-            var badges = await badgesQuery
+            var badges = badgesQuery
                                           .GroupBy(x => 1)
                                           .Select(x => new PagedResponseOutput<List<GetBadgeModel>>
                                           {
@@ -265,7 +272,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                     .Take(model.PageSize)
                                                     .ToList()
 
-                                          }).FirstOrDefaultAsync();
+                                          }).FirstOrDefault();
 
 
             return new PagedResponse<List<GetBadgeModel>>
