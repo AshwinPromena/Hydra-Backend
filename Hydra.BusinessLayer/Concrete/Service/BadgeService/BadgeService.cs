@@ -232,12 +232,11 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                                                       (x.BadgeSequence?.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                       (x.BadgeType.Name ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                       (x.IssueDate.ToString("dd-MM-yy").Contains(model.SearchString.Replace("/", "-")) ||
-                                                      (x.ExpirationDate.HasValue && x.ExpirationDate.Value.ToString("dd-MM-yy").Contains(model.SearchString.Replace("/", "-")))) ||
-                                                      (x.IsApproved)).ToList() : badgesQuery;
+                                                      (x.ExpirationDate.HasValue && x.ExpirationDate.Value.ToString("dd-MM-yy").Contains(model.SearchString.Replace("/", "-"))))).ToList() : badgesQuery;
             }
             else
             {
-                badgesQuery = badgesQuery.Where(x => model.SearchString.ToLower().Replace(" ", string.Empty) == Approved  ? x.IsApproved : x.IsApproved == false).ToList();
+                badgesQuery = badgesQuery.Where(x => model.SearchString.ToLower().Replace(" ", string.Empty) == Approved ? x.IsApproved : x.IsApproved == false).ToList();
             }
 
 
