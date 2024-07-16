@@ -145,6 +145,13 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 Type = (int)FieldType.Competencies,
                 TypeName = FieldType.Competencies.ToString()
             }));
+            if (model.DepartmentId == 0)
+            {
+                var department = new Department { Name = model.DepartmentName };
+                await _unitOfWork.DepartmentRepository.Create(department);
+                await _unitOfWork.DepartmentRepository.CommitChanges();
+                badge.DepartmentId = department.Id;
+            }
 
             badge.Image = !string.IsNullOrEmpty(model.BadgeImage)
                                            ? (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.BadgeImage)).Data
