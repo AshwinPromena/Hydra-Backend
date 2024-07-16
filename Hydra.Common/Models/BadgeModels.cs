@@ -90,6 +90,9 @@ namespace Hydra.Common.Models
 
         [JsonProperty("badgeTypeId")]
         public long BadgeTypeId { get; set; }
+
+        [JsonProperty("departmentName")]
+        public string DepartmentName { get; set; }
     }
 
     public class BadgeFieldModel
