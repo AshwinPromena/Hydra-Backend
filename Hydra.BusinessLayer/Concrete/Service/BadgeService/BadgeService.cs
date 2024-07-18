@@ -58,6 +58,17 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             if (badge != null)
                 return new(400, ResponseConstants.BadgeExists);
 
+            var verifyDepartment = await _unitOfWork.DepartmentRepository
+                                                    .FindByCondition(x => x.Id == model.DepartmentId)
+                                                    .FirstOrDefaultAsync();
+            if (verifyDepartment is null)
+            {
+                var department = new Department { Name = model.DepartmentName };
+                await _unitOfWork.DepartmentRepository.Create(department);
+                await _unitOfWork.DepartmentRepository.CommitChanges();
+                badge.DepartmentId = department.Id;
+            }
+
             badge = new()
             {
                 Name = model.BadgeName,
@@ -88,13 +99,6 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 Type = (int)FieldType.Competencies,
                 TypeName = FieldType.Competencies.ToString()
             }));
-            if (model.DepartmentId == 0)
-            {
-                var department = new Department { Name = model.DepartmentName };
-                await _unitOfWork.DepartmentRepository.Create(department);
-                await _unitOfWork.DepartmentRepository.CommitChanges();
-                badge.DepartmentId = department.Id;
-            }
 
             if (!string.IsNullOrEmpty(model.BadgeImage))
                 badge.Image = _storageService.UploadFile(ResponseConstants.Mediapath, model.BadgeImage).Result.Data;
