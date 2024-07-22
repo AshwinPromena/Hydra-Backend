@@ -4,7 +4,7 @@ namespace Hydra.BusinessLayer.Concrete.IService.IBadgeService
 {
     public interface IDepartmentServices
     {
-        Task<ApiResponse> AddDepartment(string departmentName);
+        Task<ServiceResponse<DepartmentIDModel>> AddDepartment(string departmentName);
 
         Task<ApiResponse> UpdateDepartment(int departmentId, string departmentName);
 

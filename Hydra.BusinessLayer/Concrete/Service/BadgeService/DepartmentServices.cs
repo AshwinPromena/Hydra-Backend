@@ -10,7 +10,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task<ApiResponse> AddDepartment(string departmentName)
+        public async Task<ServiceResponse<DepartmentIDModel>> AddDepartment(string departmentName)
         {
             var department = await _unitOfWork.DepartmentRepository.FindByCondition(x => x.Name.ToLower().Replace(" ", string.Empty).Equals(departmentName.ToLower().Replace(" ", string.Empty)) && x.IsActive).FirstOrDefaultAsync();
             if (department is not null)
@@ -22,7 +22,10 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             };
             await _unitOfWork.DepartmentRepository.Create(department);
             await _unitOfWork.DepartmentRepository.CommitChanges();
-            return new(200, ResponseConstants.DepartmentAdded);
+            return new(200, ResponseConstants.DepartmentAdded, new DepartmentIDModel
+            {
+                DepartmentId = department.Id,
+            });
         }
 
 

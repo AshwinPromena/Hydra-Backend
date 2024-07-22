@@ -13,10 +13,10 @@ namespace Hydra.Controllers.BadgeController
         private readonly IDepartmentServices _departmentServices = departmentServices;
 
         [HttpPost("[action]"), Authorize(Roles = "Admin, Staff")]
-        public async Task<ApiResponse> AddDepartment(string departmentName)
+        public async Task<ServiceResponse<DepartmentIDModel>> AddDepartment(string departmentName)
         {
             if (!ModelState.IsValid)
-                return new ApiResponse(400, ResponseConstants.BadRequest);
+                return new (400, ResponseConstants.BadRequest, null);
 
             return await _departmentServices.AddDepartment(departmentName);
         }

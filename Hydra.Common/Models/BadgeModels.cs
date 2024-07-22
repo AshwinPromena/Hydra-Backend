@@ -214,4 +214,11 @@ namespace Hydra.Common.Models
         [JsonProperty("badgePictureUrl")]
         public string BadgePictureUrl { get; set; }
     }
+
+
+    public class DepartmentIDModel
+    {
+        [JsonProperty("departmentId")]
+        public long DepartmentId { get; set; }
+    }
 }
