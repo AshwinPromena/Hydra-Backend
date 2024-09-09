@@ -6,7 +6,7 @@ namespace Hydra.BusinessLayer.Concrete.IService.IUniversityService
     {
         Task<ApiResponse> AddUniversity(AddUniversityModel model);
 
-        Task<ServiceResponse<List<GetUniversityByIdModel>>> GetUniversityById(long universityId);
+        Task<ServiceResponse<GetUniversityByIdModel>> GetUniversityById(long universityId);
 
         Task<PagedResponse<List<GetAllUniversityModel>>> GetAllUniversity(GetAllUniversityModel model);
 

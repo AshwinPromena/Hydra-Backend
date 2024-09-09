@@ -25,10 +25,10 @@ namespace Hydra.Controllers.UniversityController
 
 
         [HttpGet("[action]"), Authorize(Roles = "Admin , Staff")]
-        public async Task<ServiceResponse<List<GetUniversityByIdModel>>> GetUniversityById(long universityId)
+        public async Task<ServiceResponse<GetUniversityByIdModel>> GetUniversityById(long universityId)
         {
             if(universityId == 0)
-                return new(400, ResponseConstants.InvalidId);
+                return new(400, ResponseConstants.InvalidUniversityId);
 
             return await _universityService.GetUniversityById(universityId);
         }
@@ -55,7 +55,7 @@ namespace Hydra.Controllers.UniversityController
         public async Task<ApiResponse> DeleteUniversity(long universityId)
         {
             if (universityId == 0)
-                return new(400, ResponseConstants.InvalidId);
+                return new(400, ResponseConstants.InvalidUniversityId);
 
             return await _universityService.DeleteUniversity(universityId);
         }

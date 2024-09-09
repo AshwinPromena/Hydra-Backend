@@ -41,26 +41,22 @@ namespace Hydra.BusinessLayer.Concrete.Service.UniversityService
         }
 
 
-        public async Task<ServiceResponse<List<GetUniversityByIdModel>>> GetUniversityById(long universityId)
+        public async Task<ServiceResponse<GetUniversityByIdModel>> GetUniversityById(long universityId)
         {
-            var existingUniversity = await _unitOfWork.UniversityRepository
+            return new(200, ResponseConstants.Success ,await _unitOfWork.UniversityRepository
                                                       .FindByCondition(x =>
                                                      x.Id == universityId)
-                                                      .ToListAsync();
-
-            if (existingUniversity.Count() == 0)
-                return new(204, ResponseConstants.InvalidUserId);
-
-            return new(200, ResponseConstants.Success, existingUniversity.Select(s => new GetUniversityByIdModel
-            {
-                UniversityName = s.Name,
-                UniversityLogo = s.LogoUrl,
-                Color = s.Color,
-                IsActive = true,
-                CreatedDate = DateTime.UtcNow,
-                UpdatedDate = DateTime.UtcNow,
-                UniversityId = s.Id
-            }).ToList());
+                                                      .Select(s => new GetUniversityByIdModel
+                                                      {
+                                                          UniversityName = s.Name,
+                                                          UniversityLogo = s.LogoUrl,
+                                                          Color = s.Color,
+                                                          IsActive = s.IsActive,
+                                                          CreatedDate = s.CreatedDate,
+                                                          UpdatedDate = s.UpdatedDate,
+                                                          UniversityId = s.Id
+                                                      })
+                                                      .FirstOrDefaultAsync());
         }
 
 
