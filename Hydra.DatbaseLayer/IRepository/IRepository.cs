@@ -29,6 +29,4 @@ namespace Hydra.DatbaseLayer.IRepository
     public interface IDeletedUserRepository : ICommonRepository<DeletedUser> { }
 
     public interface IBadgeTypeRepository : ICommonRepository<BadgeType> { }
-
-    public interface IUniversityRepository : ICommonRepository<University> { }
 }
