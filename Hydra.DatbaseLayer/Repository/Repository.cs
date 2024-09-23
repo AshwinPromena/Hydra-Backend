@@ -30,6 +30,4 @@ namespace Hydra.DatbaseLayer.Repository
     public class DeletedUserRepository(HydraContext context) : CommonRepository<DeletedUser>(context), IDeletedUserRepository { }
 
     public class BadgeTypeRepository(HydraContext context) : CommonRepository<BadgeType>(context) , IBadgeTypeRepository { }
-
-    public class UniversityRepository(HydraContext context) : CommonRepository<University>(context), IUniversityRepository { }
 }

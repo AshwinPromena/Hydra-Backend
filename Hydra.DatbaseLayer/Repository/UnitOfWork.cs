@@ -34,7 +34,5 @@ namespace Hydra.DatbaseLayer.Repository
         public IDeletedUserRepository DeletedUserRepository => new DeletedUserRepository(_context);
 
         public IBadgeTypeRepository BadgeTypeRepository => new BadgeTypeRepository(_context);
-         
-        public IUniversityRepository UniversityRepository => new UniversityRepository(_context);
     }
 }
