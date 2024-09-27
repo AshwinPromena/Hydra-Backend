@@ -8,5 +8,6 @@
         public string Name { get; }
         public int RoleId { get; }
         public int AccessLevelId { get; }
+        public int UniversityId { get; }
     }
 }

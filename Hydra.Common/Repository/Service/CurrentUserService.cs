@@ -19,5 +19,7 @@ namespace Hydra.Common.Repository.Service
         public int RoleId => int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("roleId").Value);
 
         public int AccessLevelId => int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("accessLevelId").Value);
+
+        public int UniversityId => int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("universityId").Value);
     }
 }

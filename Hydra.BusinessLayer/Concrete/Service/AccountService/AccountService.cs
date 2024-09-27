@@ -221,7 +221,8 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                     new("accessLevel", $"{appUser.AccessLevel.Name}"),
                     new("departmentId", $"{appUser.DepartmentId}"),
                     new("department",$"{appUser.Department?.Name}"),
-                    new("profilePicture",$"{appUser.ProfilePicture}")
+                    new("profilePicture",$"{appUser.ProfilePicture}"),
+                    new("universityId", $"{appUser.UniversityId}")
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

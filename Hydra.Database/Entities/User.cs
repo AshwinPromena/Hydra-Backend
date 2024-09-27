@@ -86,6 +86,9 @@ namespace Hydra.Database.Entities
         [Column("updated_date")]
         public DateTime UpdatedDate { get; set; } = DateTime.UtcNow;
 
+        [Column("university_id")]
+        public long UniversityId { get; set; }
+
         [InverseProperty("User")]
         public virtual ICollection<UserRole> UserRole { get; set; }
 
