@@ -31,6 +31,20 @@ namespace Hydra.Database.Entities
                 IsApproved = true,
                 CreatedDate = Date,
                 UpdatedDate = Date
+            },
+            new User
+            {
+                Id = 2,
+                FirstName = "SuperAdmin",
+                LastName = "",
+                UserName = "SuperAdmin",
+                Email = "superadmin@yopmail.com",
+                Password = "3AhCUZedQxVLajDQSZhRirNTvEyK/luGud/X7oAXJX0=",
+                AccessLevelId = 3,
+                IsActive = true,
+                IsApproved = true,
+                CreatedDate = Date,
+                UpdatedDate = Date
             });
         }
 
@@ -40,13 +54,15 @@ namespace Hydra.Database.Entities
             new Role { Id = 1, Name = "Admin" },
             new Role { Id = 2, Name = "UniversityAdmin" },
             new Role { Id = 3, Name = "Staff" },
-            new Role { Id = 4, Name = "Learner" });
+            new Role { Id = 4, Name = "Learner" },
+            new Role { Id = 5, Name = "Super Admin" });
         }
 
         public static void SeedUserRoleMasterData(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserRole>().HasData(
-            new UserRole { Id = 1, UserId = 1, RoleId = 1 });
+            new UserRole { Id = 1, UserId = 1, RoleId = 1 },
+            new UserRole { Id = 224, UserId = 2, RoleId = 5 });
         }
 
         public static void SeedAccessLevelMasterData(ModelBuilder modelBuilder)
