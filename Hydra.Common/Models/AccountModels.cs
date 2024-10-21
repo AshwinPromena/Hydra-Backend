@@ -47,6 +47,10 @@ namespace Hydra.Common.Models
         [Required(ErrorMessage = "Password is required.")]
         [RegularExpression("^(?!\\s*$).+", ErrorMessage = "password cannot be empty.")]
         public string Password { get; set; }
+
+        [JsonProperty("loginType")]
+        [Required(ErrorMessage = "Login type is required.")]
+        public int LoginType { get; set; }
     }
 
     public class LoginResponse
@@ -60,6 +64,10 @@ namespace Hydra.Common.Models
         [JsonProperty("userName")]
         [Required(ErrorMessage = "UesrName is required.")]
         public string UserName { get; set; }
+
+        [JsonProperty("loginType")]
+        [Required(ErrorMessage = "Login type is required.")]
+        public int LoginType { get; set; }
     }
 
     public class ResetPasswordModel

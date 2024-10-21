@@ -72,6 +72,9 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             if (Encipher(model.Password) != user.Password)
                 return new(400, ResponseConstants.InvalidPassword);
 
+            if (user.UserRole.FirstOrDefault().Role.LoginType != model.LoginType)
+                return new(400, ResponseConstants.ApplicationForbiddenError);
+
             return new(200, ResponseConstants.Success, new LoginResponse
             {
                 AccessToken = AccessToken(user),
@@ -86,9 +89,15 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                                        x.IsActive && x.IsApproved)
                                         .Include(x => x.Verification)
                                         .Include(x => x.PasswordResetToken)
+                                        .Include(x => x.UserRole)
+                                        .ThenInclude(x => x.Role)
                                         .FirstOrDefaultAsync();
             if (user == null)
                 return new(400, ResponseConstants.InvalidUserName);
+
+            if (user.UserRole.FirstOrDefault().Role.LoginType != model.LoginType)
+                return new(400, ResponseConstants.LoginTypeMismatchError);
+
             try
             {
                 var token = new PasswordResetToken

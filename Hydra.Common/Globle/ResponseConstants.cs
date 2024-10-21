@@ -32,6 +32,8 @@
         public const string NotApproved = "Account still not approved";
         public const string InvalidToken = "Invalid password reset token or token expired";
         public const string TokenExpired = "Token has been expired";
+        public const string ApplicationForbiddenError = "You are not supposed to login here";
+        public const string LoginTypeMismatchError = "Invalid login type";
 
         #endregion
 

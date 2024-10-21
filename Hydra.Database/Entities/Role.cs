@@ -21,5 +21,8 @@ namespace Hydra.Database.Entities
 
         [InverseProperty("Role")]
         public virtual ICollection<UserRole> UserRole { get; set; }
+
+        [Column("login_type")]
+        public int LoginType { get; set; }
     }
 }
