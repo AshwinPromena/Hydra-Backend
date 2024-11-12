@@ -79,7 +79,8 @@ namespace Hydra.Database.Entities
             new BadgeType { Id = 1, Name = "Badge" },
             new BadgeType { Id = 2, Name = "Certificate" },
             new BadgeType { Id = 3, Name = "License" },
-            new BadgeType { Id = 4, Name = "Miscellaneous" });
+            new BadgeType { Id = 4, Name = "Miscellaneous" },
+            new BadgeType { Id = 5, Name = "Marksheet" });
         }
     }
 }
