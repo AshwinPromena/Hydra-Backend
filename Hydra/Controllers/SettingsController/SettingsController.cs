@@ -12,7 +12,7 @@ namespace Hydra.Controllers.SettingsController
     {
         private readonly ISettingsService _settingsService = settingsService;
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<ApiResponse> ChangePassword(ChangePasswordModel model)
         {
             if (!ModelState.IsValid)
@@ -21,7 +21,7 @@ namespace Hydra.Controllers.SettingsController
             return await _settingsService.ChangePassword(model);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<PagedResponse<List<GetAllDeletedUserModel>>> GetAllDeletedUser(GetAllDeletedUserInputModel model)
         {
             return await _settingsService.GetAllDeletedUser(model);

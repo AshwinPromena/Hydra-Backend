@@ -14,13 +14,13 @@ namespace Hydra.Controllers.BadgeController
         private readonly IBadgeService _badgeService = badgeService;
         private static List<int> ParseRole = [];
 
-        [HttpGet("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpGet("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<ServiceResponse<BadgeFactoryDashBoardModel>> BadgeFactoryDashBoard()
         {
             return await _badgeService.BadgeFactoryDashBoard();
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<ApiResponse> AddBadge(AddBadgeModel model)
         {
             if (!ModelState.IsValid)
@@ -29,7 +29,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.AddBadge(model);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<ApiResponse> UpdateBadge(UpdateBadgeModel model)
         {
             if (!ModelState.IsValid)
@@ -38,7 +38,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.UpdateBadge(model);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<ApiResponse> DeleteBadge(DeleteBadgeModel model)
         {
             if (!ModelState.IsValid)
@@ -47,7 +47,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.DeleteBadge(model);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<ServiceResponse<GetBadgeModel>> GetBadgeById(long badgeId)
         {
             if (!ModelState.IsValid)
@@ -56,7 +56,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.GetBadgeById(badgeId);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<PagedResponse<List<GetBadgeModel>>> GetAllBadges(GetAllBadgeInputModel model)
         {
             if (!ModelState.IsValid)
@@ -65,7 +65,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.GetAllBadges(model);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<ServiceResponse<List<NotApprovedBadgeModel>>> AssignBadges(AssignBadgeModel model)
         {
             if (!ModelState.IsValid)
@@ -74,7 +74,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.AssignBadges(model);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<PagedResponse<List<GetBadgeModel>>> GetUnApprovedBadges(GetUnApprovedBadgeInputModel model)
         {
             if (!ModelState.IsValid)
@@ -83,7 +83,7 @@ namespace Hydra.Controllers.BadgeController
             return await _badgeService.GetUnApprovedBadges(model);
         }
 
-        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff")]
+        [HttpPost("[action]"), Authorize(Roles = "Admin , Staff , UniversityAdmin")]
         public async Task<PagedResponse<List<GetBadgePicturesModel>>> GetBadgePictures(PagedResponseInput model)
         {
             if (!ModelState.IsValid)
