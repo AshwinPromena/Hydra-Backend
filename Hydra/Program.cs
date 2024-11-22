@@ -95,7 +95,8 @@ builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
         "http://hydra-react.vercel.app",
         "https://bfactory-react.vercel.app",
         "http://bfactory-react.vercel.app",
-        "https://development3.promena.in")
+        "https://development3.promena.in",
+        "https://main.d1iewvn4bp0hu3.amplifyapp.com")
         .SetIsOriginAllowedToAllowWildcardSubdomains()
         .AllowCredentials();
 }));
