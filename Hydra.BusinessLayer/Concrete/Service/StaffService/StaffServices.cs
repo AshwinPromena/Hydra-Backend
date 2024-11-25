@@ -23,7 +23,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
         public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
             var universityId = _currentUserService.UniversityId;
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.UniversityId == model.UniversityId).FirstOrDefaultAsync();
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.UniversityId == universityId).FirstOrDefaultAsync();
             if (user != null)
                 return new(400, ResponseConstants.UserNameExists);
 
@@ -99,7 +99,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
         public async Task<ApiResponse> UpdateStaff(UpdateStaffModel model)
         {
             var universityId = _currentUserService.UniversityId;
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == model.UserId && x.IsActive && x.UniversityId == model.UniversityId).FirstOrDefaultAsync();
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == model.UserId && x.IsActive && x.UniversityId == universityId).FirstOrDefaultAsync();
             if (user == null)
                 return new ApiResponse(404, ResponseConstants.InvalidUserId);
 
