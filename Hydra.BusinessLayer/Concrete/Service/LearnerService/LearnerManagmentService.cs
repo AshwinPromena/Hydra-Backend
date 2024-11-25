@@ -25,9 +25,11 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ServiceResponse<LearnerDashBoardModel>> LearnerDashBoard()
         {
+            var universityId = _currentUserService.UniversityId;
             var learnerCount = await _unitOfWork.UserRepository
                                                 .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner &&
-                                                                      x.IsActive)
+                                                                      x.IsActive &&
+                                                                      x.UniversityId == universityId)
                                                 .Include(i => i.LearnerBadge)
                                                 .ThenInclude(ti => ti.Badge)
                                                 .Select(x => new
@@ -55,7 +57,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLeraner(List<AddLearnerModel> model)
         {
-            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(l => model.Select(s => s.Email).Contains(l.Email)).Select(s => s.Email).ToListAsync();
+            var universityId = _currentUserService.UniversityId;
+            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(l => model.Select(s => s.Email).Contains(l.Email) && l.UniversityId == universityId).Select(s => s.Email).ToListAsync();
             var newLearners = model.Where(data => !verifyLearner.Contains(data.Email)).ToList();
             if (verifyLearner.Count > 0)
             {
@@ -81,6 +84,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                         MobileNumber = user.MobileNumber,
                         IsApproved = true,
                         LearnerId = user.LearnerId,
+                        UniversityId = universityId,
                         UserRole = new List<UserRole>
                         {
                             new UserRole
@@ -99,6 +103,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ServiceResponse<long>> AddLearner(AddLearnerModel model)
         {
+            var universityId = _currentUserService.UniversityId;
             var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.Email == model.Email && x.IsActive).FirstOrDefaultAsync();
             if (verifyLearner != null)
                 return new(400, ResponseConstants.LearnerExists);
@@ -113,6 +118,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 MobileNumber = model.MobileNumber,
                 IsApproved = true,
                 LearnerId = model.LearnerId,
+                UniversityId = universityId,
             };
             learner.UserRole.Add(new()
             {
@@ -169,10 +175,11 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<PagedResponse<List<GetLearnerModel>>> GetAllLearners(GetAllLearnerInputModel model)
         {
+            var universityId = _currentUserService.UniversityId; 
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
             var learnersQuery = _unitOfWork.UserRepository
-                                        .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner);
+                                        .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner && x.UniversityId == universityId);
             learnersQuery = !string.IsNullOrWhiteSpace(model.SearchString) ?
                             learnersQuery.Where(x => (x.FirstName + x.LastName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||
                                                      (x.Email ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString)) : learnersQuery;
@@ -241,8 +248,9 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ServiceResponse<GetLearnerByIdModel>> GetLearnerById(long userId)
         {
+            var universityId = _currentUserService.UniversityId;
             return new(200, ResponseConstants.Success, await _unitOfWork.UserRepository
-                                                                        .FindByCondition(x => x.Id == userId && x.IsActive)
+                                                                        .FindByCondition(x => x.Id == userId && x.IsActive && x.UniversityId == universityId)
                                                                         .Select(s => new GetLearnerByIdModel
                                                                         {
                                                                             UserId = s.Id,
@@ -326,7 +334,8 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ApiResponse> UpdateLearner(UpdateLearnerModel model)
         {
-            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == model.UserId).FirstOrDefaultAsync();
+            var universityId = _currentUserService.UniversityId;
+            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == model.UserId && x.UniversityId == universityId).FirstOrDefaultAsync();
 
             if (verifyLearner == null)
                 return new(400, ResponseConstants.InvalidUserId);
@@ -362,11 +371,13 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ApiResponse> RevokeBadgeFromLearner(RevokeBadgeModel model)
         {
+            var universityId = _currentUserService.UniversityId;
             var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository
                                                     .FindByCondition(x => model.UserIds.Contains(x.UserId) &&
                                                    x.User.IsActive &&
                                                model.BadgeIds.Contains(x.BadgeId) &&
-                                                   x.IsRevoked == false)
+                                                   x.IsRevoked == false &&
+                                                   x.User.UniversityId == universityId)
                                                     .ToListAsync();
             if (learnerWithBadge == null)
                 return new(400, ResponseConstants.InvalidBadgeId);
@@ -385,9 +396,11 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ApiResponse> RemoveBadge(RemoveBadgeModel model)
         {
+            var universityId = _currentUserService.UniversityId;
             var learnerWithBadge = await _unitOfWork.LearnerBadgeRepository
                                                     .FindByCondition(x => model.UserIds.Contains(x.UserId) &&
-                                                    model.BadgeIds.Contains(x.BadgeId) && x.IsActive)
+                                                    model.BadgeIds.Contains(x.BadgeId) && x.IsActive &&
+                                                        x.User.UniversityId == universityId)
                                             .ToListAsync();
 
             if (learnerWithBadge == null)
@@ -407,9 +420,11 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
         public async Task<ApiResponse> RemoveLearners(List<RemoveLearnerModel> model)
         {
+            var universityId = _currentUserService.UniversityId;
             var learners = await _unitOfWork.UserRepository
                                             .FindByCondition(x => model.Select(s => s.UserIds).Contains(x.Id) &&
-                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner)
+                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Learner &&
+                                           x.UniversityId == universityId)
                                             .Include(i => i.DeletedUser).AsNoTracking()
                                             .ToListAsync();
 
@@ -437,6 +452,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                             DeletedDate = currentDate,
                             DeletedUserName = $"{learner.FirstName} {learner.LastName}",
                             DeletedUserEmail = learner.Email,
+                            DeletedUserUniversityId = universityId
                         });
                     }
                 }

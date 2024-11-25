@@ -37,5 +37,8 @@ namespace Hydra.Database.Entities
 
         [Column("deleted_date")]
         public DateTime DeletedDate { get; set; }
+
+        [Column("deleted_user_university_id")]
+        public long DeletedUserUniversityId { get; set; }
     }
 }

@@ -35,6 +35,10 @@ namespace Hydra.Common.Models
         [Required(ErrorMessage = "Password is required.")]
         [RegularExpression("^(?!\\s*$).+", ErrorMessage = "password cannot be empty.")]
         public string Password { get; set; }
+
+        [JsonProperty("universityId")]
+        [Required(ErrorMessage = "University id is required.")]
+        public long UniversityId { get; set; }
     }
 
     public class LoginModel

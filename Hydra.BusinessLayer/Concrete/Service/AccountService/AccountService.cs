@@ -43,6 +43,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
                 DepartmentId = model.DepartmentId,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
+                UniversityId = model.UniversityId,
             };
             user.UserRole.Add(new()
             {

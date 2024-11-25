@@ -36,9 +36,10 @@ namespace Hydra.BusinessLayer.Concrete.Service.SettingsService
 
         public async Task<PagedResponse<List<GetAllDeletedUserModel>>> GetAllDeletedUser(GetAllDeletedUserInputModel model)
         {
+            var universityId = _currentUserService.UniversityId;
             model.SearchString = model.SearchString.ToLower().Replace(" ", string.Empty);
 
-            var userList = _unitOfWork.DeletedUserRepository.FindByCondition(x => x.Id > 0);
+            var userList = _unitOfWork.DeletedUserRepository.FindByCondition(x => x.Id > 0 && x.User.UniversityId == universityId);
 
             userList = !string.IsNullOrWhiteSpace(model.SearchString) ?
                       userList.Where(x => (x.DeletedUserName ?? string.Empty).ToLower().Replace(" ", string.Empty).Contains(model.SearchString) ||

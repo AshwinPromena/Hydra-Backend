@@ -39,5 +39,8 @@ namespace Hydra.Common.Models
 
         [JsonProperty("reason")]
         public string Reason { get; set; }
+
+        [JsonProperty("universityId")]
+        public long? UniversityId { get; set; }
     }
 }

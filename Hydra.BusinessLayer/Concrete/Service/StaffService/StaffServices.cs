@@ -22,7 +22,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ApiResponse> AddStaff(AddStaffModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive).FirstOrDefaultAsync();
+            var universityId = _currentUserService.UniversityId;
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Equals(model.UserName.ToLower()) && x.IsActive && x.UniversityId == model.UniversityId).FirstOrDefaultAsync();
             if (user != null)
                 return new(400, ResponseConstants.UserNameExists);
 
@@ -42,7 +43,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                 DepartmentId = model.DepartmentId,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
-                Password = Encipher(password)
+                Password = Encipher(password),
+                UniversityId = universityId,
             };
             user.UserRole.Add(new()
             {
@@ -96,7 +98,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ApiResponse> UpdateStaff(UpdateStaffModel model)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == model.UserId && x.IsActive).FirstOrDefaultAsync();
+            var universityId = _currentUserService.UniversityId;
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == model.UserId && x.IsActive && x.UniversityId == model.UniversityId).FirstOrDefaultAsync();
             if (user == null)
                 return new ApiResponse(404, ResponseConstants.InvalidUserId);
 
@@ -113,6 +116,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
             user.DepartmentId = model.DepartmentId;
             user.UpdatedDate = DateTime.UtcNow;
             user.IsApproved = model.IsApproved;
+            user.UniversityId = universityId;
 
             user.ProfilePicture = !string.IsNullOrEmpty(model.ProfilePicture)
                                            ? (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data
@@ -126,9 +130,11 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ApiResponse> DeleteStaff(List<DeleteStaffModel> model)
         {
+            var universityId = _currentUserService.UniversityId;
             var userList = await _unitOfWork.UserRepository
                                             .FindByCondition(x => model.Select(s => s.UserIds).Contains(x.Id) &&
-                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff)
+                                           x.UserRole.FirstOrDefault().RoleId == (int)Roles.Staff &&
+                                           x.UniversityId == universityId)
                                             .Include(i => i.DeletedUser).AsNoTracking()
                                             .ToListAsync();
 
@@ -154,6 +160,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
                         DeletedDate = currentDate,
                         DeletedUserName = $"{staff.FirstName} {staff.LastName}",
                         DeletedUserEmail = staff.Email,
+                        DeletedUserUniversityId = staff.UniversityId,
                     });
                 }
             }
@@ -165,7 +172,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ApiResponse> ArchivedStaffs(ArchiveStaffModel model)
         {
-            var userList = await _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && model.UserIds.Contains(x.Id)).ToListAsync();
+            var universityId = _currentUserService.UniversityId;
+            var userList = await _unitOfWork.UserRepository.FindByCondition(x => x.IsActive && model.UserIds.Contains(x.Id) && x.UniversityId == universityId).ToListAsync();
 
             foreach (var staff in userList)
             {
@@ -180,7 +188,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ServiceResponse<GetStaffModel>> GetStaffById(long userId)
         {
-            var staff = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == userId && x.IsActive)
+            var universityId = _currentUserService.UniversityId;
+            var staff = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == userId && x.IsActive && x.UniversityId == universityId)
                                                         .Select(s => new GetStaffModel()
                                                         {
                                                             UserId = s.Id,
@@ -207,7 +216,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<ApiResponse> ApproveStaffUser(long staffUserId)
         {
-            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == staffUserId && x.UserRole.FirstOrDefault().Role.Id == (long)Roles.Admin).FirstOrDefaultAsync();
+            var universityId = _currentUserService.UniversityId;
+            var user = await _unitOfWork.UserRepository.FindByCondition(x => x.Id == staffUserId && x.UserRole.FirstOrDefault().Role.Id == (long)Roles.Admin && x.UniversityId == universityId).FirstOrDefaultAsync();
             if (user is null)
                 return new(400, ResponseConstants.InvalidUserId);
             user.IsApproved = true;
@@ -218,10 +228,11 @@ namespace Hydra.BusinessLayer.Concrete.Service.StaffService
 
         public async Task<PagedResponse<List<GetStaffModel>>> GetAllStaff(GetAllStaffInputModel model)
         {
+            var universityId = _currentUserService.UniversityId;
             model.SearchString = model.SearchString?.ToLower().Replace(" ", string.Empty) ?? string.Empty;
 
             var staffQuery = _unitOfWork.UserRepository
-                .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff)
+                .FindByCondition(x => x.IsActive && x.UserRole.FirstOrDefault().RoleId == (long)Roles.Staff && x.UniversityId == universityId)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(model.SearchString))
