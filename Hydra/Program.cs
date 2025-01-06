@@ -1,6 +1,8 @@
+using Hydra.BusinessLayer.Concrete.IService;
 using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
 using Hydra.BusinessLayer.Concrete.IService.ISettingsService;
 using Hydra.BusinessLayer.Concrete.IService.IStaffService;
+using Hydra.BusinessLayer.Concrete.Service;
 using Hydra.BusinessLayer.Concrete.Service.BadgeService;
 using Hydra.BusinessLayer.Concrete.Service.SettingsService;
 using Hydra.BusinessLayer.Concrete.Service.StaffService;
@@ -117,6 +119,7 @@ builder.Services.AddScoped<IBadgeService, BadgeService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
+builder.Services.AddScoped<IContactSupportFormService, ContactSupportFormService>();
 
 builder.Services.AddSwaggerGen();
 

@@ -29,5 +29,7 @@
         IDeletedUserRepository DeletedUserRepository { get; }
 
         IBadgeTypeRepository BadgeTypeRepository { get; }
+
+        IContactSupportFormRepository ContactSupportFormRepository { get; }
     }
 }

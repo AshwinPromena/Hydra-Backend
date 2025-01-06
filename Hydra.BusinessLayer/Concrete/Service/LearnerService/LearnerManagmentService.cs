@@ -1,4 +1,5 @@
-﻿using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Hydra.BusinessLayer.Concrete.IService.IBadgeService;
 using Hydra.BusinessLayer.Repository.IService.ILearnerService;
 using Hydra.Common.Globle;
 using Hydra.Common.Globle.Enum;
@@ -15,7 +16,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                                          IReportService reportService,
                                          IBadgeService badgeService,
                                          IStorageService storageService,
-                                         ICurrentUserService currentUserService) : ILearnerManagmentService
+                                         ICurrentUserService currentUserService) :EncryptionService ,ILearnerManagmentService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IReportService _reportService = reportService;
@@ -58,7 +59,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
         public async Task<ServiceResponse<List<ExistingLearnerModel>>> BatchUploadLeraner(List<AddLearnerModel> model)
         {
             var universityId = _currentUserService.UniversityId;
-            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(l => model.Select(s => s.Email).Contains(l.Email) && l.UniversityId == universityId).Select(s => s.Email).ToListAsync();
+            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(l => model.Select(s => s.Email.ToLower().Replace(" ", string.Empty)).Contains(l.UserName.ToLower().Replace(" ", string.Empty))).Select(s => s.Email).ToListAsync();
             var newLearners = model.Where(data => !verifyLearner.Contains(data.Email)).ToList();
             if (verifyLearner.Count > 0)
             {
@@ -91,7 +92,10 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                             {
                                  RoleId = (long)Roles.Learner,
                             }
-                        }
+                        },
+                        AccessLevelId = (int)AccessLevelType.ViewEditAndDelete,
+                        UserName = user.Email,
+                        Password = Encipher(GeneratePassword())
                     };
                     learners.Add(newUser);
                 }
@@ -104,7 +108,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
         public async Task<ServiceResponse<long>> AddLearner(AddLearnerModel model)
         {
             var universityId = _currentUserService.UniversityId;
-            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.Email == model.Email && x.IsActive).FirstOrDefaultAsync();
+            var verifyLearner = await _unitOfWork.UserRepository.FindByCondition(x => x.UserName.ToLower().Replace(" ", string.Empty) == model.Email.ToLower().Replace(" ", string.Empty)).FirstOrDefaultAsync();
             if (verifyLearner != null)
                 return new(400, ResponseConstants.LearnerExists);
 
@@ -119,13 +123,16 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
                 IsApproved = true,
                 LearnerId = model.LearnerId,
                 UniversityId = universityId,
+                AccessLevelId = (int)AccessLevelType.ViewEditAndDelete,
+                UserName = model.Email,
+                Password = Encipher(GeneratePassword())
             };
             learner.UserRole.Add(new()
             {
                 RoleId = (long)Roles.Learner,
                 UserId = learner.Id,
             });
-            learner.ProfilePicture = (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data;
+            learner.ProfilePicture = string.IsNullOrEmpty(model.ProfilePicture) ? null : (await _storageService.UploadFile(FileExtentionService.GetMediapath(), model.ProfilePicture)).Data;
             await _unitOfWork.UserRepository.Create(learner);
             await _unitOfWork.UserRepository.CommitChanges();
             return new(200, ResponseConstants.LearnerAdded, learner.Id);
@@ -342,7 +349,7 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
 
             verifyLearner.FirstName = model.FirstName;
             verifyLearner.LastName = model.LastName;
-            verifyLearner.Email = model.Email;
+            //verifyLearner.Email = model.Email;
             verifyLearner.Email2 = model.Email2;
             verifyLearner.Email3 = model.Email3;
             verifyLearner.LearnerId = model.LearnerId;
@@ -462,6 +469,33 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             await _unitOfWork.UserRepository.CommitChanges();
 
             return new(200, ResponseConstants.LearnersRemoved);
+        }
+
+        public static string GeneratePassword()
+        {
+            const string numbers = "0123456789";
+            const string specialChars = "@#$";
+            const string upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string lowerCase = "abcdefghijklmnopqrstuvwxyz";
+
+            Random random = new Random();
+
+            string result = new string(
+                Enumerable.Range(0, 2).Select(_ => numbers[random.Next(numbers.Length)]).ToArray()
+            ) +
+            new string(
+                Enumerable.Range(0, 2).Select(_ => specialChars[random.Next(specialChars.Length)]).ToArray()
+            ) +
+            new string(
+                Enumerable.Range(0, 2).Select(_ => upperCase[random.Next(upperCase.Length)]).ToArray()
+            ) +
+            new string(
+                Enumerable.Range(0, 2).Select(_ => lowerCase[random.Next(lowerCase.Length)]).ToArray()
+            );
+
+            result = new string(result.ToCharArray().OrderBy(_ => random.Next()).ToArray());
+
+            return result;
         }
     }
 }

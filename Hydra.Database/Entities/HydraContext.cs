@@ -30,6 +30,8 @@ namespace Hydra.Database.Entities
 
         public virtual DbSet<BadgeType> BadgeType { get; set; }
 
+        public virtual DbSet<ContactSupportForm> ContactSupportForm { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.SeedData();
