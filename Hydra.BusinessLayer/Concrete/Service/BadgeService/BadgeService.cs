@@ -139,6 +139,8 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             badge.ApprovalUserId = model.ApprovalUserId;
             badge.UpdatedDate = DateTime.UtcNow;
             badge.BadgeTypeId = model.BadgeTypeId;
+            badge.UniversityId = _currentUserService.UniversityId;
+
 
             var badgeFieldsList = await _unitOfWork.BadgeFieldRepository.FindByCondition(x => x.BadgeId == model.BadgeId).ToListAsync();
             _unitOfWork.BadgeFieldRepository.DeleteRange(badgeFieldsList);
@@ -235,7 +237,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
             string NotApproved = "notapproved";
 
             var badgesQuery = await _unitOfWork.BadgeRepository
-                                         .FindByCondition(x => x.IsActive)
+                                         .FindByCondition(x => x.IsActive && x.UniversityId == _currentUserService.UniversityId)
                                          .Include(i => i.Department)
                                          .Include(i => i.BadgeType)
                                          .Include(i => i.BadgeSequence)
