@@ -20,7 +20,8 @@ jobs:
     - name: Install AWS CLI
       run: |
         sudo apt-get update
-        sudo apt-get install -y awscli
+        sudo apt-get install snapd
+        sudo snap install aws-cli --classic
 
     - name: Configure AWS credentials
       run: |
