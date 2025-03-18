@@ -40,11 +40,3 @@ jobs:
 
     - name: Push Docker image to AWS ECR
       run: docker push 622556412541.dkr.ecr.us-east-1.amazonaws.com/hydra-dotnet:latest
-
-    - name: Redeploy Latest Image in AWS Lightsail
-      run: |
-        aws lightsail create-container-service-deployment --service-name hydra-dotnet-service --containers '{
-          "hydra-dotnet": {
-            "image": "622556412541.dkr.ecr.us-east-1.amazonaws.com/hydra-dotnet:latest"
-          }
-        }'
