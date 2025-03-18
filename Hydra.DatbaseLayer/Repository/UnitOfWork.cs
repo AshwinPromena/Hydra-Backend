@@ -22,7 +22,7 @@ namespace Hydra.DatbaseLayer.Repository
         public IBadgeSequenceRepository BadgeSequenceRepository => new BadgeSequenceRepository(_context);
 
         public IBadgeRepository BadgeRepository => new BadgeRepository(_context);
-
+        
         public IBadgeFieldRepository BadgeFieldRepository => new BadgeFieldRepository(_context);
 
         public ILearnerBadgeRepository LearnerBadgeRepository => new LearnerBadgeRepository(_context);

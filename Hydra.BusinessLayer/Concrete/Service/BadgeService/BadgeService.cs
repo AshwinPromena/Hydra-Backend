@@ -19,18 +19,24 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
 
         public async Task<ServiceResponse<BadgeFactoryDashBoardModel>> BadgeFactoryDashBoard()
         {
-            var userBadge = await _unitOfWork.BadgeRepository.FindByCondition(x => x.Id > 0).ToListAsync();
-            var badgeType = await _unitOfWork.LearnerBadgeRepository.FindByCondition(x => x.IsActive).Include(i => i.Badge).ToListAsync();
+            var userBadge = await _unitOfWork.BadgeRepository.FindByCondition(x => x.UniversityId == _currentUserService.UniversityId).ToListAsync();
+            var badgeType = await _unitOfWork.LearnerBadgeRepository
+                                            .FindByCondition(x => x.IsActive)
+                                            .Include(i => i.Badge) // Correct way to include related entity
+                                            .Where(v => v.User.UniversityId == _currentUserService.UniversityId) // Apply filtering separately
+                                            .ToListAsync();
             var learnerCount = await _unitOfWork.UserRepository
-                                                .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner &&
-                                                                      x.IsActive)
-                                                .Select(x => new
-                                                {
-                                                    x.Id,
-                                                    badgeCount = x.LearnerBadge.Where(x => x.IsActive).Count(),
-                                                    x.CreatedDate,
-                                                })
-                                                .ToListAsync();
+                                     .FindByCondition(x => x.UserRole.FirstOrDefault().RoleId == (long)Roles.Learner &&
+                                                           x.UniversityId == _currentUserService.UniversityId &&
+                                                           x.IsActive)  
+                                     .Select(x => new
+                                     {
+                                         x.Id,
+                                         badgeCount = x.LearnerBadge.Count(b => b.IsActive),  
+                                         x.CreatedDate,
+                                     })
+                                     .ToListAsync();
+
             return new(200, ResponseConstants.Success, new BadgeFactoryDashBoardModel()
             {
                 TotalCredentials = userBadge.Count,
@@ -84,6 +90,7 @@ namespace Hydra.BusinessLayer.Concrete.Service.BadgeService
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
                 BadgeTypeId = model.BadgeTypeId,
+                UniversityId= _currentUserService.UniversityId
             };
             model.LearningOutcomes.ForEach(x => badge.BadgeField.Add(new()
             {

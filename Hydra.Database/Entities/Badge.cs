@@ -74,6 +74,10 @@ namespace Hydra.Database.Entities
         [InverseProperty("Badge")]
         public virtual BadgeType BadgeType { get; set; }
 
+        [Column("university_id")]
+        public long? UniversityId { get; set; }
+
+
         [InverseProperty("Badge")]
         public virtual ICollection<BadgeField> BadgeField { get; set; }
 
