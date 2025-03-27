@@ -3,7 +3,7 @@ name: Docker Image Build and Test
 on:
   push:
     branches:
-      - main  # Adjust branch name as needed
+      - production  # Adjust branch name as needed
 
 jobs:
   build_and_test:
