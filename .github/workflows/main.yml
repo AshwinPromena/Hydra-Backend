@@ -30,13 +30,19 @@ jobs:
         aws configure set default.region us-east-1
 
     - name: Build Docker image
-      run: docker build -t hydra-dotnet .
+      run: docker build -t hydra-prod .
 
     - name: AWS ECR Login
       run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 622556412541.dkr.ecr.us-east-1.amazonaws.com
 
     - name: Tag Docker image
-      run: docker tag hydra-dotnet:latest 622556412541.dkr.ecr.us-east-1.amazonaws.com/hydra-dotnet:latest
+      run: docker tag hydra-prod:latest 622556412541.dkr.ecr.us-east-1.amazonaws.com/hydra-prod:latest
+
 
     - name: Push Docker image to AWS ECR
-      run: docker push 622556412541.dkr.ecr.us-east-1.amazonaws.com/hydra-dotnet:latest
+      run: docker push 622556412541.dkr.ecr.us-east-1.amazonaws.com/hydra-prod:latest
+
+    - name: Update ECS service
+      run: |
+        aws ecs update-service --cluster velocity --service hydra-service --force-new-deployment
+
