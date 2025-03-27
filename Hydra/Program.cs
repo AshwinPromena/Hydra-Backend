@@ -81,6 +81,8 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
+
 
 
 builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
@@ -158,6 +160,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/");
+
 
 app.Run();
 
