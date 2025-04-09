@@ -42,7 +42,7 @@ jobs:
       run: docker push 622556412541.dkr.ecr.us-east-1.amazonaws.com/hydra-cf:latest
 
     - name: Update ECS service
-      run: aws ecs update-service --cluster velocity --service hydra-service-03 --force-new-deployment
+      run: aws ecs update-service --cluster velocity --service hydra-service-04 --force-new-deployment
 
     
 
