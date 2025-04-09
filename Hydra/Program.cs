@@ -99,7 +99,8 @@ builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
         "http://bfactory-react.vercel.app",
         "https://development3.promena.in",
         "https://prod-main.d11hhm7l7lsk42.amplifyapp.com",
-        "https://api.intellicampus.com",
+        "https://api.intellicampus.com", 
+        "https://intellilink.intellicampus.com",
         "https://main.d1iewvn4bp0hu3.amplifyapp.com")
         .SetIsOriginAllowedToAllowWildcardSubdomains()
         .AllowCredentials();
