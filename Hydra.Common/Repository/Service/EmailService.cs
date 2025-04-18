@@ -16,7 +16,7 @@ namespace Hydra.Common.Repository.Service
 
         public async Task<ApiResponse> SendPasswordResetLink(string email, long userId, string userName, string token)
         {
-            string Link = $"https://bfactory-react.vercel.app//otpverification?userId={userId}&token={token}";
+            string Link = $"https://intellilink.intellicampus.com///otpverification?userId={userId}&token={token}";
             string template = await ReadTemplate(TemplateConstatnt.PasswordResetLink);
             string content = template.Replace(ReplaceStringConstant.Link, Link)
                                      .Replace(ReplaceStringConstant.UserName, userName);
@@ -49,7 +49,7 @@ namespace Hydra.Common.Repository.Service
 
         public async Task<ApiResponse> SendStaffLoginCredential(string email, string name, string userName, string password)
         {
-            string link = $"https://bfactory-react.vercel.app";
+            string link = $"https://intellilink.intellicampus.com";
             string template = await ReadTemplate(TemplateConstatnt.StaffLoginCredentialTemplate);
             string content = template.Replace(ReplaceStringConstant.Link, link)
                                      .Replace(ReplaceStringConstant.UserName, userName)
