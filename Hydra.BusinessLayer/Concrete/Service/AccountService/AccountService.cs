@@ -70,7 +70,7 @@ namespace Hydra.BusinessLayer.Repository.Service.AccountService
             if (!user.IsApproved)
                 return new(400, ResponseConstants.NotApproved);
 
-            if (Encipher(model.Password) != user.Password)
+            if (Encipher(model.Password)!= user.Password)
                 return new(400, ResponseConstants.InvalidPassword);
 
             if (user.UserRole.FirstOrDefault().Role.LoginType != model.LoginType)
