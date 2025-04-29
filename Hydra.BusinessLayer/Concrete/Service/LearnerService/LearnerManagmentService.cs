@@ -144,13 +144,27 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             {
                 new SampleExcelDataModel
                 {
+                    StudentId = "SID001",
                     FirstName = "Mary",
                     LastName = "Johnson",
+                    StudentEmail = "maryjohnson@yopmail.com",
+                    DegreeName = "B.Sc. Computer Science",
+                    CredentialType = "Degree",
+                    RegistrationMonth = "July",
+                    RegistrationYear = "12/6/2026",
+                    StartMonth = "August",
+                    StartYear = "12/6/2026",
+                    ConferredMonth = "May",
+                    ConferredYear = "12/6/2026",
+                    StudentName = "Mary J.",
+                    PrincipalSign = "Dr. Smith",
+                    StudentUSN = "USN123456",
+                    FullName = "Mary Johnson",
                     Email = "maryjohnson@yopmail.com",
                     Email2 = "johson@yopmail.com",
                     Email3 = "mary@yopmail.com",
-                    MobileNumber ="(555) 123-4567",
-                    LearnerId = "AD1234",
+                    MobileNumber = "(555) 123-4567",
+                    LearnerId = "AD1234"
                 }
             };
             List<Dictionary<string, string>> convertedList = new List<Dictionary<string, string>>();
@@ -158,7 +172,6 @@ namespace Hydra.BusinessLayer.Repository.Service.LearnerService
             foreach (var order in data)
             {
                 Dictionary<string, string> convertedDict = new Dictionary<string, string>();
-
                 var orderProperties = order.GetType().GetProperties();
                 foreach (var prop in orderProperties)
                 {
